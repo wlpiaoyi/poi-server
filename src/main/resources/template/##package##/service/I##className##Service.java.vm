@@ -1,0 +1,19 @@
+package ##package##.service;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import service.com.filling.module.poi.IBaseService;
+import ##package##.entity.##className##;
+import ##package##.vo.##className##Vo;
+import ##package##.ro.##className##Ro;
+
+
+/**
+ * {@code @author:} 		##author##
+ * {@code @description:} 	##tableComment## 服务类接口
+ * {@code @date:} 			##createTime##
+ * {@code @version:}: 		##version##
+ */
+public interface I##className##Service extends IBaseService<##className##> {
+
+
+}

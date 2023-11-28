@@ -1,0 +1,46 @@
+package ##package##.ro;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+##/*import*/##
+
+/**
+ * {@code @author:} 		##author##
+ * {@code @description:} 	##tableComment## 请求包装类
+ * {@code @date:} 			##createTime##
+ * {@code @version:}: 		##version##
+ */
+public class ##className##Ro {
+    @Data
+    @ApiModel("##tableComment## 请求实例")
+	public static class Query extends request.tools.com.filling.module.poi.Query{
+		@JsonSerialize(using = ToStringSerializer.class)
+		@ApiModelProperty("主键id")
+		@TableId(value = "id", type = IdType.ASSIGN_ID)
+		private Long id;
+		<foreach-column>
+		/** ##columnComment## **/
+		##propertyAnnotationst##
+		private ##propertyType## ##propertyName##;
+    	</foreach-column>
+    }
+
+    @Data
+    @ApiModel("##tableComment## 请求实例")
+    public static class Submit{
+		@JsonSerialize(using = ToStringSerializer.class)
+		@ApiModelProperty("主键id")
+		@TableId(value = "id", type = IdType.ASSIGN_ID)
+		private Long id;
+		<foreach-column>
+		/** ##columnComment## **/
+		##propertyAnnotationst##
+		private ##propertyType## ##propertyName##;
+    	</foreach-column>
+    }
+}
