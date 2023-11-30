@@ -3,7 +3,10 @@ package com.filling.module.poi.excel.service.impl;
 import com.filling.framework.common.tools.ValueUtils;
 import com.filling.framework.common.exception.BusinessException;
 import com.filling.module.poi.excel.domain.entity.CellData;
+import com.filling.module.poi.excel.domain.entity.ExcelData;
 import com.filling.module.poi.excel.domain.entity.SheetData;
+import com.filling.module.poi.excel.domain.vo.CellDataVo;
+import com.filling.module.poi.excel.domain.wrapper.BaseWrapper;
 import com.filling.module.poi.excel.service.ICellDataService;
 import com.filling.module.poi.service.impl.BaseMongoServiceImpl;
 import com.mongodb.bulk.BulkWriteResult;
@@ -40,18 +43,36 @@ public class CellDataServiceImpl extends BaseMongoServiceImpl<CellData> implemen
     }
 
     @Override
+    public CellData insert(CellData entity, String collectionName) {
+        throw new BusinessException("不支持的方法");
+    }
+
+    @Override
+    public Collection<CellData> insertBatch(List<CellData> entities, String collectionName) {
+        for (CellData cellData : entities){
+            if(cellData.getId() == null){
+                cellData.setId(ObjectId.get());
+            }
+        }
+        List<CellData> iEntities = BaseWrapper.parseList(entities, CellData.class);
+        return super.insertBatch(iEntities, collectionName);
+    }
+
+    @Override
     public UpdateResult update(CellData entity, String collectionName) {
         throw new BusinessException("不支持的方法");
     }
 
     @Override
     public BulkWriteResult updateBatch(List<CellData> entities, String collectionName) {
-        throw new BusinessException("不支持的方法");
+        List<CellData> iEntities = BaseWrapper.parseList(entities, CellData.class);
+        return super.updateBatch(iEntities, collectionName);
     }
 
     @Override
     public UpdateResult update(CellData entity, int randomTag) {
-        return super.update(entity, SheetData.cellDataCollectionName(randomTag));
+        CellData iEntity = BaseWrapper.parseOne(entity, CellData.class);
+        return super.update(iEntity, SheetData.cellDataCollectionName(randomTag));
     }
 
     @Override
@@ -87,7 +108,7 @@ public class CellDataServiceImpl extends BaseMongoServiceImpl<CellData> implemen
             }
         }
         if(ValueUtils.isNotBlank(updates)){
-            super.updateBatch(updates, SheetData.cellDataCollectionName(randomTag));
+            this.updateBatch(updates, SheetData.cellDataCollectionName(randomTag));
         }
         if(ValueUtils.isNotBlank(adds)){
             super.insertBatch(adds, SheetData.cellDataCollectionName(randomTag));

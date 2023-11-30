@@ -9,6 +9,7 @@ import com.filling.module.poi.excel.domain.model.CellValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Update;
@@ -43,25 +44,18 @@ public class CellData extends BaseMongoEntity {
         }
         return this.c + "_" + this.r;
     }
+
     public void synKey(int offc, int offr){
         this.c = offc + this.c;
         this.r = offr + this.r;
     }
-
-    /**
-     * 生成Id
-     * @return
-     */
-    public ObjectId createId() {
-        if(ValueUtils.isNotBlank(super.getId())){
-            return super.getId();
-        }
-        if(ValueUtils.isBlank(this.getSheetId())){
+    public String hexId(){
+        if(this.getId() == null){
             return null;
         }
-        this.setId(new ObjectId(this.getSheetId() + "00000" + ValueUtils.bytesToHex(ValueUtils.toBytes(this.c)) + "00000" + ValueUtils.bytesToHex(ValueUtils.toBytes(this.r))));
-        return super.getId();
+        return this.getId().toHexString();
     }
+
 
     /** 列 **/
     @Schema(description =  "列")
@@ -90,6 +84,16 @@ public class CellData extends BaseMongoEntity {
 
     @Schema(description =  "拓展数据")
     private String cellBlob;
+
+
+    @SneakyThrows
+    public <T extends CellData> T copyOnlyMainData(Class<T> clazz){
+        T obj = clazz.newInstance();
+        obj.setR(this.getR());
+        obj.setC(this.getC());
+        obj.setId(this.getId());
+        return obj;
+    }
 
     public Update parseForUpdate(Update update){
         update = super.parseForUpdate(update);
@@ -120,7 +124,7 @@ public class CellData extends BaseMongoEntity {
      * 纵向排序
      * @param cellDatas
      */
-    public static void sortCellDataV(List<CellData> cellDatas){
+    public static <E extends CellData>  void sortCellDataV(List<E> cellDatas){
         cellDatas.sort((o1, o2) -> sortCellDataV(o1, o2));
 
     }
@@ -144,7 +148,7 @@ public class CellData extends BaseMongoEntity {
      * 横向排序
      * @param cellDatas
      */
-    public static void sortCellDataH(List<CellData> cellDatas){
+    public static <E extends CellData> void sortCellDataH(List<E> cellDatas){
         cellDatas.sort((o1, o2) -> sortCellDataH(o1, o2));
     }
     public static int sortCellDataH(CellData o1, CellData o2){

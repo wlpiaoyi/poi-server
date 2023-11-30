@@ -41,6 +41,10 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
     @Autowired(required = false)
     protected MongoTemplate baseTemplate;
 
+    public M findOne(ObjectId id, String collectionName){
+        return this.baseTemplate.findOne(new Query(Criteria.where("_id").is(id)), this.currentModelClass(), collectionName);
+    }
+
 
     @Override
     public List<M> queryList(Criteria criteria, String collectionName) {
@@ -103,7 +107,7 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
         if(ValueUtils.isBlank(entity.getId())){
             throw new BusinessException("更新数据Id不能为空");
         }
-        Criteria criteria = Criteria.where("id").is(entity.getId());
+        Criteria criteria = Criteria.where("_id").is(entity.getId());
         Update update = entity.parseForUpdate(null);
         return this.baseTemplate.updateFirst(new Query(criteria), update, collectionName);
     }
@@ -119,8 +123,9 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
     }
 
     @Override
-    public DeleteResult removeBatch(List<ObjectId> ids, String collectionName) {
-        Criteria criteria = Criteria.where("id").in(ids);
-        return this.baseTemplate.remove(new Query(criteria));
+    public long removeBatch(List<ObjectId> ids, String collectionName) {
+        Criteria criteria = Criteria.where("_id").in(ids);
+        DeleteResult res = this.baseTemplate.remove(new Query(criteria), collectionName);
+        return res.getDeletedCount();
     }
 }

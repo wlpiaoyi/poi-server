@@ -1,6 +1,5 @@
-package com.filling.module.poi.excel.domain.model;
+package com.filling.module.poi.tools.excel;
 
-import com.filling.module.poi.tools.utils.excel.IGridInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -14,7 +13,7 @@ import java.util.List;
  */
 @Data
 @Schema(description =  "网格信息")
-public class GridInfo implements IGridInfo {
+public class GridInfo{
     /** 行高 **/
     @Schema(description =  "行高")
     private List<Short> rowHeights;
@@ -33,7 +32,19 @@ public class GridInfo implements IGridInfo {
     /** 隐藏列 **/
     @Schema(description =  "隐藏列")
     private List<Integer> hiddenColumns;
-    /** 边框信息 **/
-    @Schema(description =  "边框信息")
-    private String borderInfo;
+    /** 合并单元格 **/
+    @Schema(description =  "合并单元格")
+    private List<Scope> cellMerges;
+    /** 单元格样式 **/
+    @Schema(description =  "单元格样式")
+    private List<DataStyle> dataStyles;
+//    /** 边框信息 **/
+//    @Schema(description =  "边框信息")
+//    private List<BorderInfo> borderInfos;
+
+
+
+
+
+
 }

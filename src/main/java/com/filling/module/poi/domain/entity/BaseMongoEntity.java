@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -67,9 +68,10 @@ public class BaseMongoEntity extends BaseEntity{
 
     public Update parseForUpdate(Update update){
         if(update == null){
-            update = Update.update("id", this.getId());
+            update = Update.update("_id", this.getId());
         }
-        update.set("updateTime", new Update());
+        this.setUpdateTime(new Date());
+        update.set("updateTime", this.getUpdateTime());
         return update;
     }
 }

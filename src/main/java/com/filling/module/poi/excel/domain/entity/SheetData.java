@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.domain.entity.BaseMongoEntity;
-import com.filling.module.poi.excel.domain.model.GridInfo;
+import com.filling.module.poi.tools.excel.GridInfo;
+import com.filling.module.poi.tools.excel.Scope;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -81,14 +82,6 @@ public class SheetData extends BaseMongoEntity {
     /** 数据验证 **/
     @Schema(description =  "数据验证")
     private String dataVerification;
-
-    public String synCellDataCollectionName(int randomTag){
-        if(this.randomTag == null || this.randomTag <= 0){
-            this.randomTag = createRandomTag();
-        }
-        return cellDataCollectionName(randomTag);
-    }
-
 
     public static String cellDataCollectionName(int randomTag){
         if(randomTag < 10){

@@ -5,7 +5,6 @@ import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.excel.domain.entity.ExcelData;
 import com.filling.module.poi.excel.domain.vo.ExcelDataVo;
 import com.filling.module.poi.excel.service.IExcelDataService;
-import com.filling.module.poi.tools.Condition;
 import com.filling.module.poi.tools.response.R;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,10 +45,20 @@ public class ExcelDataController {
     @GetMapping("/detail")
     @ApiOperationSupport(order = 1)
     @Operation(summary ="详情")
-    public R<ExcelDataVo> detail(@RequestParam String hexId) {
+    public R<ExcelDataVo> detail(@RequestParam(name = "id") String hexId) {
         ObjectId objId = new ObjectId(hexId);
         ExcelDataVo excelData = this.excelDataService.detail(objId);
         return R.success(excelData);
+    }
+
+    @SneakyThrows
+    @PostMapping("/save")
+    @ApiOperationSupport(order = 2)
+    @Operation(summary ="新增Excel")
+    @ResponseBody
+    public R save(@RequestBody ExcelDataVo body) {
+        this.excelDataService.insert(body, ExcelData.collectionName());
+        return R.success(body);
     }
 
     @SneakyThrows
@@ -57,12 +66,29 @@ public class ExcelDataController {
     @ApiOperationSupport(order = 2)
     @Operation(summary ="上传Excel")
     @ResponseBody
-    public R uploadExcel(@RequestParam("file") MultipartFile file) {
+    public R uploadExcel(@RequestParam("file") MultipartFile file,
+                         @RequestParam(name = "id", required = false) String excelId) {
         String[] args = file.getOriginalFilename().split("\\.");
-        ExcelDataVo excelData =  this.excelDataService.getExcelDataByInputStream(file.getInputStream(), args[args.length - 1]);
-        excelData.setName(file.getName());
-        this.excelDataService.insert(excelData, ExcelData.getCollectionName());
+        ExcelDataVo excelData =  this.excelDataService.getExcelDataByInputStream(file.getInputStream(),
+                args[args.length - 1],
+                ValueUtils.isNotBlank(excelId) ? new ObjectId(excelId) : null);
+        excelData.setName(args[0]);
+        if(excelData.getId() != null){
+            this.excelDataService.update(excelData, ExcelData.collectionName());
+        }else{
+            this.excelDataService.insert(excelData, ExcelData.collectionName());
+        }
         return R.success(excelData);
+    }
+
+    @SneakyThrows
+    @PostMapping("/update")
+    @ApiOperationSupport(order = 2)
+    @Operation(summary ="修改Excel")
+    @ResponseBody
+    public R update(@RequestBody ExcelDataVo body) {
+        this.excelDataService.update(body, ExcelData.collectionName());
+        return R.success(body);
     }
 
     @GetMapping("/downloadExcel")
@@ -92,6 +118,6 @@ public class ExcelDataController {
         for(String hexId : hexIds.split(",")){
             objIds.add(new ObjectId(hexId));
         }
-        return R.success(excelDataService.removeBatch(objIds, ExcelData.getCollectionName()));
+        return R.success(excelDataService.removeBatch(objIds, ExcelData.collectionName()));
     }
 }

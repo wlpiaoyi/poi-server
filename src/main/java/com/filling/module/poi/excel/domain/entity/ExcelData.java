@@ -1,13 +1,6 @@
 package com.filling.module.poi.excel.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.domain.entity.BaseMongoEntity;
-import com.filling.module.poi.tools.utils.excel.IExcelData;
-import com.filling.module.poi.tools.utils.excel.ISheetData;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +8,6 @@ import lombok.experimental.Accessors;
 import org.springframework.data.mongodb.core.query.Update;
 
 import javax.validation.constraints.NotBlank;
-import java.util.List;
 
 
 /**
@@ -30,7 +22,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class ExcelData extends BaseMongoEntity {
 
-    public static String getCollectionName(){
+    public static String collectionName(){
         return "poi_excel_data";
     }
     public Update parseForUpdate(Update update){

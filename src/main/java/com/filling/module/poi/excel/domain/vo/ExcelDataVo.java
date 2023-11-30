@@ -4,9 +4,10 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.excel.domain.entity.ExcelData;
 import com.filling.module.poi.excel.domain.entity.SheetData;
-import com.filling.module.poi.tools.utils.excel.IExcelData;
-import com.filling.module.poi.tools.utils.excel.ISheetData;
+import com.filling.module.poi.tools.excel.IExcelData;
+import com.filling.module.poi.tools.excel.ISheetData;
 import lombok.Data;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
@@ -17,16 +18,28 @@ import java.util.List;
  * {@code @version:}:       1.0
  */
 @Data
-public class ExcelDataVo extends ExcelData  implements IExcelData {
+public class ExcelDataVo<S extends SheetDataVo> extends ExcelData  implements IExcelData {
 
     @TableField(exist = false)
-    private List<SheetDataVo> sheetDatas;
+    private List<S> sheetDatas;
 
     public void clearDb(){
         super.clearDb();
         if(ValueUtils.isNotBlank(this.getSheetDatas())){
             for (SheetData sheetData : this.getSheetDatas()){
                 sheetData.clearDb();
+            }
+        }
+    }
+
+    public void setAllId(){
+        if(this.getId() == null){
+            this.setId(ObjectId.get());
+        }
+        if(ValueUtils.isNotBlank(this.getSheetDatas())){
+            for (SheetDataVo sheetData : this.getSheetDatas()){
+                sheetData.setExcelId(this.getId());
+                sheetData.setAllId();
             }
         }
     }

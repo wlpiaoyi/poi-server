@@ -81,48 +81,17 @@ public class FormHeadVo extends FormHead {
         this.childrenHeads = null;
         this.parentHead = null;
     }
-    public static void checkData(List<FormHead> formHeads){
-        Byte direction = null;
-        Set<String> columnCodeSet = new HashSet<>(formHeads.size());
-        for (FormHead formHead : formHeads){
-            if(formHead.getDirection() == null){
-                continue;
-            }
-            if(formHead.getDataType() == null){
-                continue;
-            }
-            if(direction == null){
-                direction = formHead.getDirection();
-            }
-            if(direction.byteValue() != formHead.getDirection().byteValue()){
-                throw new BusinessException("数据表头类型所在方向必须一致");
-            }
-            if(ValueUtils.isBlank(formHead.getColumnCode())){
-                if(formHead instanceof FormHeadVo){
-                    ((FormHeadVo) formHead).resetColumnCode();
-                }
-                throw new BusinessException("表单列名不能为空");
-            }
-            if(columnCodeSet.contains(formHead.getColumnCode())){
-                throw new BusinessException("表单列名重复:" + formHead.getProperty());
-            }
-            columnCodeSet.add(formHead.getColumnCode());
-        }
-        if(direction == null){
-            throw new BusinessException("没有设置数据表头类型");
-        }
-    }
 
-    public static void checkDatas(Collection<FormHeadVo> formHeads){
-        Set<String> columnSet = new HashSet<>();
-        for (FormHeadVo formHead : formHeads){
+    public static <T extends FormHead> void checkDatas(List<T> formHeads){
+        Set<String> columnSet = new HashSet<>(formHeads.size());
+        Set<String> propertySet = new HashSet<>(formHeads.size());
+        for (FormHead formHead : formHeads){
             if(ValueUtils.isBlank(formHead.getFormId())){
                 throw new BusinessException("formId不能为空");
             }
             if(formHead.getLocation() == null){
                 throw new BusinessException("cellData不能为空");
             }
-
             if(ValueUtils.isBlank(formHead.getDirection())){
                 throw new BusinessException("direction不能为空");
             }
@@ -133,17 +102,30 @@ public class FormHeadVo extends FormHead {
                 throw new BusinessException("字段不能为空");
             }
             if (ValueUtils.isBlank(formHead.getColumnCode())){
-                String columnCode = formHead.resetColumnCode();
-                int i = 10;
-                while (i-- > 0 && columnSet.contains(columnCode)){
-                    columnCode = formHead.resetColumnCode();
+                if(formHead instanceof FormHeadVo){
+                    String columnCode = ((FormHeadVo) formHead).resetColumnCode();
+                    int i = 10;
+                    while (i-- > 0 && columnSet.contains(columnCode)){
+                        columnCode = ((FormHeadVo) formHead).resetColumnCode();
+                    }
+                    if(columnSet.contains(columnCode)){
+                        throw new BusinessException("动态生成字段名称超时");
+                    }
+                    formHead.setColumnCode(columnCode);
                 }
-                if(columnSet.contains(columnCode)){
-                    throw new BusinessException("动态生成字段名称超时");
+                if(ValueUtils.isBlank(formHead.getColumnCode())){
+                    throw new BusinessException("表单列不能为空");
                 }
-                formHead.setColumnCode(columnCode);
-                columnSet.add(columnCode);
+                if(columnSet.contains(formHead.getColumnCode())){
+                    throw new BusinessException("表头列名重复:" + formHead.getColumnCode());
+                }
+                if(propertySet.contains(formHead.getProperty())){
+                    throw new BusinessException("表头字段名重复:" + formHead.getProperty());
+                }
+                columnSet.add(formHead.getColumnCode());
+                propertySet.add(formHead.getProperty());
             }
+
         }
     }
 }

@@ -20,6 +20,7 @@ import java.util.List;
  */
 public interface IBaseMongoService <M> {
 
+    M findOne(ObjectId id, String collectionName);
 
     List<M> queryList(Criteria criteria, String collectionName);
 
@@ -33,6 +34,6 @@ public interface IBaseMongoService <M> {
 
     BulkWriteResult updateBatch(List<M> entities, String collectionName);
 
-    DeleteResult removeBatch(List<ObjectId> ids, String collectionName);
+    long removeBatch(List<ObjectId> ids, String collectionName);
 
 }

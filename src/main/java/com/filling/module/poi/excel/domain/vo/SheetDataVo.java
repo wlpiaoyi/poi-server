@@ -2,16 +2,17 @@ package com.filling.module.poi.excel.domain.vo;
 
 import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.excel.domain.entity.CellData;
-import com.filling.module.poi.excel.domain.entity.CellMerge;
 import com.filling.module.poi.excel.domain.entity.SheetData;
-import com.filling.module.poi.excel.domain.model.GridInfo;
-import com.filling.module.poi.tools.utils.excel.ICellData;
-import com.filling.module.poi.tools.utils.excel.ICellMerge;
-import com.filling.module.poi.tools.utils.excel.IGridInfo;
-import com.filling.module.poi.tools.utils.excel.ISheetData;
+import com.filling.module.poi.excel.domain.model.CellValue;
+import com.filling.module.poi.tools.excel.GridInfo;
+import com.filling.module.poi.tools.excel.ICellData;
+import com.filling.module.poi.tools.excel.ISheetData;
+import com.filling.module.poi.tools.excel.Scope;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,25 +24,70 @@ import java.util.List;
 @Data
 public class SheetDataVo extends SheetData implements ISheetData {
 
-    /** 单元格合并数据 **/
-    @Schema(description =  "单元格合并数据")
-    private List<CellMerge> cellMerges;
-
     /** 单元格数据 **/
     @Schema(description =  "单元格数据")
     private List<CellDataVo> cellDatas;
 
 
+    public void setAllId(){
+        if(this.getId() == null){
+            this.setId(ObjectId.get());
+        }
+        if(ValueUtils.isNotBlank(this.getCellDatas())){
+            for (CellData cellData : this.getCellDatas()){
+                if(cellData.getId() == null){
+                    cellData.setId(ObjectId.get());
+                }
+                cellData.setSheetId(this.getId());
+            }
+        }
+    }
 
+    public void removeBlankCellData(){
+        if(ValueUtils.isNotBlank(this.getCellDatas())){
+            List<CellData> removes = new ArrayList<>();
+            for (CellData cellData : this.getCellDatas()){
+                if(cellData.getV() == null){
+                    removes.add(cellData);
+                    continue;
+                }
+                if(ValueUtils.isNotBlank(cellData.getV().getV())){
+                    continue;
+                }
+                if(ValueUtils.isNotBlank(cellData.getV().getM())){
+                    continue;
+                }
+                if(ValueUtils.isNotBlank(cellData.getV().getF())){
+                    continue;
+                }
+                removes.add(cellData);
+            }
+            if(ValueUtils.isNotBlank(removes)){
+                this.getCellDatas().removeAll(removes);
+            }
+        }
+    }
+
+    public void synCellMc() {
+        if(this.getGridInfo() != null && ValueUtils.isNotBlank(this.getGridInfo().getCellMerges())
+                && ValueUtils.isNotBlank(this.getCellDatas())){
+            for (CellDataVo cellData : this.getCellDatas()){
+                for (Scope cellMerge : this.getGridInfo().getCellMerges()){
+                    if(cellMerge.inScope(cellData)){
+                        if(cellData.getV() == null){
+                            cellData.setV(new CellValue());
+                        }
+                        cellData.getV().setMc(cellMerge);
+                        break;
+                    }
+                }
+            }
+        }
+    }
     public void clearDb(){
         super.clearDb();
         this.setRandomTag(null);
         this.setExcelId(null);
-        if(ValueUtils.isNotBlank(this.getCellMerges())){
-            for (CellMerge cellMerge : this.getCellMerges()){
-                cellMerge.clearDb();
-            }
-        }
         if(ValueUtils.isNotBlank(this.getCellDatas())){
             for (CellData cellData : this.getCellDatas()){
                 cellData.clearDb();
@@ -49,7 +95,6 @@ public class SheetDataVo extends SheetData implements ISheetData {
         }
         this.synProperties();
     }
-
 
     @Override
     public String sheetName() {
@@ -74,26 +119,14 @@ public class SheetDataVo extends SheetData implements ISheetData {
     }
 
     @Override
-    public List<ICellMerge> cellMerges() {
-        List datas = this.cellMerges;
-        return datas;
-    }
-
-    @Override
-    public void putCellMerges(List<ICellMerge> cellMerges) {
-        List datas = cellMerges;
-        this.cellMerges = datas;
-
-    }
-
-    @Override
-    public IGridInfo gridInfo() {
+    public GridInfo gridInfo() {
         return this.getGridInfo();
     }
 
+
     @Override
-    public void putGridInfo(IGridInfo gridInfo) {
-        this.setGridInfo((GridInfo) gridInfo);
+    public void putGridInfo(GridInfo gridInfo) {
+        this.setGridInfo(gridInfo);
     }
 
 }

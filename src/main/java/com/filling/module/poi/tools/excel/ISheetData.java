@@ -1,4 +1,4 @@
-package com.filling.module.poi.tools.utils.excel;
+package com.filling.module.poi.tools.excel;
 
 import java.util.List;
 
@@ -10,18 +10,21 @@ import java.util.List;
  */
 public interface ISheetData {
 
+    /** Sheet名称 **/
     String sheetName();
     void putSheetName(String name);
 
+    /** 单元格数据 **/
     List<ICellData> cellDatas();
     void putCellDatas(List<ICellData> cellDatas);
 
-    List<ICellMerge> cellMerges();
+    /** 网格数据 **/
+    GridInfo gridInfo();
+    void putGridInfo(GridInfo gridInfo);
 
-    void putCellMerges(List<ICellMerge> cellMerges);
+//    List<ICellMerge> cellMerges();
+//
+//    void putCellMerges(List<ICellMerge> cellMerges);
 
-    IGridInfo gridInfo();
-
-    void putGridInfo(IGridInfo gridInfo);
 
 }

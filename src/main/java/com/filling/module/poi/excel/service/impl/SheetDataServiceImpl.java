@@ -1,15 +1,16 @@
 package com.filling.module.poi.excel.service.impl;
 
+import com.filling.framework.common.exception.BusinessException;
 import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.excel.domain.entity.CellData;
-import com.filling.module.poi.excel.domain.entity.CellMerge;
 import com.filling.module.poi.excel.domain.entity.SheetData;
+import com.filling.module.poi.excel.domain.vo.CellDataVo;
 import com.filling.module.poi.excel.domain.vo.SheetDataVo;
+import com.filling.module.poi.excel.domain.wrapper.BaseWrapper;
 import com.filling.module.poi.excel.service.ICellDataService;
-import com.filling.module.poi.excel.service.ICellMergeService;
 import com.filling.module.poi.excel.service.ISheetDataService;
 import com.filling.module.poi.service.impl.BaseMongoServiceImpl;
-import com.mongodb.client.result.DeleteResult;
+import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -19,7 +20,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * {@code @author:}         wlpiaoyi
@@ -35,19 +38,18 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
     @Autowired
     private ICellDataService cellDataService;
 
-    @Autowired
-    private ICellMergeService cellMergeService;
-
 
     @Override
     public SheetDataVo detail(ObjectId id) {
-        Criteria criteria = Criteria.where("id").is(id);
-        SheetDataVo sheetDataVo = this.baseTemplate.findOne(new Query(criteria), SheetDataVo.class, SheetData.collectionName());
+        SheetDataVo sheetDataVo = this.baseTemplate.findOne(new Query(Criteria.where("_id").is(id)),
+                SheetDataVo.class, SheetData.collectionName());
         if(sheetDataVo == null){
             return null;
         }
-        sheetDataVo.setCellDatas(this.cellDataService.queryBySheetId(sheetDataVo.getId(), sheetDataVo.getRandomTag()));
-        sheetDataVo.setCellMerges(this.cellMergeService.queryBySheetId(sheetDataVo.getId()));
+        List<CellData> cellDatas = this.cellDataService.queryBySheetId(sheetDataVo.getId(), sheetDataVo.getRandomTag());
+        if(ValueUtils.isNotBlank(cellDatas)){
+            sheetDataVo.setCellDatas(BaseWrapper.parseList(cellDatas, CellDataVo.class));
+        }
         return sheetDataVo;
     }
 
@@ -64,51 +66,65 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
         entity.createRandomTag();
         if(entity instanceof SheetDataVo){
             SheetDataVo entityVo = (SheetDataVo) entity;
+            entityVo.synCellMc();
             if(ValueUtils.isNotBlank(entityVo.getCellDatas())){
+                ((SheetDataVo) entity).removeBlankCellData();
                 for (CellData cellData : entityVo.getCellDatas()){
                     cellData.setSheetId(entity.getId());
                 }
                 this.cellDataService.insertBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(entityVo.getRandomTag()));
             }
-            if(ValueUtils.isNotBlank(entityVo.getCellMerges())){
-                for (CellMerge cellMerge : entityVo.getCellMerges()){
-                    cellMerge.setSheetId(entity.getId());
-                }
-                this.cellMergeService.insertBatch(entityVo.getCellMerges(), CellMerge.collectionName());
-            }
         }
-        return super.insert(entity, collectionName);
+        SheetData iEntity = BaseWrapper.parseOne(entity, SheetData.class);
+        return super.insert(iEntity, collectionName);
+    }
+
+    @Override
+    public Collection<SheetData> insertBatch(List<SheetData> entities, String collectionName) {
+        throw new BusinessException("不支持的方法");
     }
 
     @Override
     public UpdateResult update(SheetData entity, String collectionName) {
+        if(entity.getId() == null){
+            throw new BusinessException("Id不能为空");
+        }
+        SheetData db = this.findOne(entity.getId(), SheetData.collectionName());
+        if(db == null){
+            throw new BusinessException("没有找到数据");
+        }
         if(entity instanceof SheetDataVo){
             SheetDataVo entityVo = (SheetDataVo) entity;
+            entityVo.synCellMc();
             if(ValueUtils.isNotBlank(entityVo.getCellDatas())){
+                ((SheetDataVo) entity).removeBlankCellData();
                 for (CellData cellData : entityVo.getCellDatas()){
                     cellData.setSheetId(entity.getId());
                 }
-                this.cellDataService.updateBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(entityVo.getRandomTag()));
-            }
-            if(ValueUtils.isNotBlank(entityVo.getCellMerges())){
-                for (CellMerge cellMerge : entityVo.getCellMerges()){
-                    cellMerge.setSheetId(entity.getId());
+                List<CellData> removes = this.cellDataService.queryBySheetId(db.getId(), db.getRandomTag());
+                if(ValueUtils.isNotBlank(removes)){
+                    this.cellDataService.removeBatch(removes.stream().map(CellData::getId).collect(Collectors.toList()), SheetData.cellDataCollectionName(db.getRandomTag()));
                 }
-                this.cellMergeService.updateBatch(entityVo.getCellMerges(), CellMerge.collectionName());
+                this.cellDataService.insertBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(db.getRandomTag()));
             }
         }
-        return super.update(entity, collectionName);
+        SheetData iEntity = BaseWrapper.parseOne(entity, SheetData.class);
+        return super.update(iEntity, collectionName);
     }
 
     @Override
-    public DeleteResult removeBatch(List<ObjectId> ids, String collectionName) {
+    public BulkWriteResult updateBatch(List<SheetData> entities, String collectionName) {
+        throw new BusinessException("不支持的方法");
+    }
+
+    @Override
+    public long removeBatch(List<ObjectId> ids, String collectionName) {
         Criteria criteria = Criteria.where("id").in(ids);
         List<SheetData> sheetDatas = this.queryList(criteria, SheetData.collectionName());
         for(SheetData sheetData : sheetDatas){
             this.baseTemplate.remove(new Query(Criteria.where("sheetId").is(sheetData.getId())),
                     SheetData.cellDataCollectionName(sheetData.getRandomTag()));
         }
-        this.baseTemplate.remove(new Query(Criteria.where("sheetId").in(ids)), CellMerge.collectionName());
         return super.removeBatch(ids, collectionName);
     }
 }

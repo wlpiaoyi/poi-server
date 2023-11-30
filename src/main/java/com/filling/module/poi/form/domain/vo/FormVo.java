@@ -2,13 +2,16 @@ package com.filling.module.poi.form.domain.vo;
 
 import com.filling.framework.common.exception.BusinessException;
 import com.filling.framework.common.tools.ValueUtils;
+import com.filling.framework.common.tools.data.DataUtils;
+import com.filling.module.poi.domain.entity.BaseEntity;
 import com.filling.module.poi.excel.domain.entity.CellData;
-import com.filling.module.poi.excel.domain.entity.SheetData;
-import com.filling.module.poi.excel.domain.vo.SheetDataVo;
 import com.filling.module.poi.form.domain.entity.Form;
 import com.filling.module.poi.form.domain.entity.FormHead;
 import com.filling.module.poi.excel.domain.model.CellValue;
+import com.filling.module.poi.form.domain.entity.FormHeadHr;
+import com.filling.module.poi.form.domain.entity.FormHeadRela;
 import com.filling.module.poi.form.domain.model.FormPosition;
+import com.filling.module.poi.tools.excel.Scope;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -27,13 +30,70 @@ public class FormVo extends Form {
 
     private List<FormHeadContext> formHeadContexts;
     private List<FormHeadVo> formHeads;
+    private List<FormHeadRela> formHeadRelas;
+    private List<FormHeadHr> formHeadHrs;
 
+
+    public void onlyMainDataForLocation(){
+        if(ValueUtils.isNotBlank(this.getFormHeads())){
+            for (FormHeadVo formHeadVo : this.getFormHeads()){
+                formHeadVo.onlyMainDataForLocation();
+            }
+        }
+        if(ValueUtils.isNotBlank(this.getFormHeadRelas())){
+            for (FormHeadRela formHeadRela : this.getFormHeadRelas()){
+                formHeadRela.onlyMainDataForLocation();
+            }
+        }
+    }
+
+    public static void checkData(Form entity){
+        if(ValueUtils.isBlank(entity.getName())){
+            throw new BusinessException("表单名称不能为空");
+        }
+        if(entity.getType() == 1){
+            if(ValueUtils.isBlank(entity.getExcelId())){
+                throw new BusinessException("ExcelId不能为空");
+            }
+            if(ValueUtils.isBlank(entity.getSheetId())){
+                throw new BusinessException("SheetId不能为空");
+            }
+            if(ValueUtils.isBlank(entity.getTab())){
+                throw new BusinessException("标签不能为空");
+            }
+        }
+        Set<String> tableCodeSet = new HashSet<>();
+        if(ValueUtils.isBlank(entity.getTableName())){
+            String tableCode = BaseEntity.createPropertyCode(entity.getName());
+            int i = 10;
+            while (i-- > 0 && tableCodeSet.contains(tableCode)){
+                tableCode = BaseEntity.createPropertyCode(entity.getName());
+            }
+            if(tableCodeSet.contains(tableCode)){
+                throw new BusinessException("动态生成字段名称超时");
+            }
+            entity.setTableName(tableCode);
+            tableCodeSet.add(tableCode);
+        }
+    }
 
     public void clearDb(){
         super.clearDb();
+        this.setSheetId(null);
+        this.setExcelId(null);
         if(ValueUtils.isNotBlank(this.formHeads)){
-            for (FormHeadVo formHead : this.formHeads){
+            for (FormHead formHead : this.formHeads){
                 formHead.clearDb();
+            }
+        }
+        if(ValueUtils.isNotBlank(this.formHeadRelas)){
+            for (FormHeadRela formHead : this.formHeadRelas){
+                formHead.clearDb();
+            }
+        }
+        if(ValueUtils.isNotBlank(this.formHeadHrs)){
+            for (FormHeadHr formHeadHr : this.formHeadHrs){
+                formHeadHr.clearDb();
             }
         }
     }
@@ -302,7 +362,6 @@ public class FormVo extends Form {
                 fhs1 = new ArrayList<>();
             }
             fhs1.add(formHead);
-            formHead.setSort(sort ++);
         }
         if(ValueUtils.isNotBlank(fhs1)){
             fhs2.add(fhs1);
@@ -412,7 +471,6 @@ public class FormVo extends Form {
                 fhs1 = new ArrayList<>();
             }
             fhs1.add(formHead);
-            formHead.setSort(sort ++);
         }
         if(ValueUtils.isNotBlank(fhs1)){
             fhs2.add(fhs1);
@@ -486,7 +544,7 @@ public class FormVo extends Form {
                     return fh;
                 }
             }else{
-                CellValue.MergeCell mc = fh.getLocation().getV().getMc();
+                Scope mc = fh.getLocation().getV().getMc();
                 if(mc.getC() >=  formHead.getLocation().getC()){
                     continue;
                 }

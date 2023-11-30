@@ -27,7 +27,7 @@ public interface IExcelDataService <M extends ExcelData> extends IBaseMongoServi
      * @return
      * @throws IOException
      */
-    ExcelDataVo getExcelDataByInputStream(InputStream inputStream, String type) throws IOException;
+    ExcelDataVo getExcelDataByInputStream(InputStream inputStream, String type, ObjectId excelId) throws IOException;
 
     /**
      *

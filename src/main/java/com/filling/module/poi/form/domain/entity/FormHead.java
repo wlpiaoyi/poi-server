@@ -3,6 +3,7 @@ package com.filling.module.poi.form.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.domain.entity.BaseMongoEntity;
 import com.filling.module.poi.excel.domain.entity.CellData;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,8 +26,14 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public class FormHead extends BaseMongoEntity {
 
-    public static String getCollectionName(){
+    public static String collectionName(){
         return "poi_form_head";
+    }
+
+    public void onlyMainDataForLocation(){
+        if(this.location != null){
+            this.location = this.location.copyOnlyMainData(CellData.class);
+        }
     }
 
     @JsonIgnore
@@ -36,6 +43,14 @@ public class FormHead extends BaseMongoEntity {
         }
         return this.location.mapKey();
     }
+
+    public String hexDataId(){
+        if(this.getDataId() == null){
+            return null;
+        }
+        return this.getDataId().toHexString();
+    }
+
 
     /** formId **/
     @Schema(description = "formId")
@@ -74,7 +89,7 @@ public class FormHead extends BaseMongoEntity {
     /** sort **/
     @Schema(description = "sort")
     @NotNull(message = "sort不能为空")
-    private Integer sort;
+    private Long sort;
 
     /** 深度 **/
     @Schema(description = "深度")
