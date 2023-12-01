@@ -23,16 +23,22 @@ public class SheetDataUtils {
         void run(Cell cell, DataStyle curDataStyle);
 
     }
+    public interface CellDataEnd{
+        void run(Sheet sheet, ISheetData sheetData);
+    }
 
-    @SneakyThrows
+
+        @SneakyThrows
     public static void parseData(ISheetData sheetData, Sheet sheet,
                                  Class<? extends ICellData> cdClazz,
                                  Class<? extends ICellValue> cvClass,
-                                 CellDataRun cellDataRun){
+                                 CellDataRun cellDataRun,
+                                 CellDataEnd cellDataEnd){
         sheetData.putSheetName(sheet.getSheetName());
         Iterator<Row> rowIterator = sheet.rowIterator();
         List<ICellData> cellDatas = new ArrayList<>();
         sheetData.putCellDatas(cellDatas);
+        //TODO 数据验证 sheet.getDataValidations();
         Map<String, DataStyle> dataStyleMap = new HashMap<>();
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
@@ -63,6 +69,7 @@ public class SheetDataUtils {
         }
         setMergedRegions(sheetData.gridInfo().getCellMerges(), sheet);
         setRcValue(sheetData.gridInfo(), sheet);
+        cellDataEnd.run(sheet, sheetData);
     }
 
 

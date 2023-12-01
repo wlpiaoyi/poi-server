@@ -94,8 +94,8 @@ public class ExcelDataController {
     @GetMapping("/downloadExcel")
     @ApiOperationSupport(order = 3)
     @Operation(summary ="下载Excel")
-    public void downloadExcel(@RequestParam String excelHexId, HttpServletResponse response) throws IOException {
-        ObjectId objId = new ObjectId(excelHexId);
+    public void downloadExcel(@RequestParam(name = "id") String hexId, HttpServletResponse response) throws IOException {
+        ObjectId objId = new ObjectId(hexId);
         ExcelDataVo excelData = this.excelDataService.detail(objId);
         if(excelData == null){
             throw new BusinessException("没有找到Excel数据");

@@ -20,9 +20,9 @@ public class DataHSSFUtils {
     public static void parseSheet(HSSFWorkbook workbook, ISheetData sheetData){
         DataSheetUtils.parseSheet(workbook, sheetData, (cell, dataStyle, cellData) -> {
             DataStyleHSSFUtils.setCellStyle((HSSFCell) cell, dataStyle);
-        }, (sheet, gridInfo) -> {
-            if(ValueUtils.isNotBlank(gridInfo.getCellMerges())){
-                setMergedRegions((HSSFSheet) sheet, gridInfo.getCellMerges());
+        }, (sheet, iSheetData) -> {
+            if(ValueUtils.isNotBlank(iSheetData.gridInfo().getCellMerges())){
+                setMergedRegions((HSSFSheet) sheet, iSheetData.gridInfo().getCellMerges());
             }
         });
     }

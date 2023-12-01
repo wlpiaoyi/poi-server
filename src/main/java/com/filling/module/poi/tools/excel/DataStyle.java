@@ -3,6 +3,8 @@ package com.filling.module.poi.tools.excel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 import java.util.Map;
@@ -17,20 +19,8 @@ import java.util.Map;
 public class DataStyle {
 
 
-//    /** 0:String 1:数字 2:日期 **/
-//    private int type;
-//    /** 数据值 **/
-//    private String v;
-//    /** 展示值 **/
-//    private String m;
-//    /** 公式 **/
-//    private String f;
-//    /** 合并单元格 **/
-//    private Scope mc;
     /** 作用范围 **/
     private List<Point> points = null;
-//    /** 单元格值格式 **/
-//    private Map ct;
     /** 背景色 **/
     private String bg = "#FFFFFF";
     /** 字体 **/
@@ -46,7 +36,7 @@ public class DataStyle {
     /** 下滑线 **/
     private byte un = 0;
     /** 垂直对齐  0 中间、1 上、2下 **/
-    private int vt = 0;   //
+    private int vt = 0;
     /** 水平对齐   0 居中、1 左、2 右 **/
     private int ht = 0;
     /** 自动换行   0 截断、1 溢出、2 自动换行 **/
@@ -54,11 +44,10 @@ public class DataStyle {
     /** 单元格数据格式 **/
     private short dfm;
     /** 单元格数据格式 **/
-    @JsonIgnore
     private String dfmv;
 
-//    @JsonIgnore
-//    private XSSFDataFormat dataFormat;
+    @Transient
+    private XSSFDataFormat dataFormat;
 
     public String toString(){
         return "bg:" + this.getBg()

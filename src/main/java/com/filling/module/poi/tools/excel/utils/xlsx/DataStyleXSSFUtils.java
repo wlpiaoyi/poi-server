@@ -28,7 +28,11 @@ public class DataStyleXSSFUtils {
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         }
         if(dataStyle.getDfm() > 0 && ValueUtils.isNotBlank(dataStyle.getDfmv())){
-            XSSFDataFormat dataFormat = cell.getSheet().getWorkbook().createDataFormat();
+            XSSFDataFormat dataFormat = dataStyle.getDataFormat();
+            if(dataFormat == null){
+                dataFormat = cell.getSheet().getWorkbook().createDataFormat();
+                dataStyle.setDataFormat(dataFormat);
+            }
             cellStyle.setDataFormat(dataFormat.getFormat(dataStyle.getDfmv()));
         }
         //自动换行

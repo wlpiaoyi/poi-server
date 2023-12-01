@@ -139,7 +139,6 @@ public class CellDataServiceImpl extends BaseMongoServiceImpl<CellData> implemen
         return true;
     }
 
-
 //    @Override
 //    public long removeBatch(List<ObjectId> ids) {
 //        throw new BusinessException("不支持的方法");

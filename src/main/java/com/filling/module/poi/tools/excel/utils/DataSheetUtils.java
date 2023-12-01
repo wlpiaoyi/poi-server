@@ -23,7 +23,7 @@ public class DataSheetUtils {
     }
 
     public interface CellDataEnd{
-        void run(Sheet sheet, GridInfo gridInfo);
+        void run(Sheet sheet, ISheetData sheetData);
 
     }
 
@@ -69,9 +69,8 @@ public class DataSheetUtils {
 
         }
         if(sheetData.gridInfo() != null){
-            GridInfo gridInfo = sheetData.gridInfo();
-            cellDataEnd.run(sheet, gridInfo);
-            DataSheetUtils.setRCValue(sheet, gridInfo);
+            cellDataEnd.run(sheet, sheetData);
+            DataSheetUtils.setRCValue(sheet, sheetData.gridInfo());
         }
     }
 

@@ -5,6 +5,8 @@ import com.filling.module.poi.tools.excel.utils.SheetDataUtils;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
+import java.util.ArrayList;
+
 /**
  * {@code @author:}         wlpiaoyi
  * {@code @description:}    TODO
@@ -19,6 +21,9 @@ public class XSSFDataUtils {
                                  Class<? extends ICellValue> cvClass){
         SheetDataUtils.parseData(sheetData, sheet, cdClazz, cvClass, (cell, curDataStyle) -> {
             StyleXSSFDataUtils.setDataStyle(curDataStyle, (XSSFCell) cell);
+        }, (xsheet, isheetData) ->{
+            isheetData.gridInfo().setDataValidations(new ArrayList<>());
+            ValidationDataUtils.setData((XSSFSheet) xsheet, isheetData.gridInfo().getDataValidations());
         });
     }
 

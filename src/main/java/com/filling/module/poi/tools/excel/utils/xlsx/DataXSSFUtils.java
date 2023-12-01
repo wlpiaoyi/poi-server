@@ -7,6 +7,7 @@ import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,9 +22,13 @@ public class DataXSSFUtils {
     public static void parseSheet(XSSFWorkbook workbook, ISheetData sheetData){
         DataSheetUtils.parseSheet(workbook, sheetData, (cell, dataStyle, cellData) -> {
             DataStyleXSSFUtils.setCellStyle((XSSFCell) cell, dataStyle);
-        }, (sheet, gridInfo) -> {
-            if(ValueUtils.isNotBlank(gridInfo.getCellMerges())){
-                setMergedRegions((XSSFSheet) sheet, gridInfo.getCellMerges());
+        }, (sheet, isheetData) -> {
+            if(ValueUtils.isNotBlank(isheetData.gridInfo().getCellMerges())){
+                setMergedRegions((XSSFSheet) sheet, isheetData.gridInfo().getCellMerges());
+            }
+            if(ValueUtils.isNotBlank(isheetData.gridInfo().getDataValidations())){
+//                isheetData.gridInfo().setDataValidations(new ArrayList<>());
+                DataValidationUtils.setValidation((XSSFSheet) sheet, isheetData.gridInfo().getDataValidations());
             }
         });
     }

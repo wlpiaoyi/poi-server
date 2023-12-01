@@ -38,6 +38,9 @@ public class GridInfo{
     /** 单元格样式 **/
     @Schema(description =  "单元格样式")
     private List<DataStyle> dataStyles;
+    /** 单元格数据验证 **/
+    @Schema(description =  "单元格数据验证")
+    private List<DataValidation> dataValidations;
 //    /** 边框信息 **/
 //    @Schema(description =  "边框信息")
 //    private List<BorderInfo> borderInfos;
