@@ -7,10 +7,7 @@ import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.*;
 
 /**
  * {@code @author:}         wlpiaoyi
@@ -29,6 +26,10 @@ public class DataStyleXSSFUtils {
             color.setRGB(DataSheetUtils.hexToBytes(dataStyle.getBg()));
             cellStyle.setFillForegroundColor(color);
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        }
+        if(dataStyle.getDfm() > 0 && ValueUtils.isNotBlank(dataStyle.getDfmv())){
+            XSSFDataFormat dataFormat = cell.getSheet().getWorkbook().createDataFormat();
+            cellStyle.setDataFormat(dataFormat.getFormat(dataStyle.getDfmv()));
         }
         //自动换行
         cellStyle.setWrapText(dataStyle.getTb() == 2);

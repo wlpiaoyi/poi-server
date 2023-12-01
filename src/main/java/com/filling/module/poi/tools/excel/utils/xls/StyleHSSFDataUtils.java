@@ -25,6 +25,7 @@ public class StyleHSSFDataUtils {
         }
 
         synFont(dataStyle, cell);
+        dataStyle.setDfm(cellStyle.getDataFormat());
         //自动换行
         if(cellStyle.getWrapText()){
             dataStyle.setTb(2);

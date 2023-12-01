@@ -1,5 +1,6 @@
 package com.filling.module.poi.tools.excel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -17,6 +18,7 @@ public class Scope extends Point{
     /** 行数量 **/
     private int rs;
 
+    @JsonIgnore
     public boolean notEmpty(){
         if(this.getC() >= 0 && this.getCs() > 0){
             return true;

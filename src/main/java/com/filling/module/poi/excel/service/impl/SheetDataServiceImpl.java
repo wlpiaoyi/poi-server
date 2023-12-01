@@ -42,7 +42,7 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
     @Override
     public SheetDataVo detail(ObjectId id) {
         SheetDataVo sheetDataVo = this.baseTemplate.findOne(new Query(Criteria.where("_id").is(id)),
-                SheetDataVo.class, SheetData.collectionName());
+                SheetDataVo.class);
         if(sheetDataVo == null){
             return null;
         }
@@ -56,10 +56,10 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
     @Override
     public List<SheetData> queryByExcelId(ObjectId excelId, Class<SheetData> entityClazz) {
         Criteria criteria = Criteria.where("excelId").is(excelId);
-        return this.queryList(criteria, SheetData.collectionName());
+        return this.queryList(criteria);
     }
 
-    public SheetData insert(SheetData entity, String collectionName) {
+    public SheetData insert(SheetData entity) {
         if(entity.getId() == null){
             entity.setId(ObjectId.get());
         }
@@ -76,7 +76,10 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
             }
         }
         SheetData iEntity = BaseWrapper.parseOne(entity, SheetData.class);
-        return super.insert(iEntity, collectionName);
+        return super.insert(iEntity);
+    }
+    public SheetData insert(SheetData entity, String collectionName) {
+        throw new BusinessException("不支持的方法");
     }
 
     @Override
@@ -85,11 +88,11 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
     }
 
     @Override
-    public UpdateResult update(SheetData entity, String collectionName) {
+    public UpdateResult update(SheetData entity) {
         if(entity.getId() == null){
             throw new BusinessException("Id不能为空");
         }
-        SheetData db = this.findOne(entity.getId(), SheetData.collectionName());
+        SheetData db = this.findOne(entity.getId());
         if(db == null){
             throw new BusinessException("没有找到数据");
         }
@@ -109,22 +112,35 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
             }
         }
         SheetData iEntity = BaseWrapper.parseOne(entity, SheetData.class);
-        return super.update(iEntity, collectionName);
+        return super.update(iEntity);
+    }
+    @Override
+    public UpdateResult update(SheetData entity, String collectionName) {
+        throw new BusinessException("不支持的方法");
     }
 
+    @Override
+    public BulkWriteResult updateBatch(List<SheetData> entities) {
+        throw new BusinessException("不支持的方法");
+    }
     @Override
     public BulkWriteResult updateBatch(List<SheetData> entities, String collectionName) {
         throw new BusinessException("不支持的方法");
     }
 
     @Override
-    public long removeBatch(List<ObjectId> ids, String collectionName) {
+    public long removeBatch(List<ObjectId> ids) {
         Criteria criteria = Criteria.where("id").in(ids);
-        List<SheetData> sheetDatas = this.queryList(criteria, SheetData.collectionName());
+        List<SheetData> sheetDatas = this.queryList(criteria);
         for(SheetData sheetData : sheetDatas){
             this.baseTemplate.remove(new Query(Criteria.where("sheetId").is(sheetData.getId())),
                     SheetData.cellDataCollectionName(sheetData.getRandomTag()));
         }
-        return super.removeBatch(ids, collectionName);
+        return super.removeBatch(ids);
+    }
+    @Override
+    public long removeBatch(List<ObjectId> ids, String collectionName) {
+        throw new BusinessException("不支持的方法");
+
     }
 }

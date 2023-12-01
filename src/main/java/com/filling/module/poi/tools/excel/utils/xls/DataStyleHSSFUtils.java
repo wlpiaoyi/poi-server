@@ -26,6 +26,7 @@ public class DataStyleHSSFUtils {
         cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         //自动换行
         cellStyle.setWrapText(dataStyle.getTb() == 2);
+        cellStyle.setDataFormat(dataStyle.getDfm());
         //文字对齐方式
         switch (dataStyle.getVt()){
             case 0:{

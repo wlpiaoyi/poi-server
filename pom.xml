@@ -33,23 +33,13 @@
     </properties>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>com.alibaba</groupId>-->
-<!--            <artifactId>fastjson</artifactId>-->
-<!--            <version>1.2.83</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>cn.hutool</groupId>-->
-<!--            <artifactId>hutool-all</artifactId>-->
-<!--            <version>5.3.3</version>-->
-<!--        </dependency>-->
 
         <!-- swagger3工具 -->
         <dependency>
             <groupId>io.swagger.core.v3</groupId> <!-- 接口文档：使用最新版本的 Swagger 模型 -->
             <artifactId>swagger-annotations</artifactId>
             <version>${swagger.version}</version>
-<!--            <scope>provided</scope> &lt;!&ndash; 设置为 provided，主要是 PageParam 使用到 &ndash;&gt;-->
+            <!-- <scope>provided</scope> &lt;!&ndash; 设置为 provided，主要是 PageParam 使用到 &ndash;&gt;-->
         </dependency>
         <dependency>
             <groupId>io.swagger.core.v3</groupId> <!-- 接口文档：使用最新版本的 Swagger 模型 -->
@@ -66,23 +56,26 @@
             <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
             <version>${knife4j.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.github.xiaoymin</groupId> &lt;!&ndash; 接口文档 UI：knife4j【网关专属】 &ndash;&gt;-->
-<!--            <artifactId>knife4j-gateway-spring-boot-starter</artifactId>-->
-<!--            <version>${knife4j.version}</version>-->
-<!--        </dependency>-->
 
-
+        <!-- poi工具 -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.wlpiaoyi.framework</groupId>
             <artifactId>utils</artifactId>
             <version>1.0.2-SNAPSHOT</version>
         </dependency>
+
+
         <dependency>
             <artifactId>spring-boot-starter-validation</artifactId>
             <groupId>org.springframework.boot</groupId>

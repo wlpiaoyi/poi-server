@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Update;
 
 import javax.validation.constraints.NotBlank;
@@ -19,12 +20,13 @@ import javax.validation.constraints.NotBlank;
 @Data
 @Accessors(chain=false)
 @Schema(description = "Excel基础内容")
+@Document(collection = "poi_excel_data")
 @EqualsAndHashCode(callSuper = true)
 public class ExcelData extends BaseMongoEntity {
 
-    public static String collectionName(){
-        return "poi_excel_data";
-    }
+//    public static String collectionName(){
+//        return "poi_excel_data";
+//    }
     public Update parseForUpdate(Update update){
         update = super.parseForUpdate(update);
         if(this.getName() != null){

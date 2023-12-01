@@ -1,6 +1,8 @@
 package com.filling.module.poi.tools.excel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,14 @@ public class DataStyle {
     private int ht = 0;
     /** 自动换行   0 截断、1 溢出、2 自动换行 **/
     private int tb = 0;
+    /** 单元格数据格式 **/
+    private short dfm;
+    /** 单元格数据格式 **/
+    @JsonIgnore
+    private String dfmv;
+
+//    @JsonIgnore
+//    private XSSFDataFormat dataFormat;
 
     public String toString(){
         return "bg:" + this.getBg()
@@ -60,7 +70,8 @@ public class DataStyle {
                 + ",un:" + this.un
                 + ",vt:" + this.vt
                 + ",ht:" + this.ht
-                + ",tb:" + this.tb;
+                + ",tb:" + this.tb
+                + ",dfmv:" + this.dfmv;
     }
 
 }

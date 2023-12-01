@@ -13,7 +13,7 @@ public interface ICellValue {
      * @return
      */
     boolean notEmpty();
-    /** 0:String 1:数字 2:日期 **/
+    /** 0:String 1:数字 **/
     int getType();
 
     void setType(int type);

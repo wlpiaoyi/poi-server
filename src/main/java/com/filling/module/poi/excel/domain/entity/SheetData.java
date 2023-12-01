@@ -1,16 +1,17 @@
 package com.filling.module.poi.excel.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.domain.entity.BaseMongoEntity;
 import com.filling.module.poi.tools.excel.GridInfo;
-import com.filling.module.poi.tools.excel.Scope;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Update;
 
 import javax.validation.constraints.NotNull;
@@ -26,13 +27,14 @@ import java.math.BigInteger;
 @Data
 @Accessors(chain=false)
 @Schema(description = "Sheet基础内容")
+@Document(collection = "poi_sheet_data")
 @EqualsAndHashCode(callSuper = true)
 public class SheetData extends BaseMongoEntity {
 
 
-    public static String collectionName(){
-        return "poi_sheet_data";
-    }
+//    public static String collectionName(){
+//        return "poi_sheet_data";
+//    }
     public Update parseForUpdate(Update update){
         update = super.parseForUpdate(update);
         if(this.getExcelId() != null){
@@ -47,8 +49,8 @@ public class SheetData extends BaseMongoEntity {
         if(this.getThumbImage() != null){
             update.set("thumbImage", this.getThumbImage());
         }
-        if(this.getName() != null){
-            update.set("name", this.getName());
+        if(this.getSheetName() != null){
+            update.set("sheetName", this.getSheetName());
         }
         if(this.getDataVerification() != null){
             update.set("dataVerification", this.getDataVerification());
@@ -76,8 +78,8 @@ public class SheetData extends BaseMongoEntity {
     private String thumbImage;
 
     /** 名称 **/
-    @Schema(description =  "名称")
-    private String name;
+    @Schema(description = "名称")
+    private String sheetName;
 
     /** 数据验证 **/
     @Schema(description =  "数据验证")
@@ -85,9 +87,9 @@ public class SheetData extends BaseMongoEntity {
 
     public static String cellDataCollectionName(int randomTag){
         if(randomTag < 10){
-            return "poi_cell_data_0" + randomTag;
+            return CellData.COLLECTION_NAME + "_0" + randomTag;
         }else{
-            return "poi_cell_data_" + randomTag;
+            return CellData.COLLECTION_NAME + "_" + randomTag;
         }
     }
 

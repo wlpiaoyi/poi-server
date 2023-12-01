@@ -56,7 +56,7 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
     @Override
     public ExcelDataVo detail(ObjectId id) {
         ExcelDataVo excelDataVo = this.baseTemplate.findOne(new Query(Criteria.where("_id").is(id)),
-                ExcelDataVo.class, ExcelData.collectionName());
+                ExcelDataVo.class);
         if(excelDataVo == null){
             return null;
         }
@@ -79,7 +79,7 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
 
         ExcelDataVo excelData = new ExcelDataVo();
         if(excelId != null){
-            ExcelData db = this.findOne(excelId, ExcelData.collectionName());
+            ExcelData db = this.findOne(excelId);
             if(db == null){
                 throw new BusinessException("没有找到对应的数据");
             }
@@ -92,7 +92,7 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
             List<SheetData> sdDbs = this.sheetDataService.queryByExcelId(excelId, SheetData.class);
             if(ValueUtils.isNotBlank(sdDbs)){
                 sdMap = sdDbs.stream().collect(Collectors.toMap(
-                        SheetData::getName, Function.identity()
+                        SheetData::getSheetName, Function.identity()
                 ));
             }
         }
@@ -104,7 +104,7 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
                     XSSFSheet sheet = (XSSFSheet)iterator.next();
                     SheetDataVo sheetData = new SheetDataVo();
                     XSSFDataUtils.parseData(sheetData, sheet, CellDataVo.class, CellValue.class);
-                    SheetData sdDb = sdMap.get(sheetData.getName());
+                    SheetData sdDb = sdMap.get(sheetData.getSheetName());
                     if(sdDb != null){
                         sheetData.setId(sdDb.getId());
                         sheetData.setCreateTime(sdDb.getCreateTime());
@@ -126,7 +126,7 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
                     HSSFSheet sheet = (HSSFSheet)iterator.next();
                     SheetDataVo sheetData = new SheetDataVo();
                     HSSFDataUtils.parseData(sheetData, sheet, CellDataVo.class, CellValue.class);
-                    SheetData sdDb = sdMap.get(sheetData.getName());
+                    SheetData sdDb = sdMap.get(sheetData.getSheetName());
                     if(sdDb != null){
                         sheetData.setId(sdDb.getId());
                         sheetData.setCreateTime(sdDb.getCreateTime());
@@ -207,8 +207,9 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
         zipOutputStream.close();
     }
 
+
     @Override
-    public ExcelData insert(ExcelData entity, String collectionName) {
+    public ExcelData insert(ExcelData entity) {
         if(entity.getId() == null){
             entity.setId(ObjectId.get());
         }
@@ -217,13 +218,22 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
             if(ValueUtils.isNotBlank(entityVo.getSheetDatas())){
                 for (SheetDataVo sheetDataVo : entityVo.getSheetDatas()){
                     sheetDataVo.setExcelId(entity.getId());
-                    this.sheetDataService.insert(sheetDataVo, SheetData.collectionName());
+                    this.sheetDataService.insert(sheetDataVo);
                 }
             }
         }
 
         ExcelData iEntity = BaseWrapper.parseOne(entity, ExcelData.class);
-        return super.insert(iEntity, collectionName);
+        return super.insert(iEntity);
+    }
+    @Override
+    public ExcelData insert(ExcelData entity, String collectionName) {
+        throw new BusinessException("不支持的方法");
+    }
+
+    @Override
+    public Collection<ExcelData> insertBatch(List<ExcelData> entities) {
+        throw new BusinessException("不支持的方法");
     }
 
     @Override
@@ -232,11 +242,11 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
     }
 
     @Override
-    public UpdateResult update(ExcelData entity, String collectionName) {
+    public UpdateResult update(ExcelData entity) {
         if(entity.getId() == null){
             throw new BusinessException("Id不能为空");
         }
-        ExcelData db = this.findOne(entity.getId(), ExcelData.collectionName());
+        ExcelData db = this.findOne(entity.getId());
         if(db == null){
             throw new BusinessException("没有找到数据");
         }
@@ -245,26 +255,45 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
             if(ValueUtils.isNotBlank(entityVo.getSheetDatas())){
                 for (SheetDataVo sheetDataVo : entityVo.getSheetDatas()){
                     sheetDataVo.setExcelId(entity.getId());
-                    this.sheetDataService.update(sheetDataVo, SheetData.collectionName());
+                    if(sheetDataVo.getId() != null){
+                        this.sheetDataService.update(sheetDataVo);
+                    }else{
+                        this.sheetDataService.insert(sheetDataVo);
+                    }
                 }
             }
         }
 
         ExcelData iEntity = BaseWrapper.parseOne(entity, ExcelData.class);
-        return super.update(iEntity, collectionName);
+        return super.update(iEntity);
+    }
+    @Override
+    public UpdateResult update(ExcelData entity, String collectionName) {
+        throw new BusinessException("不支持的方法");
     }
 
+
+    @Override
+    public BulkWriteResult updateBatch(List<ExcelData> entities) {
+        throw new BusinessException("不支持的方法");
+    }
     @Override
     public BulkWriteResult updateBatch(List<ExcelData> entities, String collectionName) {
         throw new BusinessException("不支持的方法");
     }
 
+
     @Override
     public long removeBatch(List<ObjectId> ids, String collectionName) {
+        throw new BusinessException("不支持的方法");
+    }
+
+    @Override
+    public long removeBatch(List<ObjectId> ids) {
         Criteria criteria = Criteria.where("excelId").in(ids);
-        List<SheetData> sheetDatas = this.sheetDataService.queryList(criteria, SheetData.collectionName());
+        List<SheetData> sheetDatas = this.sheetDataService.queryList(criteria);
         List<ObjectId> sheetDataIds = sheetDatas.stream().map(SheetData::getId).collect(Collectors.toList());
-        this.sheetDataService.removeBatch(sheetDataIds, SheetData.collectionName());
-        return super.removeBatch(ids, collectionName);
+        this.sheetDataService.removeBatch(sheetDataIds);
+        return super.removeBatch(ids);
     }
 }

@@ -50,7 +50,7 @@ public class FormServiceImpl extends BaseMongoServiceImpl<Form> implements IForm
     private IExcelDataService excelDataService;
 
     public FormSheetVo.Detail detail(ObjectId id){
-        Form form = this.findOne(id, Form.collectionName());
+        Form form = this.findOne(id);
         if(form == null){
             return null;
         }
@@ -68,10 +68,18 @@ public class FormServiceImpl extends BaseMongoServiceImpl<Form> implements IForm
     }
 
     @Override
+    public Form insert(Form entity) {
+        throw new BusinessException("不支持的方法");
+    }
+    @Override
     public Form insert(Form entity, String collectionName) {
         throw new BusinessException("不支持的方法");
     }
 
+    @Override
+    public Collection<Form> insertBatch(List<Form> entities) {
+        throw new BusinessException("不支持的方法");
+    }
     @Override
     public Collection<Form> insertBatch(List<Form> entities, String collectionName) {
         throw new BusinessException("不支持的方法");
@@ -106,12 +114,17 @@ public class FormServiceImpl extends BaseMongoServiceImpl<Form> implements IForm
         }
 
         if (ValueUtils.isNotBlank(formHeadSaves)) {
-            this.formHeadService.insertBatch(formHeadSaves, FormHead.collectionName());
+            this.formHeadService.insertBatch(formHeadSaves);
         }
-        this.excelDataService.insert(formExcelData, ExcelData.collectionName());
+        this.excelDataService.insert(formExcelData);
         List<Form> iEntities = BaseWrapper.parseList(forms, Form.class);
-        super.insertBatch(iEntities, Form.collectionName());
+        super.insertBatch(iEntities);
 
+    }
+
+    @Override
+    public UpdateResult update(Form entity) {
+        throw new BusinessException("不支持的方法");
     }
 
     @Override
@@ -119,6 +132,10 @@ public class FormServiceImpl extends BaseMongoServiceImpl<Form> implements IForm
         throw new BusinessException("不支持的方法");
     }
 
+    @Override
+    public BulkWriteResult updateBatch(List<Form> entities) {
+        throw new BusinessException("不支持的方法");
+    }
     @Override
     public BulkWriteResult updateBatch(List<Form> entities, String collectionName) {
         throw new BusinessException("不支持的方法");
@@ -140,7 +157,7 @@ public class FormServiceImpl extends BaseMongoServiceImpl<Form> implements IForm
                 }
             }
         }
-        List<Form> dbs = this.queryList(Criteria.where("_id").in(forms.stream().map(Form::getId).collect(Collectors.toList())), Form.collectionName());
+        List<Form> dbs = this.queryList(Criteria.where("_id").in(forms.stream().map(Form::getId).collect(Collectors.toList())));
         forms.clear(); forms = null;
         if(ValueUtils.isBlank(dbs)){
             throw new BusinessException("没有找到数据");
@@ -166,11 +183,11 @@ public class FormServiceImpl extends BaseMongoServiceImpl<Form> implements IForm
             }
         }
         if (ValueUtils.isNotBlank(formHeadSaves)) {
-            this.formHeadService.removeBatchByFormIds(forms.stream().map(Form::getId).collect(Collectors.toList()), Form.collectionName());
-            this.formHeadService.insertBatch(formHeadSaves, FormHead.collectionName());
+            this.formHeadService.removeBatchByFormIds(forms.stream().map(Form::getId).collect(Collectors.toList()));
+            this.formHeadService.insertBatch(formHeadSaves);
         }
-        this.excelDataService.update(formExcelData, ExcelData.collectionName());
+        this.excelDataService.update(formExcelData);
         List<Form> iEntities = BaseWrapper.parseList(forms, Form.class);
-        super.updateBatch(iEntities, Form.collectionName());
+        super.updateBatch(iEntities);
     }
 }

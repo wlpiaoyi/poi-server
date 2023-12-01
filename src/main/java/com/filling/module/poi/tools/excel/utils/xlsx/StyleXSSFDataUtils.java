@@ -31,6 +31,8 @@ public class StyleXSSFDataUtils {
         }
 
         synFont(dataStyle, cell);
+        dataStyle.setDfm(cellStyle.getDataFormat());
+        dataStyle.setDfmv(cellStyle.getDataFormatString());
         //自动换行
         if(cellStyle.getWrapText()){
             dataStyle.setTb(2);

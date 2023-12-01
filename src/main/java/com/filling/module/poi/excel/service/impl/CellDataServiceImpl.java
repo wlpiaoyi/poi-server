@@ -43,19 +43,32 @@ public class CellDataServiceImpl extends BaseMongoServiceImpl<CellData> implemen
     }
 
     @Override
+    public CellData insert(CellData entity) {
+        throw new BusinessException("不支持的方法");
+    }
+    @Override
     public CellData insert(CellData entity, String collectionName) {
         throw new BusinessException("不支持的方法");
     }
 
     @Override
-    public Collection<CellData> insertBatch(List<CellData> entities, String collectionName) {
+    public Collection<CellData> insertBatch(List<CellData> entities) {
         for (CellData cellData : entities){
             if(cellData.getId() == null){
                 cellData.setId(ObjectId.get());
             }
         }
         List<CellData> iEntities = BaseWrapper.parseList(entities, CellData.class);
-        return super.insertBatch(iEntities, collectionName);
+        return super.insertBatch(iEntities);
+    }
+//    @Override
+//    public Collection<CellData> insertBatch(List<CellData> entities, String collectionName) {
+//        throw new BusinessException("不支持的方法");
+//    }
+
+    @Override
+    public UpdateResult update(CellData entity) {
+        throw new BusinessException("不支持的方法");
     }
 
     @Override
@@ -63,6 +76,12 @@ public class CellDataServiceImpl extends BaseMongoServiceImpl<CellData> implemen
         throw new BusinessException("不支持的方法");
     }
 
+
+    @Override
+    public BulkWriteResult updateBatch(List<CellData> entities) {
+        List<CellData> iEntities = BaseWrapper.parseList(entities, CellData.class);
+        return super.updateBatch(iEntities);
+    }
     @Override
     public BulkWriteResult updateBatch(List<CellData> entities, String collectionName) {
         List<CellData> iEntities = BaseWrapper.parseList(entities, CellData.class);
@@ -121,4 +140,13 @@ public class CellDataServiceImpl extends BaseMongoServiceImpl<CellData> implemen
     }
 
 
+//    @Override
+//    public long removeBatch(List<ObjectId> ids) {
+//        throw new BusinessException("不支持的方法");
+//    }
+//
+//    @Override
+//    public long removeBatch(List<ObjectId> ids, String collectionName) {
+//        throw new BusinessException("不支持的方法");
+//    }
 }

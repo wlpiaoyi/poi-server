@@ -17,6 +17,6 @@ public interface IFormHeadService<M extends FormHead> extends IBaseMongoService<
     List<M> queryListByFormId(ObjectId formId);
 
 
-    long removeBatchByFormIds(List<ObjectId> ids, String collectionName);
+    long removeBatchByFormIds(List<ObjectId> ids);
 
 }

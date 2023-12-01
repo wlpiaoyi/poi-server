@@ -20,20 +20,28 @@ import java.util.List;
  */
 public interface IBaseMongoService <M> {
 
+    M findOne(ObjectId id);
     M findOne(ObjectId id, String collectionName);
 
+    List<M> queryList(Criteria criteria);
     List<M> queryList(Criteria criteria, String collectionName);
 
+    Page<M> queryPage(Query query);
     Page<M> queryPage(Query query, String collectionName);
 
+    M insert(M entity);
     M insert(M entity, String collectionName);
 
+    Collection<M> insertBatch(List<M> entities);
     Collection<M> insertBatch(List<M> entities, String collectionName);
 
+    UpdateResult update(M entity);
     UpdateResult update(M entity, String collectionName);
 
+    BulkWriteResult updateBatch(List<M> entities);
     BulkWriteResult updateBatch(List<M> entities, String collectionName);
 
     long removeBatch(List<ObjectId> ids, String collectionName);
+    long removeBatch(List<ObjectId> ids);
 
 }

@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Update;
 
 import javax.validation.constraints.NotBlank;
@@ -30,6 +31,8 @@ import java.util.List;
 @Schema(description = "")
 @EqualsAndHashCode(callSuper = true)
 public class CellData extends BaseMongoEntity {
+
+    public static final String COLLECTION_NAME = "poi_sheet_data";
 
     public static String getCollectionName(){
         throw new BusinessException("un support method");

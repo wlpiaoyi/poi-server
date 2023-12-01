@@ -98,12 +98,12 @@ public class SheetDataVo extends SheetData implements ISheetData {
 
     @Override
     public String sheetName() {
-        return this.getName();
+        return this.getSheetName();
     }
 
     @Override
     public void putSheetName(String name) {
-        this.setName(name);
+        this.setSheetName(name);
     }
 
     @Override

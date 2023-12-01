@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -23,12 +24,13 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @Schema(description = "表单头")
+@Document(collection = "poi_form_head")
 @EqualsAndHashCode(callSuper = true)
 public class FormHead extends BaseMongoEntity {
 
-    public static String collectionName(){
-        return "poi_form_head";
-    }
+//    public static String collectionName(){
+//        return "poi_form_head";
+//    }
 
     public void onlyMainDataForLocation(){
         if(this.location != null){

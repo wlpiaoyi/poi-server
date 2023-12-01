@@ -4,13 +4,12 @@ import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.filling.framework.common.exception.BusinessException;
 import com.filling.framework.common.tools.ValueUtils;
-import com.filling.framework.common.tools.gson.GsonBuilder;
 import com.filling.module.poi.domain.entity.BaseMongoEntity;
 import com.filling.module.poi.service.IBaseMongoService;
-import com.google.gson.Gson;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ResolvableType;
@@ -28,9 +27,12 @@ import java.util.*;
  * {@code @date:}           2023/11/24 10:23
  * {@code @version:}:       1.0
  */
+@Slf4j
 public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMongoService<M> {
 
-    protected Class<M> currentModelClass() {
+
+
+    protected Class<M> currentEntityClass() {
         return (Class)this.getResolvableType().as(BaseMongoServiceImpl.class).getGeneric(new int[]{0}).getType();
     }
 
@@ -41,11 +43,26 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
     @Autowired(required = false)
     protected MongoTemplate baseTemplate;
 
+    public M findOne(ObjectId id){
+        return this.baseTemplate.findOne(new Query(Criteria.where("_id").is(id)), this.currentEntityClass());
+    }
+
     public M findOne(ObjectId id, String collectionName){
-        return this.baseTemplate.findOne(new Query(Criteria.where("_id").is(id)), this.currentModelClass(), collectionName);
+        return this.baseTemplate.findOne(new Query(Criteria.where("_id").is(id)), this.currentEntityClass(), collectionName);
     }
 
 
+    @Override
+    public List<M> queryList(Criteria criteria) {
+        Query query;
+        if(criteria == null){
+            query = new Query();
+        }else{
+            query = new Query(criteria);
+        }
+        List<M> list = baseTemplate.find(query, currentEntityClass());
+        return list;
+    }
     @Override
     public List<M> queryList(Criteria criteria, String collectionName) {
         Query query;
@@ -54,10 +71,32 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
         }else{
             query = new Query(criteria);
         }
-        List<M> list = baseTemplate.find(query, currentModelClass(), collectionName);
+        List<M> list = baseTemplate.find(query, currentEntityClass(), collectionName);
         return list;
     }
 
+    @Override
+    public Page<M> queryPage(Query query) {
+        //获取总数量
+        long total = baseTemplate.count(query, currentEntityClass());
+        Page<M> page = new Page<>();
+        page.setTotal(total);
+        if(query.getSkip() >= total){
+            return page;
+        }
+        if(query.getSkip() < 0){
+            query.skip(0);
+        }
+        if(query.getLimit() <= 0){
+            query.limit(Integer.MAX_VALUE);
+        }
+        //查询当前页的数据。
+        List<M> list = baseTemplate.find(query, currentEntityClass());
+        page.setCurrent(query.getSkip() / query.getLimit());
+        page.setSize(query.getLimit());
+        page.setRecords(list);
+        return page;
+    }
     @Override
     public Page<M> queryPage(Query query, String collectionName) {
         //获取总数量
@@ -74,23 +113,52 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
             query.limit(Integer.MAX_VALUE);
         }
         //查询当前页的数据。
-        List<M> list = baseTemplate.find(query, currentModelClass(), collectionName);
+        List<M> list = baseTemplate.find(query, currentEntityClass(), collectionName);
         page.setCurrent(query.getSkip() / query.getLimit());
         page.setSize(query.getLimit());
         page.setRecords(list);
         return page;
     }
 
+
+    @Override
+    public M insert(M entity) {
+        entity.setCreateTime(new Date());
+        if(entity.getId() == null){
+            entity.setId(ObjectId.get());
+        }
+        try{
+            log.info("mongoTemplate insert to collection {}, data {}", entity);
+            return this.baseTemplate.insert(entity);
+        }catch (Exception e){
+            throw e;
+        }
+    }
     @Override
     public M insert(M entity, String collectionName) {
         entity.setCreateTime(new Date());
         if(entity.getId() == null){
             entity.setId(ObjectId.get());
         }
-        return this.baseTemplate.insert(entity, collectionName);
+        try{
+            log.info("mongoTemplate insert to collection {}, data {}", collectionName, entity);
+            return this.baseTemplate.insert(entity, collectionName);
+        }catch (Exception e){
+            throw e;
+        }
     }
 
 
+    @Override
+    public Collection<M> insertBatch(List<M> entities) {
+        for (M entity : entities){
+            entity.setCreateTime(new Date());
+            if(entity.getId() == null){
+                entity.setId(ObjectId.get());
+            }
+        }
+        return this.baseTemplate.insert(entities, this.currentEntityClass());
+    }
     @Override
     public Collection<M> insertBatch(List<M> entities, String collectionName) {
         for (M entity : entities){
@@ -103,15 +171,33 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
     }
 
     @Override
+    public UpdateResult update(M entity) {
+        if(ValueUtils.isBlank(entity.getId())){
+            throw new BusinessException("更新数据Id不能为空");
+        }
+        Criteria criteria = Criteria.where("_id").is(entity.getId());
+        Update update = entity.parseForUpdate(null);
+        return this.baseTemplate.updateFirst(new Query(criteria), update, this.currentEntityClass());
+    }
+    @Override
     public UpdateResult update(M entity, String collectionName) {
         if(ValueUtils.isBlank(entity.getId())){
             throw new BusinessException("更新数据Id不能为空");
         }
         Criteria criteria = Criteria.where("_id").is(entity.getId());
         Update update = entity.parseForUpdate(null);
-        return this.baseTemplate.updateFirst(new Query(criteria), update, collectionName);
+        return this.baseTemplate.updateFirst(new Query(criteria), update, this.currentEntityClass(), collectionName);
     }
 
+    public BulkWriteResult updateBatch(List<M> entities) {
+
+        BulkOperations operations = this.baseTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, this.currentEntityClass());
+        for (M entity : entities) {
+            Update update = entity.parseForUpdate(null);
+            operations.updateOne(Query.query(Criteria.where("id").is(entity.getId())), update);
+        }
+        return operations.execute();
+    }
     public BulkWriteResult updateBatch(List<M> entities, String collectionName) {
 
         BulkOperations operations = this.baseTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, collectionName);
@@ -126,6 +212,14 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
     public long removeBatch(List<ObjectId> ids, String collectionName) {
         Criteria criteria = Criteria.where("_id").in(ids);
         DeleteResult res = this.baseTemplate.remove(new Query(criteria), collectionName);
+        return res.getDeletedCount();
+    }
+
+
+    @Override
+    public long removeBatch(List<ObjectId> ids) {
+        Criteria criteria = Criteria.where("_id").in(ids);
+        DeleteResult res = this.baseTemplate.remove(new Query(criteria), this.currentEntityClass());
         return res.getDeletedCount();
     }
 }

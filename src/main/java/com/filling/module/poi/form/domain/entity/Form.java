@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.nio.charset.StandardCharsets;
@@ -25,12 +26,13 @@ import java.security.MessageDigest;
  */
 @Data
 @Schema(description = "表单")
+@Document(collection = "poi_form")
 @EqualsAndHashCode(callSuper = true)
 public class Form extends BaseMongoEntity {
 
-    public static String collectionName(){
-        return "poi_form";
-    }
+//    public static String collectionName(){
+//        return "poi_form";
+//    }
 
 
     /** tableName **/

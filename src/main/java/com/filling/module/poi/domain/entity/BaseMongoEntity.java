@@ -26,9 +26,9 @@ import java.util.Random;
 @EqualsAndHashCode(callSuper = false)
 public class BaseMongoEntity extends BaseEntity{
 
-    public static String collectionName(){
-        return BaseMongoEntity.class.getName();
-    }
+//    public static String collectionName(){
+//        return BaseMongoEntity.class.getName();
+//    }
 
     @JsonSerialize(using = ToStringSerializer.class)
     @Schema(description = "主键id")

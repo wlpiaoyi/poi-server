@@ -1,5 +1,6 @@
 package com.filling.module.poi.excel.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.tools.excel.ICellValue;
 import com.filling.module.poi.tools.excel.Scope;
@@ -22,6 +23,7 @@ public class CellValue implements ICellValue {
      * 是否为空
      * @return
      */
+    @JsonIgnore
     public boolean notEmpty(){
         if(ValueUtils.isNotBlank(this.getV())){
             return true;

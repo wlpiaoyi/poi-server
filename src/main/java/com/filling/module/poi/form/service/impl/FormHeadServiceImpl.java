@@ -34,17 +34,21 @@ public class FormHeadServiceImpl extends BaseMongoServiceImpl<FormHead> implemen
     @Override
     public List<FormHead> queryListByFormId(ObjectId formId) {
         Criteria criteria = Criteria.where("formId").is(formId);
-        List<FormHead> datas = this.queryList(criteria, FormHead.collectionName());
+        List<FormHead> datas = this.queryList(criteria);
         return datas;
     }
 
+    @Override
+    public FormHead insert(FormHead entity) {
+        throw new BusinessException("不支持的方法");
+    }
     @Override
     public FormHead insert(FormHead entity, String collectionName) {
         throw new BusinessException("不支持的方法");
     }
 
     @Override
-    public Collection<FormHead> insertBatch(List<FormHead> entities, String collectionName) {
+    public Collection<FormHead> insertBatch(List<FormHead> entities) {
         for (FormHead formHead : entities){
             if(formHead.getId() == null){
                 formHead.setId(ObjectId.get());
@@ -59,11 +63,24 @@ public class FormHeadServiceImpl extends BaseMongoServiceImpl<FormHead> implemen
         }
         FormHeadVo.checkDatas(entities);
         List<FormHead> iEntities = BaseWrapper.parseList(entities, FormHead.class);
-        return super.insertBatch(iEntities, collectionName);
+        return super.insertBatch(iEntities);
+    }
+    @Override
+    public Collection<FormHead> insertBatch(List<FormHead> entities, String collectionName) {
+        throw new BusinessException("不支持的方法");
     }
 
     @Override
+    public UpdateResult update(FormHead entity) {
+        throw new BusinessException("不支持的方法");
+    }
+    @Override
     public UpdateResult update(FormHead entity, String collectionName) {
+        throw new BusinessException("不支持的方法");
+    }
+
+    @Override
+    public BulkWriteResult updateBatch(List<FormHead> entities) {
         throw new BusinessException("不支持的方法");
     }
 
@@ -73,9 +90,9 @@ public class FormHeadServiceImpl extends BaseMongoServiceImpl<FormHead> implemen
     }
 
     @Override
-    public long removeBatchByFormIds(List<ObjectId> ids, String collectionName) {
+    public long removeBatchByFormIds(List<ObjectId> ids) {
         Criteria criteria = Criteria.where("formId").in(ids);
-        DeleteResult res = this.baseTemplate.remove(new Query(criteria), collectionName);
+        DeleteResult res = this.baseTemplate.remove(new Query(criteria), FormHead.class);
         return res.getDeletedCount();
     }
 }

@@ -57,7 +57,7 @@ public class ExcelDataController {
     @Operation(summary ="新增Excel")
     @ResponseBody
     public R save(@RequestBody ExcelDataVo body) {
-        this.excelDataService.insert(body, ExcelData.collectionName());
+        this.excelDataService.insert(body);
         return R.success(body);
     }
 
@@ -74,9 +74,9 @@ public class ExcelDataController {
                 ValueUtils.isNotBlank(excelId) ? new ObjectId(excelId) : null);
         excelData.setName(args[0]);
         if(excelData.getId() != null){
-            this.excelDataService.update(excelData, ExcelData.collectionName());
+            this.excelDataService.update(excelData);
         }else{
-            this.excelDataService.insert(excelData, ExcelData.collectionName());
+            this.excelDataService.insert(excelData);
         }
         return R.success(excelData);
     }
@@ -87,7 +87,7 @@ public class ExcelDataController {
     @Operation(summary ="修改Excel")
     @ResponseBody
     public R update(@RequestBody ExcelDataVo body) {
-        this.excelDataService.update(body, ExcelData.collectionName());
+        this.excelDataService.update(body);
         return R.success(body);
     }
 
@@ -118,6 +118,6 @@ public class ExcelDataController {
         for(String hexId : hexIds.split(",")){
             objIds.add(new ObjectId(hexId));
         }
-        return R.success(excelDataService.removeBatch(objIds, ExcelData.collectionName()));
+        return R.success(excelDataService.removeBatch(objIds));
     }
 }
