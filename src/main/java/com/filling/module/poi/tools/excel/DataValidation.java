@@ -46,6 +46,10 @@ public class DataValidation {
         /** 验证类型 **/
         @Schema(description = "验证类型")
         private int validationType = -1;
+
+        /** 日期格式化 **/
+        @Schema(description = "日期格式化")
+        private String dateFormat = "YYYY/MM/DD";
         private int operator = -1;
 
         /** 下拉规则 **/

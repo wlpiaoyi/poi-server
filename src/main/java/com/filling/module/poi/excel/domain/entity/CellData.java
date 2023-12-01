@@ -35,10 +35,6 @@ public class CellData extends BaseMongoEntity {
 
     public static final String COLLECTION_NAME = "poi_sheet_data";
 
-    public static String getCollectionName(){
-        throw new BusinessException("un support method");
-    }
-
     public String mapKey(){
         if(this.c < 0){
             return super.mapKey();

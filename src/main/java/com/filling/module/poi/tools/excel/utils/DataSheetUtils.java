@@ -149,8 +149,12 @@ public class DataSheetUtils {
 
     public static byte[] hexToBytes(String fc) {
         if(fc.startsWith("#")){
-            byte[] bytes = ValueUtils.hexToBytes(fc.substring(1));
-            return bytes;
+            try{
+                byte[] bytes = ValueUtils.hexToBytes(fc.substring(1));
+                return bytes;
+            }catch (Exception e){
+                throw e;
+            }
         }else if(fc.startsWith("rgb(")){
             Integer[] ints = ValueUtils.toIntegerArray(fc.substring(4, fc.length() - 1).replaceAll(" ", ""));
             byte[] bytes = new byte[]{0,0,0};

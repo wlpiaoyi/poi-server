@@ -3,6 +3,7 @@ package com.filling.module.poi.tools.excel.utils.xlsx;
 import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.tools.excel.DataValidation;
 import com.filling.module.poi.tools.excel.Scope;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFDataValidation;
@@ -54,31 +55,37 @@ class DataValidationUtils {
     @NotNull
     private static XSSFDataValidationConstraint getDataValidationConstraint(DataValidation dataValidation) {
         XSSFDataValidationConstraint constraint = null;
-        if(ValueUtils.isNotBlank(dataValidation.getContainer().getExplicitListOfValues())){
-            constraint = new XSSFDataValidationConstraint(dataValidation.getContainer().getExplicitListOfValues());
-        }else{
-            constraint = new XSSFDataValidationConstraint(
-                    dataValidation.getContainer().getValidationType(),
-                    dataValidation.getContainer().getOperator(),
-                    dataValidation.getContainer().getFormula1(),
-                    dataValidation.getContainer().getFormula2()
-            );
+
+        switch (dataValidation.getContainer().getValidationType()){
+            case DataValidationConstraint.ValidationType.LIST:{
+                constraint = new XSSFDataValidationConstraint(dataValidation.getContainer().getExplicitListOfValues());
+            }
+            break;
+            default:{
+                constraint = new XSSFDataValidationConstraint(
+                        dataValidation.getContainer().getValidationType(),
+                        dataValidation.getContainer().getOperator(),
+                        dataValidation.getContainer().getFormula1(),
+                        dataValidation.getContainer().getFormula2()
+                );
+            }
+            break;
         }
         return constraint;
     }
 
-    @NotNull
-    private static List<Scope> getCellRanges(XSSFDataValidation sheetDv) {
-        List<Scope> cellRanges = new ArrayList<>();
-        for (CellRangeAddress crd : sheetDv.getRegions().getCellRangeAddresses()){
-            Scope cellRange = new Scope();
-            cellRange.setR(crd.getFirstRow());
-            cellRange.setC(crd.getFirstColumn());
-            cellRange.setRs(crd.getLastRow() - crd.getFirstRow());
-            cellRange.setCs(crd.getLastColumn() - crd.getFirstColumn());
-            cellRanges.add(cellRange);
-        }
-        return cellRanges;
-    }
+//    @NotNull
+//    private static List<Scope> getCellRanges(XSSFDataValidation sheetDv) {
+//        List<Scope> cellRanges = new ArrayList<>();
+//        for (CellRangeAddress crd : sheetDv.getRegions().getCellRangeAddresses()){
+//            Scope cellRange = new Scope();
+//            cellRange.setR(crd.getFirstRow());
+//            cellRange.setC(crd.getFirstColumn());
+//            cellRange.setRs(crd.getLastRow() - crd.getFirstRow());
+//            cellRange.setCs(crd.getLastColumn() - crd.getFirstColumn());
+//            cellRanges.add(cellRange);
+//        }
+//        return cellRanges;
+//    }
 
 }

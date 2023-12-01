@@ -47,7 +47,7 @@ public class DataStyle {
     private String dfmv;
 
     @Transient
-    private XSSFDataFormat dataFormat;
+    private Object dataFormat;
 
     public String toString(){
         return "bg:" + this.getBg()

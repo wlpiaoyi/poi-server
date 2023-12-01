@@ -20,13 +20,21 @@ public class DataXSSFUtils {
     public static void parseSheet(XSSFWorkbook workbook, ISheetData sheetData){
         DataSheetUtils.parseSheet(workbook, sheetData, (cell, dataStyle, cellData) -> {
             DataStyleUtils.setCellStyle((XSSFCell) cell, dataStyle);
-        }, (sheet, isheetData) -> {
-            if(ValueUtils.isNotBlank(isheetData.gridInfo().getCellMerges())){
-                setMergedRegions((XSSFSheet) sheet, isheetData.gridInfo().getCellMerges());
+        }, (sheet, iSheetData) -> {
+            if(sheet == null){
+                return;
             }
-            if(ValueUtils.isNotBlank(isheetData.gridInfo().getDataValidations())){
-//                isheetData.gridInfo().setDataValidations(new ArrayList<>());
-                DataValidationUtils.setValidation((XSSFSheet) sheet, isheetData.gridInfo().getDataValidations());
+            if(iSheetData == null){
+                return;
+            }
+            if(iSheetData.gridInfo() == null){
+                return;
+            }
+            if(ValueUtils.isNotBlank(iSheetData.gridInfo().getCellMerges())){
+                setMergedRegions((XSSFSheet) sheet, iSheetData.gridInfo().getCellMerges());
+            }
+            if(ValueUtils.isNotBlank(iSheetData.gridInfo().getDataValidations())){
+                DataValidationUtils.setValidation((XSSFSheet) sheet, iSheetData.gridInfo().getDataValidations());
             }
         });
     }

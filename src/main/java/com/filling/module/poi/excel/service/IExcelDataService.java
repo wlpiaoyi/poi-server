@@ -35,7 +35,7 @@ public interface IExcelDataService <M extends ExcelData> extends IBaseMongoServi
      * @param outputStream
      * @throws IOException
      */
-    void putOutputStreamByExcelData(ExcelDataVo excelDataVo, OutputStream outputStream) throws IOException;
+    void putOutputStreamByExcelData(ExcelDataVo excelDataVo, String fileType, OutputStream outputStream) throws IOException;
     void putOutputStreamByExcelData(Collection<ExcelDataVo> excelDataVos, OutputStream outputStream) throws IOException;
 
 }

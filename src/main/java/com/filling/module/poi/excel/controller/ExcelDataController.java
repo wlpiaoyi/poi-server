@@ -94,17 +94,24 @@ public class ExcelDataController {
     @GetMapping("/downloadExcel")
     @ApiOperationSupport(order = 3)
     @Operation(summary ="下载Excel")
-    public void downloadExcel(@RequestParam(name = "id") String hexId, HttpServletResponse response) throws IOException {
+    public void downloadExcel(@RequestParam(name = "id") String hexId,
+                              @RequestParam(required = false, defaultValue = "xlsx") String fileType,
+                              HttpServletResponse response) throws IOException {
         ObjectId objId = new ObjectId(hexId);
         ExcelDataVo excelData = this.excelDataService.detail(objId);
         if(excelData == null){
             throw new BusinessException("没有找到Excel数据");
         }
+        if(fileType.equals("xls")){
+
+        }else{
+            fileType = "xlsx";
+        }
         response.setCharacterEncoding(Charsets.UTF_8.name());
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("content-Disposition","attachment;filename=" + excelData.getName() + ".xlsx");
+        response.setHeader("content-Disposition","attachment;filename=" + excelData.getName() + "." + fileType);
         response.setStatus(200);
-        this.excelDataService.putOutputStreamByExcelData(excelData, response.getOutputStream());
+        this.excelDataService.putOutputStreamByExcelData(excelData, fileType, response.getOutputStream());
     }
 
     /**

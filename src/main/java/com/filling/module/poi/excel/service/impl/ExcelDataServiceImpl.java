@@ -13,6 +13,7 @@ import com.filling.module.poi.excel.domain.wrapper.BaseWrapper;
 import com.filling.module.poi.excel.service.IExcelDataService;
 import com.filling.module.poi.excel.service.ISheetDataService;
 import com.filling.module.poi.service.impl.BaseMongoServiceImpl;
+import com.filling.module.poi.tools.excel.utils.xls.DataHSSFUtils;
 import com.filling.module.poi.tools.excel.utils.xls.HSSFDataUtils;
 import com.filling.module.poi.tools.excel.utils.xlsx.DataXSSFUtils;
 //import com.filling.module.poi.tools.excel.utils.HSSFDataUtils;
@@ -143,15 +144,26 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
     }
 
     @Override
-    public void putOutputStreamByExcelData(ExcelDataVo excelDataVo, OutputStream outputStream) throws IOException {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        for (SheetDataVo sheetDataVo : ((ExcelDataVo<SheetDataVo>) excelDataVo).getSheetDatas()){
-            DataXSSFUtils.parseSheet(workbook, sheetDataVo);
+    public void putOutputStreamByExcelData(ExcelDataVo excelDataVo, String fileType, OutputStream outputStream) throws IOException {
+        if(fileType.equals("xls")){
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            for (SheetDataVo sheetDataVo : ((ExcelDataVo<SheetDataVo>) excelDataVo).getSheetDatas()){
+                DataHSSFUtils.parseSheet(workbook, sheetDataVo);
+            }
+            workbook.write(outputStream);
+            outputStream.flush();
+            outputStream.close();
+            workbook.close();
+        }else{
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            for (SheetDataVo sheetDataVo : ((ExcelDataVo<SheetDataVo>) excelDataVo).getSheetDatas()){
+                DataXSSFUtils.parseSheet(workbook, sheetDataVo);
+            }
+            workbook.write(outputStream);
+            outputStream.flush();
+            outputStream.close();
+            workbook.close();
         }
-        workbook.write(outputStream);
-        outputStream.flush();
-        outputStream.close();
-        workbook.close();
     }
 
 

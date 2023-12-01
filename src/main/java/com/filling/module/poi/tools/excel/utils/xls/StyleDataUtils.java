@@ -5,6 +5,7 @@ import com.filling.module.poi.tools.excel.DataStyle;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.util.HSSFColor;
 
 import java.util.Locale;
 
@@ -16,16 +17,31 @@ import java.util.Locale;
  */
 class StyleDataUtils {
 
+    static String parseColorToHexString(HSSFColor color){
+        short[] rgb =  color.getTriplet();
+        String hexString = "";
+        for (short v : rgb){
+            String arg = Integer.toHexString(v);
+            if(arg.length() == 1){
+                hexString += "0";
+            }
+            hexString += arg;
+        }
+        return hexString;
+
+    }
+
 
     static boolean setDataStyle(DataStyle dataStyle, HSSFCell cell) {
 
         HSSFCellStyle cellStyle = cell.getCellStyle();
         if(cellStyle.getFillBackgroundColorColor() != null){
-            dataStyle.setBg("#" + cellStyle.getFillBackgroundColorColor().getHexString().toUpperCase(Locale.ROOT));
+//            dataStyle.setBg(("#" + parseColorToHexString(cellStyle.getFillBackgroundColorColor())) .toUpperCase(Locale.ROOT));
+            dataStyle.setBg("#FFFFFF");
         }
-
         synFont(dataStyle, cell);
         dataStyle.setDfm(cellStyle.getDataFormat());
+        dataStyle.setDfmv(cellStyle.getDataFormatString());
         //自动换行
         if(cellStyle.getWrapText()){
             dataStyle.setTb(2);
@@ -72,7 +88,7 @@ class StyleDataUtils {
             dataStyle.setFf("宋体");
         }
         if(font.getHSSFColor(cell.getSheet().getWorkbook()) != null){
-            dataStyle.setFc("#" + font.getHSSFColor(cell.getSheet().getWorkbook()).getHexString().toUpperCase(Locale.ROOT));
+            dataStyle.setFc("#" + parseColorToHexString(font.getHSSFColor(cell.getSheet().getWorkbook())).toUpperCase(Locale.ROOT));
         }
         dataStyle.setIt(font.getItalic() ? 1 : 0);
         dataStyle.setBl(font.getBold() ? 1 : 0);

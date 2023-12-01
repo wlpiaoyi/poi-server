@@ -21,9 +21,22 @@ public class DataHSSFUtils {
         DataSheetUtils.parseSheet(workbook, sheetData, (cell, dataStyle, cellData) -> {
             DataStyleUtils.setCellStyle((HSSFCell) cell, dataStyle);
         }, (sheet, iSheetData) -> {
+            if(sheet == null){
+                return;
+            }
+            if(iSheetData == null){
+                return;
+            }
+            if(iSheetData.gridInfo() == null){
+                return;
+            }
             if(ValueUtils.isNotBlank(iSheetData.gridInfo().getCellMerges())){
                 setMergedRegions((HSSFSheet) sheet, iSheetData.gridInfo().getCellMerges());
             }
+            if(ValueUtils.isNotBlank(iSheetData.gridInfo().getDataValidations())){
+                DataValidationUtils.setValidation((HSSFSheet) sheet, iSheetData.gridInfo().getDataValidations());
+            }
+
         });
     }
 

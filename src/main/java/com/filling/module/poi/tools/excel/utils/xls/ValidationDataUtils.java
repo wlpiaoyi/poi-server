@@ -1,10 +1,11 @@
-package com.filling.module.poi.tools.excel.utils.xlsx;
+package com.filling.module.poi.tools.excel.utils.xls;
 
 import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.tools.excel.DataValidation;
 import com.filling.module.poi.tools.excel.Scope;
+import org.apache.poi.hssf.usermodel.HSSFDataValidation;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.jetbrains.annotations.NotNull;
@@ -15,16 +16,17 @@ import java.util.List;
 /**
  * {@code @author:}         wlpiaoyi
  * {@code @description:}    TODO
- * {@code @date:}           2023/12/1 12:35
+ * {@code @date:}           2023/12/1 17:32
  * {@code @version:}:       1.0
  */
-class ValidationDataUtils {
+public class ValidationDataUtils {
 
-    static boolean setData(XSSFSheet sheet, List<DataValidation> dataValidations){
+    static boolean setData(HSSFSheet sheet, List<DataValidation> dataValidations){
         if(ValueUtils.isBlank(sheet.getDataValidations())){
             return false;
         }
-        for (XSSFDataValidation sheetDv : sheet.getDataValidations()){
+
+        for (HSSFDataValidation sheetDv : sheet.getDataValidations()){
             DataValidation dataValidation = new DataValidation();
             dataValidation.setContainer(new DataValidation.Container());
             dataValidation.getContainer().setExplicitListOfValues(sheetDv.getValidationConstraint().getExplicitListValues());
@@ -42,8 +44,9 @@ class ValidationDataUtils {
         return true;
     }
 
+
     @NotNull
-    private static List<Scope> getCellRanges(XSSFDataValidation sheetDv) {
+    private static List<Scope> getCellRanges(HSSFDataValidation sheetDv) {
         List<Scope> cellRanges = new ArrayList<>();
         for (CellRangeAddress crd : sheetDv.getRegions().getCellRangeAddresses()){
             Scope cellRange = new Scope();
@@ -55,5 +58,4 @@ class ValidationDataUtils {
         }
         return cellRanges;
     }
-
 }

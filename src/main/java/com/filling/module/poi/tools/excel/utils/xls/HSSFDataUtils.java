@@ -7,6 +7,8 @@ import com.filling.module.poi.tools.excel.utils.SheetDataUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 
+import java.util.ArrayList;
+
 /**
  * {@code @author:}         wlpiaoyi
  * {@code @description:}    TODO
@@ -21,7 +23,8 @@ public class HSSFDataUtils {
         SheetDataUtils.parseData(sheetData, sheet, cdClazz, cvClass, (cell, curDataStyle) -> {
             StyleDataUtils.setDataStyle(curDataStyle, (HSSFCell) cell);
         }, (hsheet, isheetData)->{
-
+            isheetData.gridInfo().setDataValidations(new ArrayList<>());
+            ValidationDataUtils.setData((HSSFSheet) hsheet, isheetData.gridInfo().getDataValidations());
         });
     }
 }

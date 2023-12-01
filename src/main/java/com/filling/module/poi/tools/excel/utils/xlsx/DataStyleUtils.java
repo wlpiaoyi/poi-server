@@ -28,7 +28,7 @@ class DataStyleUtils {
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         }
         if(dataStyle.getDfm() > 0 && ValueUtils.isNotBlank(dataStyle.getDfmv())){
-            XSSFDataFormat dataFormat = dataStyle.getDataFormat();
+            XSSFDataFormat dataFormat = (XSSFDataFormat) dataStyle.getDataFormat();
             if(dataFormat == null){
                 dataFormat = cell.getSheet().getWorkbook().createDataFormat();
                 dataStyle.setDataFormat(dataFormat);
