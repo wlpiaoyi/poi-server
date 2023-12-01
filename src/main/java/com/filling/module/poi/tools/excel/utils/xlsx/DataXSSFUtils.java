@@ -3,11 +3,9 @@ package com.filling.module.poi.tools.excel.utils.xlsx;
 import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.tools.excel.*;
 import com.filling.module.poi.tools.excel.utils.DataSheetUtils;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,7 +19,7 @@ public class DataXSSFUtils {
 
     public static void parseSheet(XSSFWorkbook workbook, ISheetData sheetData){
         DataSheetUtils.parseSheet(workbook, sheetData, (cell, dataStyle, cellData) -> {
-            DataStyleXSSFUtils.setCellStyle((XSSFCell) cell, dataStyle);
+            DataStyleUtils.setCellStyle((XSSFCell) cell, dataStyle);
         }, (sheet, isheetData) -> {
             if(ValueUtils.isNotBlank(isheetData.gridInfo().getCellMerges())){
                 setMergedRegions((XSSFSheet) sheet, isheetData.gridInfo().getCellMerges());
@@ -56,7 +54,7 @@ public class DataXSSFUtils {
                     }
                     cell = row.createCell(c);
                     XSSFCellStyle cellStyle = cell.getRow().getSheet().getWorkbook().createCellStyle();
-                    DataStyleXSSFUtils.synCellBorderStyle(cellStyle);
+                    DataStyleUtils.synCellBorderStyle(cellStyle);
                     cell.setCellStyle(cellStyle);
                 }
             }

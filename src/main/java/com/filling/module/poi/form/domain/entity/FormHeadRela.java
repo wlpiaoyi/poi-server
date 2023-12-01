@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotNull;
 
@@ -57,20 +58,24 @@ public class FormHeadRela extends BaseMongoEntity{
     @Schema(description = "当前表头Id")
     @NotNull(message = "当前表头Id不能为空")
     @JsonSerialize(using = ToStringSerializer.class)
+    @Indexed
     private ObjectId headId;
     /** 关联表头Id **/
     @Schema(description = "关联表头Id")
     @JsonSerialize(using = ToStringSerializer.class)
+    @Indexed
     private ObjectId headRelaId;
 
     /** 当前表单Id **/
     @Schema(description = "当前表单Id")
     @NotNull(message = "当前表单Id不能为空")
     @JsonSerialize(using = ToStringSerializer.class)
+    @Indexed
     private ObjectId formId;
     /** 关联表单Id **/
     @Schema(description = "关联表单Id")
     @JsonSerialize(using = ToStringSerializer.class)
+    @Indexed
     private ObjectId formRelaId;
 
     @Schema(description = "关联字段名字（外部关联时使用）")

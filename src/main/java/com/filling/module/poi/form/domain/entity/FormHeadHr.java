@@ -6,6 +6,7 @@ import com.filling.module.poi.domain.entity.BaseMongoEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotNull;
 
@@ -33,6 +34,7 @@ public class FormHeadHr extends BaseMongoEntity {
     @Schema(description = "表单Id")
     @NotNull(message = "表单Id不能为空")
     @JsonSerialize(using = ToStringSerializer.class)
+    @Indexed
     private Long formId;
 
     /** 表数据项code **/

@@ -18,9 +18,9 @@ import java.util.List;
  * {@code @date:}           2023/12/1 12:35
  * {@code @version:}:       1.0
  */
-public class ValidationDataUtils {
+class ValidationDataUtils {
 
-    public static boolean setData(XSSFSheet sheet, List<DataValidation> dataValidations){
+    static boolean setData(XSSFSheet sheet, List<DataValidation> dataValidations){
         if(ValueUtils.isBlank(sheet.getDataValidations())){
             return false;
         }

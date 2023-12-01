@@ -20,7 +20,7 @@ public class XSSFDataUtils {
                                  Class<? extends ICellData> cdClazz,
                                  Class<? extends ICellValue> cvClass){
         SheetDataUtils.parseData(sheetData, sheet, cdClazz, cvClass, (cell, curDataStyle) -> {
-            StyleXSSFDataUtils.setDataStyle(curDataStyle, (XSSFCell) cell);
+            StyleDataUtils.setDataStyle(curDataStyle, (XSSFCell) cell);
         }, (xsheet, isheetData) ->{
             isheetData.gridInfo().setDataValidations(new ArrayList<>());
             ValidationDataUtils.setData((XSSFSheet) xsheet, isheetData.gridInfo().getDataValidations());

@@ -1,16 +1,12 @@
 package com.filling.module.poi.tools.excel.utils.xlsx;
 
 import com.filling.framework.common.tools.ValueUtils;
-import com.filling.module.poi.excel.domain.model.CellValue;
 import com.filling.module.poi.tools.excel.DataStyle;
-import com.filling.module.poi.tools.excel.ICellData;
-import com.filling.module.poi.tools.excel.ICellValue;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 
-import java.math.BigDecimal;
 import java.util.Locale;
 
 /**
@@ -19,10 +15,10 @@ import java.util.Locale;
  * {@code @date:}           2023/11/30 11:15
  * {@code @version:}:       1.0
  */
-public class StyleXSSFDataUtils {
+class StyleDataUtils {
 
 
-    public static boolean setDataStyle(DataStyle dataStyle, XSSFCell cell) {
+    static boolean setDataStyle(DataStyle dataStyle, XSSFCell cell) {
 
         XSSFCellStyle cellStyle = cell.getCellStyle();
         XSSFColor bgColor = cellStyle.getFillForegroundColorColor();

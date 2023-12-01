@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
@@ -58,6 +59,7 @@ public class FormHead extends BaseMongoEntity {
     @Schema(description = "formId")
     @NotNull(message = "formId不能为空")
     @JsonSerialize(using = ToStringSerializer.class)
+    @Indexed
     private ObjectId formId;
 
 
@@ -70,6 +72,7 @@ public class FormHead extends BaseMongoEntity {
     @Schema(description = "上级ID")
     @NotNull(message = "上级ID不能为空")
     @JsonSerialize(using = ToStringSerializer.class)
+    @Indexed
     private ObjectId parentId;
 
     /** 字段 **/

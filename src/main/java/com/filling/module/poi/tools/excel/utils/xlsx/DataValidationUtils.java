@@ -20,9 +20,9 @@ import java.util.List;
  * {@code @date:}           2023/12/1 12:35
  * {@code @version:}:       1.0
  */
-public class DataValidationUtils {
+class DataValidationUtils {
 
-    public static boolean setValidation(XSSFSheet sheet, List<DataValidation> dataValidations){
+    static boolean setValidation(XSSFSheet sheet, List<DataValidation> dataValidations){
         if(ValueUtils.isBlank(dataValidations)){
             return false;
         }

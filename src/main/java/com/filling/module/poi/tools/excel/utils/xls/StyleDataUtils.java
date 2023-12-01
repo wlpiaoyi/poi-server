@@ -14,10 +14,10 @@ import java.util.Locale;
  * {@code @date:}           2023/11/30 13:45
  * {@code @version:}:       1.0
  */
-public class StyleHSSFDataUtils {
+class StyleDataUtils {
 
 
-    public static boolean setDataStyle(DataStyle dataStyle, HSSFCell cell) {
+    static boolean setDataStyle(DataStyle dataStyle, HSSFCell cell) {
 
         HSSFCellStyle cellStyle = cell.getCellStyle();
         if(cellStyle.getFillBackgroundColorColor() != null){

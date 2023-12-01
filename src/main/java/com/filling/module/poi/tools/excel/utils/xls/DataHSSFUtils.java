@@ -19,7 +19,7 @@ public class DataHSSFUtils {
 
     public static void parseSheet(HSSFWorkbook workbook, ISheetData sheetData){
         DataSheetUtils.parseSheet(workbook, sheetData, (cell, dataStyle, cellData) -> {
-            DataStyleHSSFUtils.setCellStyle((HSSFCell) cell, dataStyle);
+            DataStyleUtils.setCellStyle((HSSFCell) cell, dataStyle);
         }, (sheet, iSheetData) -> {
             if(ValueUtils.isNotBlank(iSheetData.gridInfo().getCellMerges())){
                 setMergedRegions((HSSFSheet) sheet, iSheetData.gridInfo().getCellMerges());
@@ -50,7 +50,7 @@ public class DataHSSFUtils {
                     }
                     cell = row.createCell(c);
                     HSSFCellStyle cellStyle = cell.getRow().getSheet().getWorkbook().createCellStyle();
-                    DataStyleHSSFUtils.synCellBorderStyle(cellStyle);
+                    DataStyleUtils.synCellBorderStyle(cellStyle);
                     cell.setCellStyle(cellStyle);
                 }
             }

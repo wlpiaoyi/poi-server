@@ -19,7 +19,7 @@ public class HSSFDataUtils {
                                  Class<? extends ICellData> cdClazz,
                                  Class<? extends ICellValue> cvClass){
         SheetDataUtils.parseData(sheetData, sheet, cdClazz, cvClass, (cell, curDataStyle) -> {
-            StyleHSSFDataUtils.setDataStyle(curDataStyle, (HSSFCell) cell);
+            StyleDataUtils.setDataStyle(curDataStyle, (HSSFCell) cell);
         }, (hsheet, isheetData)->{
 
         });

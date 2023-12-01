@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
@@ -60,11 +61,13 @@ public class Form extends BaseMongoEntity {
     /* ExcelId **/
     @Schema(description = "ExcelId")
     @JsonSerialize(using = ToStringSerializer.class)
+    @Indexed
     private ObjectId excelId;
 
     /** SheetId **/
     @Schema(description = "SheetId")
     @JsonSerialize(using = ToStringSerializer.class)
+    @Indexed
     private ObjectId sheetId;
 
     /** 表头位置 **/

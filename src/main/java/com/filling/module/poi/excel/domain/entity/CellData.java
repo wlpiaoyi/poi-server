@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Update;
 
@@ -78,6 +79,7 @@ public class CellData extends BaseMongoEntity {
     /** sheetId **/
     @Schema(description =  "sheetId")
     @NotNull(message = "sheetId不能为空")
+    @Indexed
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId sheetId;
 

@@ -7,18 +7,23 @@ import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.domain.entity.BaseMongoEntity;
 import com.filling.module.poi.service.IBaseMongoService;
 import com.mongodb.bulk.BulkWriteResult;
+import com.mongodb.client.ListIndexesIterable;
+import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ResolvableType;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -120,9 +125,51 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
         return page;
     }
 
+    private void synIndex(String collection){
+        ListIndexesIterable<Document> indexList = this.baseTemplate
+                .getCollection(collection).listIndexes();
+        List<String> indexFds = new ArrayList<>();
+        for (Document indexDoc : indexList) {
+            Object key = indexDoc.get("key");
+            if(key == null){
+                continue;
+            }
+            if(!(key instanceof Document)){
+                continue;
+            }
+            Document keyDocument = (Document) key;
+            if(keyDocument.containsKey("_id")){
+                continue;
+            }
+            indexFds.addAll(keyDocument.keySet());
+        }
+        Field[] fields = this.currentEntityClass().getDeclaredFields();
+        if(ValueUtils.isNotBlank(fields)){
+            for (Field field : fields){
+                if(field.getAnnotation(Indexed.class) == null){
+                    continue;
+                }
+                if(indexFds.contains(field.getName())){
+                    indexFds.remove(field.getName());
+                }else{
+                    indexFds.add(field.getName());
+                }
+            }
+        }
+
+        for (String indexFd : indexFds){
+            String resultStr = this.baseTemplate.getCollection(collection)
+                    .createIndex(new Document(indexFd, "hashed"),
+                            new IndexOptions().background(false).name(collection + ".idx." + indexFd));
+            log.debug("add mongo index for document:{}, idx:{}, result:{}", collection, indexFd, resultStr);
+        }
+    }
+
 
     @Override
     public M insert(M entity) {
+        org.springframework.data.mongodb.core.mapping.Document document = this.currentEntityClass().getAnnotation(org.springframework.data.mongodb.core.mapping.Document.class);
+        this.synIndex(document.collection());
         entity.setCreateTime(new Date());
         if(entity.getId() == null){
             entity.setId(ObjectId.get());
@@ -136,6 +183,7 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
     }
     @Override
     public M insert(M entity, String collectionName) {
+        this.synIndex(collectionName);
         entity.setCreateTime(new Date());
         if(entity.getId() == null){
             entity.setId(ObjectId.get());
@@ -151,6 +199,8 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
 
     @Override
     public Collection<M> insertBatch(List<M> entities) {
+        org.springframework.data.mongodb.core.mapping.Document document = this.currentEntityClass().getAnnotation(org.springframework.data.mongodb.core.mapping.Document.class);
+        this.synIndex(document.collection());
         for (M entity : entities){
             entity.setCreateTime(new Date());
             if(entity.getId() == null){
@@ -161,6 +211,7 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
     }
     @Override
     public Collection<M> insertBatch(List<M> entities, String collectionName) {
+        this.synIndex(collectionName);
         for (M entity : entities){
             entity.setCreateTime(new Date());
             if(entity.getId() == null){
