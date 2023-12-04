@@ -4,12 +4,14 @@ import com.filling.framework.common.tools.ValueUtils;
 import com.filling.module.poi.tools.excel.DataStyle;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 
 /**
  * {@code @author:}         wlpiaoyi
@@ -27,6 +29,16 @@ public class DataStyleUtils {
         //自动换行
         cellStyle.setWrapText(dataStyle.getTb() == 2);
         cellStyle.setDataFormat(dataStyle.getDfm());
+
+
+        if(dataStyle.getDfm() > 0 && ValueUtils.isNotBlank(dataStyle.getDfmv())){
+            HSSFDataFormat dataFormat = (HSSFDataFormat) dataStyle.getDataFormat();
+            if(dataFormat == null){
+                dataFormat = cell.getSheet().getWorkbook().createDataFormat();
+                dataStyle.setDataFormat(dataFormat);
+            }
+            cellStyle.setDataFormat(dataFormat.getFormat(dataStyle.getDfmv()));
+        }
         //文字对齐方式
         switch (dataStyle.getVt()){
             case 0:{

@@ -47,6 +47,7 @@ public class DataStyle {
     private String dfmv;
 
     @Transient
+    @JsonIgnore
     private Object dataFormat;
 
     public String toString(){

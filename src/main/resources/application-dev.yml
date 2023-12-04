@@ -3,6 +3,10 @@ v2:
   fileurl: D:/upload
   filetemp: D:/upload/temp
 
+# mongodb 日志级别
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 spring:
   mvc:
     pathmatch:
