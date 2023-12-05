@@ -56,6 +56,8 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
 
     @Override
     public ExcelDataVo detail(ObjectId id) {
+        long pointTime = System.currentTimeMillis();
+        log.info("excel start detail dataId[{}]", id.toHexString());
         ExcelDataVo excelDataVo = this.baseTemplate.findOne(new Query(Criteria.where("_id").is(id)),
                 ExcelDataVo.class);
         if(excelDataVo == null){
@@ -72,6 +74,7 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
                 excelDataVo.getSheetDatas().add(sheetDataVo);
             }
         }
+        log.info("excel end detail dataId[{}], duriTime:{}ms", id.toHexString(), System.currentTimeMillis() - pointTime);
         return excelDataVo;
     }
 
@@ -222,21 +225,24 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
 
     @Override
     public ExcelData insert(ExcelData entity) {
+        long pointTime = System.currentTimeMillis();
         if(entity.getId() == null){
             entity.setId(ObjectId.get());
         }
+        log.info("excel start insert dataId[{}]", entity.getId().toHexString());
         if(entity instanceof ExcelDataVo){
             ExcelDataVo<SheetDataVo> entityVo = (ExcelDataVo) entity;
             if(ValueUtils.isNotBlank(entityVo.getSheetDatas())){
                 for (SheetDataVo sheetDataVo : entityVo.getSheetDatas()){
                     sheetDataVo.setExcelId(entity.getId());
-                    this.sheetDataService.insert(sheetDataVo);
                 }
+                this.sheetDataService.insertBatch(entityVo.getSheetDatas());
             }
         }
-
         ExcelData iEntity = BaseWrapper.parseOne(entity, ExcelData.class);
-        return super.insert(iEntity);
+        ExcelData result = super.insert(iEntity);
+        log.info("excel end insert dataId[{}], duriTime:{}ms", entity.getId().toHexString(), System.currentTimeMillis() - pointTime);
+        return result;
     }
     @Override
     public ExcelData insert(ExcelData entity, String collectionName) {
@@ -255,6 +261,7 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
 
     @Override
     public UpdateResult update(ExcelData entity) {
+        long pointTime = System.currentTimeMillis();
         if(entity.getId() == null){
             throw new BusinessException("Id不能为空");
         }
@@ -262,6 +269,7 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
         if(db == null){
             throw new BusinessException("没有找到数据");
         }
+        log.info("entity start update dataId[{}]", entity.hashCode());
         if(entity instanceof ExcelDataVo){
             ExcelDataVo<SheetDataVo> entityVo = (ExcelDataVo) entity;
             if(ValueUtils.isNotBlank(entityVo.getSheetDatas())){
@@ -277,7 +285,9 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
         }
 
         ExcelData iEntity = BaseWrapper.parseOne(entity, ExcelData.class);
-        return super.update(iEntity);
+        UpdateResult result = super.update(iEntity);
+        log.info("entity emd update dataId[{}], duriTime:{}ms", entity.hashCode(), System.currentTimeMillis() - pointTime);
+        return result;
     }
     @Override
     public UpdateResult update(ExcelData entity, String collectionName) {

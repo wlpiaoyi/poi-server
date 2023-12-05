@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +43,8 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
 
     @Override
     public SheetDataVo detail(ObjectId id) {
+        long pointTime = System.currentTimeMillis();
+        log.info("sheet start detail dataId[{}]", id.toHexString());
         SheetDataVo sheetDataVo = this.baseTemplate.findOne(new Query(Criteria.where("_id").is(id)),
                 SheetDataVo.class);
         if(sheetDataVo == null){
@@ -50,6 +54,7 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
         if(ValueUtils.isNotBlank(cellDatas)){
             sheetDataVo.setCellDatas(BaseWrapper.parseList(cellDatas, CellDataVo.class));
         }
+        log.info("sheet end detail dataId[{}], duriTime:{}ms", id.toHexString(), System.currentTimeMillis() - pointTime);
         return sheetDataVo;
     }
 
@@ -80,6 +85,39 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
     }
     public SheetData insert(SheetData entity, String collectionName) {
         throw new BusinessException("不支持的方法");
+    }
+
+    @Override
+    public Collection<SheetData> insertBatch(List<SheetData> entities) {
+        long pointTime = System.currentTimeMillis();
+        log.info("sheet start insertBath dataId[{}]", entities.hashCode());
+        for (SheetData entity : entities){
+            if(entity.getId() == null){
+                entity.setId(ObjectId.get());
+            }
+            entity.createRandomTag();
+            if(entity instanceof SheetDataVo){
+                log.info("sheet start insertBath handle dataId[{}][]", entities.hashCode(), entity.getId().toHexString());
+                SheetDataVo entityVo = (SheetDataVo) entity;
+                entityVo.synCellMc();
+                if(ValueUtils.isNotBlank(entityVo.getCellDatas())){
+                    ((SheetDataVo) entity).removeBlankCellData();
+                    for (CellData cellData : entityVo.getCellDatas()){
+                        cellData.setSheetId(entity.getId());
+                    }
+                    log.info("sheet start insertBath insertCellBatch dataId[{}][]", entities.hashCode(), entity.getId().toHexString());
+                    this.cellDataService.insertBatch(entityVo.getCellDatas(),
+                            SheetData.cellDataCollectionName(entityVo.getRandomTag()));
+                    log.info("sheet end insertBath insertCellBatch dataId[{}][]", entities.hashCode(), entity.getId().toHexString());
+
+                }
+                log.info("sheet end insertBath handle dataId[{}][]", entities.hashCode(), entity.getId().toHexString());
+            }
+        }
+        List<SheetData> iEntities = BaseWrapper.parseList(entities, SheetData.class);
+        Collection<SheetData> result = super.insertBatch(iEntities);
+        log.info("sheet end insertBath dataId[{}], duriTime:{}ms", entities.hashCode(), System.currentTimeMillis() - pointTime);
+        return result;
     }
 
     @Override
@@ -121,7 +159,44 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
 
     @Override
     public BulkWriteResult updateBatch(List<SheetData> entities) {
-        throw new BusinessException("不支持的方法");
+        long pointTime = System.currentTimeMillis();
+        log.info("sheet start updateBath dataId[{}]", entities.hashCode());
+        List<SheetData> dbs = this.queryList(Criteria.where("_id").in(
+                entities.stream().map(SheetData::getId).collect(Collectors.toList())
+        ));
+        if(entities.size() != dbs.size()){
+            throw new BusinessException("不能修改不存在的数据");
+        }
+        Map<String, SheetData> dbMap = dbs.stream().collect(Collectors.toMap(
+                SheetData::mapKey, Function.identity()
+        ));
+        for (SheetData entity : entities){
+            if(entity.getId() == null){
+                throw new BusinessException("Id不能为空");
+            }
+            log.info("sheet start updateBatch handle dataId[{}][]", entities.hashCode(), entity.getId().toHexString());
+            if(entity instanceof SheetDataVo){
+                SheetData db = dbMap.get(entity.mapKey());
+                if(db == null){
+                    throw new BusinessException("没有找到数据");
+                }
+                SheetDataVo entityVo = (SheetDataVo) entity;
+                entityVo.removeBlankCellData();
+                entityVo.synCellMc();
+                log.info("sheet start updateBatch updateCellBatch dataId[{}][]", entities.hashCode(), entity.getId().toHexString());
+                List<CellData> removes = this.cellDataService.queryBySheetId(db.getId(), db.getRandomTag());
+                if(ValueUtils.isNotBlank(removes)){
+                    this.cellDataService.removeBatch(removes.stream().map(CellData::getId).collect(Collectors.toList()), SheetData.cellDataCollectionName(db.getRandomTag()));
+                }
+                this.cellDataService.insertBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(db.getRandomTag()));
+                log.info("sheet end updateBatch updateCellBatch dataId[{}][]", entities.hashCode(), entity.getId().toHexString());
+            }
+            log.info("sheet end updateBatch handle dataId[{}][]", entities.hashCode(), entity.getId().toHexString());
+        }
+        List<SheetData> iEntities = BaseWrapper.parseList(entities, SheetData.class);
+        BulkWriteResult result = super.updateBatch(iEntities);
+        log.info("sheet end updateBath dataId[{}], duriTime:{}ms", entities.hashCode(), System.currentTimeMillis() - pointTime);
+        return result;
     }
     @Override
     public BulkWriteResult updateBatch(List<SheetData> entities, String collectionName) {

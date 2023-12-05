@@ -58,7 +58,7 @@ public class ExcelDataController {
     @ResponseBody
     public R save(@RequestBody ExcelDataVo body) {
         this.excelDataService.insert(body);
-        return R.success(body);
+        return R.success(body.getId().toHexString());
     }
 
     @SneakyThrows
@@ -78,7 +78,7 @@ public class ExcelDataController {
         }else{
             this.excelDataService.insert(excelData);
         }
-        return R.success(excelData);
+        return R.success(excelData.getId().toHexString());
     }
 
     @SneakyThrows
@@ -88,7 +88,7 @@ public class ExcelDataController {
     @ResponseBody
     public R update(@RequestBody ExcelDataVo body) {
         this.excelDataService.update(body);
-        return R.success(body);
+        return R.success(body.getId().toHexString());
     }
 
     @GetMapping("/downloadExcel")

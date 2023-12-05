@@ -6,16 +6,34 @@ v2:
 # mongodb 日志级别
 logging:
   level:
-    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
 spring:
+  #  LOWER_CAMEL_CASE    userName    默认策略
+  #  KEBAB_CASE    user-name
+  #  LOWER_CASE    username
+  #  SNAKE_CASE    user_name
+  #  UPPER_CAMEL_CASE    UserName
+  　jackson:
+    　property-naming-strategy: LOWER_CAMEL_CASE
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
   data:
     mongodb:
-      host: 36.138.30.68
-      port: 37017
+      uri: mongodb://root:htData%402023*@36.138.30.68:37017
+#      host: 36.138.30.68
+#      port: 37017
+#      password: 'htData@2023*'
+#      username: root
       database: poie_test
+      authentication-database: admin
+      auto-index-creation: false # 默认为false，即不会自动创建索引，
+      transactionEnabled: false # 支持事务true
       option:
         max-connection-idle-time: 1500
         max-connection-per-host: 200
@@ -23,10 +41,6 @@ spring:
         max-connection-life-time: 0
         connect-timeout: 10000
         socket-timeout: 60000
-      password: 'htData@2023*'
-      username: root
-      authentication-database: admin
-      auto-index-creation: false # 默认为false，即不会自动创建索引，
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
