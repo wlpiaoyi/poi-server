@@ -11,7 +11,7 @@ logging:
         data:
           mongodb:
             core:
-              MongoTemplate: DEBUG
+              MongoTemplate: INFO
 spring:
   #  LOWER_CAMEL_CASE    userName    默认策略
   #  KEBAB_CASE    user-name
@@ -25,7 +25,8 @@ spring:
       matching-strategy: ant_path_matcher
   data:
     mongodb:
-      uri: mongodb://root:htData%402023*@36.138.30.68:37017
+#      uri: mongodb://root:htData%402023*@36.138.30.68:27000,36.138.30.68:27001/?slaveOk=true&replicaSet=rs&readPreference=secondaryPreferred
+      uri: mongodb://root:htData%402023*@36.138.30.68:27000,36.138.30.68:27001
 #      host: 36.138.30.68
 #      port: 37017
 #      password: 'htData@2023*'
@@ -33,7 +34,7 @@ spring:
       database: poie_test
       authentication-database: admin
       auto-index-creation: false # 默认为false，即不会自动创建索引，
-      transactionEnabled: false # 支持事务true
+      transactionEnabled: true # 支持事务true
       option:
         max-connection-idle-time: 1500
         max-connection-per-host: 200
