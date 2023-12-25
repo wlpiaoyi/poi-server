@@ -1,6 +1,7 @@
 package com.icss.poie.biz.excel.controller;
 
 import com.icss.poie.biz.excel.domain.vo.ExcelDataVo;
+import com.icss.poie.biz.excel.domain.wrapper.BaseWrapper;
 import com.icss.poie.framework.common.exception.BusinessException;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.biz.excel.service.IExcelDataService;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,7 +110,7 @@ public class ExcelDataController {
         }
         response.setCharacterEncoding(Charsets.UTF_8.name());
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("content-Disposition","attachment;filename=" + excelData.getName() + "." + fileType);
+        response.setHeader("content-Disposition","attachment;filename=" + URLEncoder.encode(excelData.getName(), response.getCharacterEncoding()) + "." + fileType);
         response.setStatus(200);
         this.excelDataService.putOutputStreamByExcelData(excelData, fileType, response.getOutputStream());
     }

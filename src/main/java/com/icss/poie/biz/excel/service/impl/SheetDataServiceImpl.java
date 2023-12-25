@@ -1,10 +1,12 @@
 package com.icss.poie.biz.excel.service.impl;
 
+import com.icss.poie.biz.excel.domain.entity.GridInfo;
 import com.icss.poie.biz.excel.domain.entity.SheetData;
 import com.icss.poie.biz.excel.domain.vo.CellDataVo;
 import com.icss.poie.biz.excel.domain.vo.SheetDataVo;
 import com.icss.poie.biz.excel.domain.wrapper.BaseWrapper;
 import com.icss.poie.biz.excel.service.ICellDataService;
+import com.icss.poie.biz.excel.service.IGridInfoService;
 import com.icss.poie.biz.excel.service.ISheetDataService;
 import com.icss.poie.framework.common.exception.BusinessException;
 import com.icss.poie.framework.common.tools.MongoTransactional;
@@ -40,6 +42,8 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
 
     @Autowired
     private ICellDataService cellDataService;
+    @Autowired
+    private IGridInfoService<GridInfo> gridInfoService;
 
 
     @Override
@@ -50,8 +54,9 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
                 SheetDataVo.class);
         if(sheetDataVo == null){
             return null;
-        }
-        List<CellData> cellDatas = this.cellDataService.queryBySheetId(sheetDataVo.getId(), sheetDataVo.getRandomTag());
+        };
+        sheetDataVo.setGridInfo(this.gridInfoService.findOneBySheetId(sheetDataVo.getId(), sheetDataVo.getGiRandomTag()));
+        List<CellData> cellDatas = this.cellDataService.queryBySheetId(sheetDataVo.getId(), sheetDataVo.getCellRandomTag());
         if(ValueUtils.isNotBlank(cellDatas)){
             sheetDataVo.setCellDatas(BaseWrapper.parseList(cellDatas, CellDataVo.class));
         }
@@ -82,7 +87,11 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
                 for (CellData cellData : entityVo.getCellDatas()){
                     cellData.setSheetId(entity.getId());
                 }
-                this.cellDataService.insertBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(entityVo.getRandomTag()));
+                this.cellDataService.insertBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(entityVo.getCellRandomTag()));
+            }
+            if(entityVo.getGridInfo() != null){
+                entityVo.getGridInfo().setSheetId(entityVo.getId());
+                this.gridInfoService.insert(entityVo.getGridInfo(), SheetData.gridInfoCollectionName(entityVo.getGiRandomTag()));
             }
         }
         SheetData iEntity = BaseWrapper.parseOne(entity, SheetData.class);
@@ -116,11 +125,15 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
                     }
                     log.info("sheet start insertBath insertCellBatch dataId[{}][{}]", entities.hashCode(), entity.hashCode());
                     this.cellDataService.insertBatch(entityVo.getCellDatas(),
-                            SheetData.cellDataCollectionName(entityVo.getRandomTag()));
+                            SheetData.cellDataCollectionName(entityVo.getCellRandomTag()));
                     log.info("sheet end insertBath insertCellBatch dataId[{}][{}]", entities.hashCode(), entity.hashCode());
 
                 }
                 log.info("sheet end insertBath handle dataId[{}][{}]", entities.hashCode(), entity.hashCode());
+                if(entityVo.getGridInfo() != null){
+                    entityVo.getGridInfo().setSheetId(entityVo.getId());
+                    this.gridInfoService.insert(entityVo.getGridInfo(), SheetData.gridInfoCollectionName(entityVo.getGiRandomTag()));
+                }
             }
         }
         List<SheetData> iEntities = BaseWrapper.parseList(entities, SheetData.class);
@@ -151,11 +164,16 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
                 for (CellData cellData : entityVo.getCellDatas()){
                     cellData.setSheetId(entity.getId());
                 }
-                List<CellData> removes = this.cellDataService.queryBySheetId(db.getId(), db.getRandomTag());
+                List<CellData> removes = this.cellDataService.queryBySheetId(db.getId(), db.getCellRandomTag());
                 if(ValueUtils.isNotBlank(removes)){
-                    this.cellDataService.removeBatch(removes.stream().map(CellData::getId).collect(Collectors.toList()), SheetData.cellDataCollectionName(db.getRandomTag()));
+                    this.cellDataService.removeBatch(removes.stream().map(CellData::getId).collect(Collectors.toList()), SheetData.cellDataCollectionName(db.getCellRandomTag()));
                 }
-                this.cellDataService.insertBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(db.getRandomTag()));
+                this.cellDataService.insertBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(db.getCellRandomTag()));
+
+                if(entityVo.getGridInfo() != null){
+                    entityVo.getGridInfo().setSheetId(entityVo.getId());
+                    this.gridInfoService.update(entityVo.getGridInfo(), SheetData.gridInfoCollectionName(entityVo.getGiRandomTag()));
+                }
             }
         }
         SheetData iEntity = BaseWrapper.parseOne(entity, SheetData.class);
@@ -194,12 +212,16 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
                 entityVo.removeBlankCellData();
                 entityVo.synCellMc();
                 log.info("sheet start updateBatch updateCellBatch dataId[{}][{}]", entities.hashCode(), entity.getId().toHexString());
-                List<CellData> removes = this.cellDataService.queryBySheetId(db.getId(), db.getRandomTag());
+                List<CellData> removes = this.cellDataService.queryBySheetId(db.getId(), db.getCellRandomTag());
                 if(ValueUtils.isNotBlank(removes)){
-                    this.cellDataService.removeBatch(removes.stream().map(CellData::getId).collect(Collectors.toList()), SheetData.cellDataCollectionName(db.getRandomTag()));
+                    this.cellDataService.removeBatch(removes.stream().map(CellData::getId).collect(Collectors.toList()), SheetData.cellDataCollectionName(db.getCellRandomTag()));
                 }
-                this.cellDataService.insertBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(db.getRandomTag()));
+                this.cellDataService.insertBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(db.getCellRandomTag()));
                 log.info("sheet end updateBatch updateCellBatch dataId[{}][{}]", entities.hashCode(), entity.getId().toHexString());
+                if(entityVo.getGridInfo() != null){
+                    entityVo.getGridInfo().setSheetId(entityVo.getId());
+                    this.gridInfoService.update(entityVo.getGridInfo(), SheetData.gridInfoCollectionName(entityVo.getGiRandomTag()));
+                }
             }
             log.info("sheet end updateBatch handle dataId[{}][{}]", entities.hashCode(), entity.getId().toHexString());
         }
@@ -219,7 +241,9 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
         List<SheetData> sheetDatas = this.queryList(criteria);
         for(SheetData sheetData : sheetDatas){
             this.baseTemplate.remove(new Query(Criteria.where("sheetId").is(sheetData.getId())),
-                    SheetData.cellDataCollectionName(sheetData.getRandomTag()));
+                    SheetData.cellDataCollectionName(sheetData.getCellRandomTag()));
+            this.baseTemplate.remove(new Query(Criteria.where("sheetId").is(sheetData.getId())),
+                    SheetData.gridInfoCollectionName(sheetData.getGiRandomTag()));
         }
         return super.removeBatch(ids);
     }

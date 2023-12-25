@@ -11,13 +11,20 @@ import java.util.Locale;
 
 /**
  * {@code @author:}         wlpiaoyi
- * {@code @description:}    TODO
+ * {@code @description:}    单元格内容格式
  * {@code @date:}           2023/11/30 11:15
  * {@code @version:}:       1.0
  */
 class StyleDataUtils {
 
-
+    /**
+     * @description: 读取Excel单元格格式同步到数据对象内
+     * @param dataStyle
+     * @param cell
+     * @return: boolean
+     * @author: wlpia
+     * @date: 2023/12/25 11:42
+     */
     static boolean setDataStyle(DataStyle dataStyle, XSSFCell cell) {
 
         XSSFCellStyle cellStyle = cell.getCellStyle();
@@ -63,7 +70,14 @@ class StyleDataUtils {
         }
         return true;
     }
-
+    /**
+     * @description: 同步单元格字体到数据对象中
+     * @param dataStyle
+     * @param cell
+     * @return: void
+     * @author: wlpia
+     * @date: 2023/12/25 11:43
+     */
     private static void synFont(DataStyle dataStyle,XSSFCell cell) {
         XSSFFont font = cell.getCellStyle().getFont();
         if(font == null){

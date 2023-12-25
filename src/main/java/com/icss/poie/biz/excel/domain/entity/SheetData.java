@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.icss.poie.domain.entity.BaseMongoEntity;
 import com.icss.poie.framework.common.tools.ValueUtils;
-import com.icss.poie.tools.excel.GridInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,19 +31,16 @@ import java.math.BigInteger;
 public class SheetData extends BaseMongoEntity {
 
 
-//    public static String collectionName(){
-//        return "poi_sheet_data";
-//    }
     public Update parseForUpdate(Update update){
         update = super.parseForUpdate(update);
         if(this.getExcelId() != null){
             update.set("excelId", this.getExcelId());
         }
-        if(this.getRandomTag() != null){
-            update.set("randomTag", this.getRandomTag());
+        if(this.getCellRandomTag() != null){
+            update.set("cellRandomTag", this.getCellRandomTag());
         }
-        if(this.getGridInfo() != null){
-            update.set("gridInfo", this.getGridInfo());
+        if(this.getGiRandomTag() != null){
+            update.set("giRandomTag", this.getGiRandomTag());
         }
         if(this.getThumbImage() != null){
             update.set("thumbImage", this.getThumbImage());
@@ -52,9 +48,6 @@ public class SheetData extends BaseMongoEntity {
         if(this.getSheetName() != null){
             update.set("sheetName", this.getSheetName());
         }
-//        if(this.getDataVerification() != null){
-//            update.set("dataVerification", this.getDataVerification());
-//        }
         return update;
     }
 
@@ -68,11 +61,11 @@ public class SheetData extends BaseMongoEntity {
     /** 随机标识, CellData使用 **/
     @Schema(description =  "随机标识, CellData使用 ")
     @NotNull(message = "随机标识, CellData使用")
-    private Byte randomTag;
-
-    /** 网格信息 **/
-    @Schema(description =  "网格信息")
-    private GridInfo gridInfo;
+    private Byte cellRandomTag;
+    /** 随机标识, GridInfo使用 **/
+    @Schema(description =  "随机标识, GridInfo使用 ")
+    @NotNull(message = "随机标识, GridInfo使用")
+    private Byte giRandomTag;
 
     /** 缩略图 **/
     @Schema(description =  "缩略图")
@@ -81,10 +74,22 @@ public class SheetData extends BaseMongoEntity {
     /** 名称 **/
     @Schema(description = "名称")
     private String sheetName;
-//
-//    /** 数据验证 **/
-//    @Schema(description =  "数据验证")
-//    private String dataVerification;
+
+    public static final int MAX_CELL_RANDOM_TAG = 12;
+    public static final int MAX_GI_RANDOM_TAG = 4;
+    /**
+     * 获取并自动生成随机数
+     * @return
+     */
+    public void createRandomTag() {
+        if(this.getId() == null){
+            return;
+        }
+        BigInteger idValue = new BigInteger(ValueUtils.hexToBytes(this.getId().toHexString()));
+        this.cellRandomTag = (byte) (idValue.divideAndRemainder(new BigInteger(String.valueOf(MAX_CELL_RANDOM_TAG)))[1].byteValue() + 1);
+        this.giRandomTag = (byte) (idValue.divideAndRemainder(new BigInteger(String.valueOf(MAX_GI_RANDOM_TAG)))[1].byteValue() + 1);
+
+    }
 
     public static String cellDataCollectionName(int randomTag){
         if(randomTag < 10){
@@ -94,19 +99,12 @@ public class SheetData extends BaseMongoEntity {
         }
     }
 
-    public static final int MAX_RANDOM_TAG = 12;
-
-    /**
-     * 获取并自动生成随机数
-     * @return
-     */
-    public Byte createRandomTag() {
-        if(this.getId() == null){
-            return null;
+    public static String gridInfoCollectionName(int randomTag){
+        if(randomTag < 10){
+            return GridInfo.COLLECTION_NAME + "_0" + randomTag;
+        }else{
+            return GridInfo.COLLECTION_NAME + "_" + randomTag;
         }
-        BigInteger idValue = new BigInteger(ValueUtils.hexToBytes(this.getId().toHexString()));
-        this.randomTag = (byte) (idValue.divideAndRemainder(new BigInteger(String.valueOf(MAX_RANDOM_TAG)))[1].byteValue() + 1);
-        return this.randomTag;
     }
 
 

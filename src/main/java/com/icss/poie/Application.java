@@ -22,10 +22,10 @@ import java.util.*;
  * {@code @version:}:       1.0
  */
 @SpringBootApplication(scanBasePackages = {
-        "com.filling.module.poi"
+        "com.icss.poie"
 })
-@ComponentScan(basePackages = {"com.filling.module.poi"})
-@MapperScan("com.filling.module.poi")
+@ComponentScan(basePackages = {"com.icss.poie"})
+@MapperScan("com.icss.poie")
 //@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 public class Application implements ApplicationContextAware {
 

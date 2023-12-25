@@ -1,13 +1,11 @@
 package com.icss.poie.biz.excel.domain.vo;
 
+import com.icss.poie.biz.excel.domain.entity.GridInfo;
 import com.icss.poie.biz.excel.domain.entity.SheetData;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.biz.excel.domain.entity.CellData;
 import com.icss.poie.biz.excel.domain.model.CellValue;
-import com.icss.poie.tools.excel.GridInfo;
-import com.icss.poie.tools.excel.ICellData;
-import com.icss.poie.tools.excel.ISheetData;
-import com.icss.poie.tools.excel.Scope;
+import com.icss.poie.tools.excel.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -27,6 +25,10 @@ public class SheetDataVo extends SheetData implements ISheetData {
     /** 单元格数据 **/
     @Schema(description =  "单元格数据")
     private List<CellDataVo> cellDatas;
+
+    /** 网格信息 **/
+    @Schema(description =  "网格信息")
+    private GridInfo gridInfo;
 
 
     public void setAllId(){
@@ -80,7 +82,8 @@ public class SheetDataVo extends SheetData implements ISheetData {
     }
     public void clearDb(){
         super.clearDb();
-        this.setRandomTag(null);
+        this.setCellRandomTag(null);
+        this.setGiRandomTag(null);
         this.setExcelId(null);
         if(ValueUtils.isNotBlank(this.getCellDatas())){
             for (CellData cellData : this.getCellDatas()){
@@ -113,14 +116,19 @@ public class SheetDataVo extends SheetData implements ISheetData {
     }
 
     @Override
-    public GridInfo gridInfo() {
+    public IGridInfo gridInfo() {
         return this.getGridInfo();
     }
 
 
     @Override
-    public void putGridInfo(GridInfo gridInfo) {
-        this.setGridInfo(gridInfo);
+    public void putGridInfo(IGridInfo gridInfo) {
+        this.setGridInfo((GridInfo) gridInfo);
+    }
+
+    @Override
+    public IGridInfo newInstanceGridInfo() {
+        return new GridInfo();
     }
 
 }

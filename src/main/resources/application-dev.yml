@@ -74,12 +74,12 @@ knife4j:
   swagger-ui:
     path: doc.html
 
-filling:
+poie:
   info:
     version: 1.0.0
-    base-package: com.filling.module.poi
+    base-package: com.icss.poie
   swagger:
     title: 管理后台
     description: 提供管理员管理的所有功能
-    version: ${filling.info.version}
-    base-package: ${filling.info.base-package}
+    version: ${poie.info.version}
+    base-package: ${poie.info.base-package}

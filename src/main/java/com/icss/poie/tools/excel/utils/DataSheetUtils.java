@@ -3,9 +3,23 @@ package com.icss.poie.tools.excel.utils;
 import com.icss.poie.framework.common.tools.PatternUtils;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.tools.excel.*;
+import com.icss.poie.tools.excel.Picture;
+import lombok.SneakyThrows;
+import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,58 +41,105 @@ public class DataSheetUtils {
     }
 
 
+    @SneakyThrows
     public static void parseSheet(Workbook workbook, ISheetData sheetData, CellDataRun cellDataRun, CellDataEnd cellDataEnd){
 
         Sheet sheet = workbook.createSheet(sheetData.sheetName());
         Map<Integer, Row> rowMap = new HashMap<>();
         DataStyle defaultDataStyle = new DataStyle();
-        for (ICellData cellData : sheetData.cellDatas()){
-            if(ValueUtils.isBlank(cellData.v().getF()) && ValueUtils.isBlank(cellData.v().getV())){
-                continue;
-            }
-            Row row = rowMap.get(cellData.getR());
-            if(row == null){
-                row = sheet.createRow(cellData.getR());
-                rowMap.put(cellData.getR(), row);
-            }
-            Cell cell = row.createCell(cellData.getC());
-            DataStyle dataStyle = null;
-            if(sheetData.gridInfo() != null && ValueUtils.isNotBlank(sheetData.gridInfo().getDataStyles())){
-                for(DataStyle item : sheetData.gridInfo().getDataStyles()){
-                    if(item.getPoints() == null || ValueUtils.isBlank(item.getPoints())){
-                        dataStyle = item;
-                        break;
-                    }
-                    for (Point point : item.getPoints()){
-                        if(point.getC() == cellData.getC() && point.getR() == cellData.getR()){
+        if(ValueUtils.isNotBlank(sheetData.cellDatas())){
+            for (ICellData cellData : sheetData.cellDatas()){
+                if(cellData.v() == null){
+                    continue;
+                }
+                if(ValueUtils.isBlank(cellData.v().getF()) && ValueUtils.isBlank(cellData.v().getV())){
+                    continue;
+                }
+                Row row = rowMap.get(cellData.getR());
+                if(row == null){
+                    row = sheet.createRow(cellData.getR());
+                    rowMap.put(cellData.getR(), row);
+                }
+                Cell cell = row.createCell(cellData.getC());
+                DataStyle dataStyle = null;
+                if(sheetData.gridInfo() != null && ValueUtils.isNotBlank(sheetData.gridInfo().getDataStyles())){
+                    for(DataStyle item : sheetData.gridInfo().getDataStyles()){
+                        if(item.getPoints() == null || ValueUtils.isBlank(item.getPoints())){
                             dataStyle = item;
                             break;
                         }
-                    }
-                    if(dataStyle != null){
-                        break;
+                        for (Point point : item.getPoints()){
+                            if(point.getC() == cellData.getC() && point.getR() == cellData.getR()){
+                                dataStyle = item;
+                                break;
+                            }
+                        }
+                        if(dataStyle != null){
+                            break;
+                        }
                     }
                 }
-            }
-            if(dataStyle == null){
-                dataStyle = defaultDataStyle;
-            }
-            setCellData(cell, cellData);
-            cellDataRun.run(cell, dataStyle, cellData);
+                if(dataStyle == null){
+                    dataStyle = defaultDataStyle;
+                }
+                setCellData(cell, cellData);
+                cellDataRun.run(cell, dataStyle, cellData);
 
+            }
         }
+
         if(sheetData.gridInfo() != null){
             cellDataEnd.run(sheet, sheetData);
             DataSheetUtils.setRCValue(sheet, sheetData.gridInfo());
             if(sheetData.gridInfo().getFrozenWindow() != null){
                 sheet.createFreezePane(sheetData.gridInfo().getFrozenWindow().getC(), sheetData.gridInfo().getFrozenWindow().getR());
             }
+            if(ValueUtils.isNotBlank(sheetData.gridInfo().getPictures())){
+                setPictures(sheet, sheetData.gridInfo().getPictures());
+            }
         }
     }
 
+    /**
+     * 图片
+     * @param sheet
+     * @param pictures
+     */
+    public static void setPictures(Sheet sheet, List<Picture> pictures){
+        Drawing drawing = sheet.createDrawingPatriarch();
+        for (Picture pictureValue : pictures){
+            ClientAnchor anchor;
+            if(sheet instanceof XSSFSheet){
 
+                anchor = new XSSFClientAnchor(pictureValue.getDx1(),
+                        pictureValue.getDy1(),
+                        pictureValue.getDx2(),
+                        pictureValue.getDy2(),
+                        pictureValue.getCol1(),
+                        pictureValue.getRow1(),
+                        pictureValue.getCol2(),
+                        pictureValue.getRow2());
+            }else if(sheet instanceof HSSFSheet){
+                anchor = new HSSFClientAnchor(pictureValue.getDx1(),
+                        pictureValue.getDy1(),
+                        pictureValue.getDx2(),
+                        pictureValue.getDy2(),
+                        (short) pictureValue.getCol1(),
+                        pictureValue.getRow1(),
+                        (short) pictureValue.getCol2(),
+                        pictureValue.getRow2());
 
+            }else throw new BusinessException("不支持的格式");
+            drawing.createPicture(anchor, sheet.getWorkbook().addPicture(pictureValue.getData(), pictureValue.getPictureType()));
+        }
+    }
 
+    /**
+     * 单元格数据
+     * @param cell
+     * @param cellData
+     * @return
+     */
     public static boolean setCellData(Cell cell, ICellData cellData){
         // 判断数据的类型
         if(ValueUtils.isNotBlank(cellData.v().getF())){
@@ -117,7 +178,7 @@ public class DataSheetUtils {
      * @param sheet
      * @param gridInfo
      */
-    public static void setRCValue(Sheet sheet, GridInfo gridInfo){
+    public static void setRCValue(Sheet sheet, IGridInfo gridInfo){
         if(ValueUtils.isNotBlank(gridInfo.getRowHeights())){
             int index = 0;
             for (Short value : gridInfo.getRowHeights()){

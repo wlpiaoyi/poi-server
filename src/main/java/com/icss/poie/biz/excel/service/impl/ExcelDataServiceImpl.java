@@ -113,7 +113,8 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
                     if(sdDb != null){
                         sheetData.setId(sdDb.getId());
                         sheetData.setCreateTime(sdDb.getCreateTime());
-                        sheetData.setRandomTag(sdDb.getRandomTag());
+                        sheetData.setCellRandomTag(sdDb.getCellRandomTag());
+                        sheetData.setGiRandomTag(sdDb.getGiRandomTag());
                     }
                     excelData.getSheetDatas().add(sheetData);
                 }
@@ -135,7 +136,8 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
                     if(sdDb != null){
                         sheetData.setId(sdDb.getId());
                         sheetData.setCreateTime(sdDb.getCreateTime());
-                        sheetData.setRandomTag(sdDb.getRandomTag());
+                        sheetData.setCellRandomTag(sdDb.getCellRandomTag());
+                        sheetData.setGiRandomTag(sdDb.getGiRandomTag());
                     }
                     excelData.getSheetDatas().add(sheetData);
                 }

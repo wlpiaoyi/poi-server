@@ -10,7 +10,7 @@ import javax.validation.constraints.NotEmpty;
  *
  * @author
  */
-@ConfigurationProperties("filling.swagger")
+@ConfigurationProperties("poie.swagger")
 @Data
 public class SwaggerProperties {
 

@@ -19,8 +19,9 @@ public interface ISheetData {
     void putCellDatas(List<ICellData> cellDatas);
 
     /** 网格数据 **/
-    GridInfo gridInfo();
-    void putGridInfo(GridInfo gridInfo);
+    IGridInfo gridInfo();
+    void putGridInfo(IGridInfo gridInfo);
+    IGridInfo newInstanceGridInfo();
 
 //    List<ICellMerge> cellMerges();
 //

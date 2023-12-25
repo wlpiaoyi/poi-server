@@ -48,7 +48,6 @@ public class BaseMongoEntity extends BaseEntity{
     public void synProperties(){
 
     }
-
     @SneakyThrows
     public static String createPropertyCode(String property){
         if(ValueUtils.isBlank(property)){

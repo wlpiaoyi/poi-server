@@ -4,10 +4,12 @@ import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.biz.excel.domain.model.CellValue;
 import com.icss.poie.tools.excel.*;
 import lombok.SneakyThrows;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
+import org.apache.poi.xssf.usermodel.XSSFPicture;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -28,7 +30,7 @@ public class SheetDataUtils {
     }
 
 
-        @SneakyThrows
+    @SneakyThrows
     public static void parseData(ISheetData sheetData, Sheet sheet,
                                  Class<? extends ICellData> cdClazz,
                                  Class<? extends ICellValue> cvClass,
@@ -62,7 +64,7 @@ public class SheetDataUtils {
                 cellDatas.add(cellData);
             }
         }
-        sheetData.putGridInfo(new GridInfo());
+        sheetData.putGridInfo(sheetData.newInstanceGridInfo());
         sheetData.gridInfo().setCellMerges(new ArrayList<>());
         if(ValueUtils.isNotBlank(dataStyleMap)){
             sheetData.gridInfo().setDataStyles(new ArrayList(){{ addAll(dataStyleMap.values());}});
@@ -70,6 +72,7 @@ public class SheetDataUtils {
         setMergedRegions(sheetData.gridInfo().getCellMerges(), sheet);
         setRcValue(sheetData.gridInfo(), sheet);
         cellDataEnd.run(sheet, sheetData);
+
         if(sheet.getPaneInformation() != null && sheet.getPaneInformation().isFreezePane()){
             Point point = new Point();
             point.setC(sheet.getPaneInformation().getVerticalSplitLeftColumn());
@@ -78,10 +81,57 @@ public class SheetDataUtils {
         }else{
             sheetData.gridInfo().setFrozenWindow(null);
         }
+        List<com.icss.poie.tools.excel.Picture> pictures = new ArrayList<>();
+        setPicture(pictures, sheet);
+        if(ValueUtils.isNotBlank(pictures)){
+            sheetData.gridInfo().setPictures(pictures);
+        }
     }
 
+    /**
+     * 图片
+     * @param pictures
+     * @param sheet
+     */
+    public static void setPicture(List<com.icss.poie.tools.excel.Picture> pictures, Sheet sheet){
+        if(sheet.getDrawingPatriarch() == null){
+            return;
+        }
+        Iterator iterator = sheet.getDrawingPatriarch().iterator();
+        while (iterator.hasNext()){
+            Object object = iterator.next();
+            if(object instanceof Picture){
+                Picture picture = (Picture) object;
+                com.icss.poie.tools.excel.Picture pictureValue = getPicture(picture);
+                pictures.add(pictureValue);
+            }
+        }
+    }
 
-    public static void setRcValue(GridInfo gridInfo, Sheet sheet){
+    @NotNull
+    private static com.icss.poie.tools.excel.Picture getPicture(Picture picture) {
+        PictureData pictureData = picture.getPictureData();
+        com.icss.poie.tools.excel.Picture pictureValue = new com.icss.poie.tools.excel.Picture();
+        pictureValue.setData(pictureData.getData());
+        pictureValue.setPictureType(pictureData.getPictureType());
+        ClientAnchor clientAnchor = picture.getClientAnchor();
+        pictureValue.setCol1(clientAnchor.getCol1());
+        pictureValue.setCol2(clientAnchor.getCol2());
+        pictureValue.setRow1(clientAnchor.getRow1());
+        pictureValue.setRow2(clientAnchor.getRow2());
+        pictureValue.setDx1(clientAnchor.getDx1());
+        pictureValue.setDx2(clientAnchor.getDx2());
+        pictureValue.setDy1(clientAnchor.getDy1());
+        pictureValue.setDy2(clientAnchor.getDy2());
+        return pictureValue;
+    }
+
+    /**
+     * 行列高宽、隐藏、只读
+     * @param gridInfo
+     * @param sheet
+     */
+    public static void setRcValue(IGridInfo gridInfo, Sheet sheet){
         Iterator<Row> rowIterator = sheet.rowIterator();
         gridInfo.setRowHeights(new ArrayList<>());
         gridInfo.setColumnWidths(new ArrayList<>());
@@ -135,7 +185,7 @@ public class SheetDataUtils {
             }
             break;
             case BLANK:
-//                cellData.v().setV("");
+                cellData.v().setV(null);
                 break;
             default:
                 cellData.v().setV("非法字符");
@@ -144,8 +194,11 @@ public class SheetDataUtils {
         return true;
     }
 
-
-
+    /**
+     * 合并单元格
+     * @param cellMerges
+     * @param sheet
+     */
     public static void setMergedRegions(List<Scope> cellMerges, Sheet sheet) {
 
         int count = sheet.getNumMergedRegions();

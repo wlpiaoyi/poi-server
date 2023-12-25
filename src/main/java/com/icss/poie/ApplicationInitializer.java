@@ -1,5 +1,6 @@
 package com.icss.poie;
 
+import com.icss.poie.biz.excel.domain.entity.GridInfo;
 import com.icss.poie.framework.common.tools.PackageUtils;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.biz.excel.domain.entity.CellData;
@@ -26,7 +27,7 @@ public class ApplicationInitializer {
 	 * @param mongoTemplate
 	 */
 	public static void synMongoDocumentIndex(MongoTemplate mongoTemplate){
-		PackageUtils.iteratorClazz("com.filling.module.poi", clazz -> {
+		PackageUtils.iteratorClazz("com.icss.poie.biz", clazz -> {
 			org.springframework.data.mongodb.core.mapping.Document document = clazz.getAnnotation(org.springframework.data.mongodb.core.mapping.Document.class);
 			if(document == null){
 				return;
@@ -34,9 +35,13 @@ public class ApplicationInitializer {
 			ApplicationInitializer.synMongoDocumentIndex(clazz, document.collection(), mongoTemplate);
 		});
 
-		for (int i = 1; i <= 12; i ++){
+		for (int i = 1; i <= SheetData.MAX_CELL_RANDOM_TAG; i ++){
 			String collection = SheetData.cellDataCollectionName(i);
 			ApplicationInitializer.synMongoDocumentIndex(CellData.class, collection, mongoTemplate);
+		}
+		for (int i = 1; i <= SheetData.MAX_GI_RANDOM_TAG; i ++){
+			String collection = SheetData.gridInfoCollectionName(i);
+			ApplicationInitializer.synMongoDocumentIndex(GridInfo.class, collection, mongoTemplate);
 		}
 	}
 

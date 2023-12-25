@@ -30,7 +30,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class CellData extends BaseMongoEntity {
 
-    public static final String COLLECTION_NAME = "poi_sheet_data";
+    public static final String COLLECTION_NAME = "poi_cell_data";
 
     public String mapKey(){
         if(this.c < 0){
