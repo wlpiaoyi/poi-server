@@ -42,23 +42,6 @@ spring:
         max-connection-life-time: 0
         connect-timeout: 10000
         socket-timeout: 60000
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-#    driver-class-name: org.sqlite.JDBC
-#    url: jdbc:sqlite:.\sqllite\data.db
-    url: jdbc:mysql://36.138.30.68:13306/poie_test?useSSL=false&useUnicode=true&characterEncoding=utf-8&transformedBitIsBoolean=true&tinyInt1isBit=false&allowMultiQueries=true&serverTimezone=GMT%2B8
-    username: root
-    password: zrgj@2022*
-    initial-size: 10
-    max-active: 100
-    min-idle: 30
-    max-wait: 40
-    validation-query: SELECT 1
-    druid:
-      # MySql、PostgreSQL、SqlServer、DaMeng校验
-      validation-query: select 1
-springdoc:
   api-docs:
     enabled: true # 1. 是否开启 Swagger 接文档的元数据
     path: /v3/api-docs
