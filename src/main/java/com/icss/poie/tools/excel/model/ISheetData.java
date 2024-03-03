@@ -1,4 +1,4 @@
-package com.icss.poie.tools.excel;
+package com.icss.poie.tools.excel.model;
 
 import java.util.List;
 
@@ -17,6 +17,9 @@ public interface ISheetData {
     /** 单元格数据 **/
     List<ICellData> cellDatas();
     void putCellDatas(List<ICellData> cellDatas);
+
+    /** 缓存 **/
+    ICacheMap cacheMap();
 
     /** 网格数据 **/
     IGridInfo gridInfo();

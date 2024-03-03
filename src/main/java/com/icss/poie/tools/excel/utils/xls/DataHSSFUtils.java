@@ -1,8 +1,8 @@
 package com.icss.poie.tools.excel.utils.xls;
 
 import com.icss.poie.framework.common.tools.ValueUtils;
-import com.icss.poie.tools.excel.ISheetData;
-import com.icss.poie.tools.excel.Scope;
+import com.icss.poie.tools.excel.model.ISheetData;
+import com.icss.poie.tools.excel.model.Scope;
 import com.icss.poie.tools.excel.utils.DataSheetUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;

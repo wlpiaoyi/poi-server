@@ -1,8 +1,8 @@
 package com.icss.poie.tools.excel.utils.xls;
 
-import com.icss.poie.tools.excel.ICellData;
-import com.icss.poie.tools.excel.ICellValue;
-import com.icss.poie.tools.excel.ISheetData;
+import com.icss.poie.tools.excel.model.ICellData;
+import com.icss.poie.tools.excel.model.ICellValue;
+import com.icss.poie.tools.excel.model.ISheetData;
 import com.icss.poie.tools.excel.utils.SheetDataUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFSheet;

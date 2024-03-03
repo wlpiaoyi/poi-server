@@ -1,7 +1,7 @@
 package com.icss.poie.tools.excel.utils.xls;
 
 import com.icss.poie.framework.common.tools.ValueUtils;
-import com.icss.poie.tools.excel.DataStyle;
+import com.icss.poie.tools.excel.model.DataStyle;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;

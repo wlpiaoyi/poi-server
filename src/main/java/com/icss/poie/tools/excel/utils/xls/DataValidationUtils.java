@@ -2,8 +2,8 @@ package com.icss.poie.tools.excel.utils.xls;
 
 
 import com.icss.poie.framework.common.tools.ValueUtils;
-import com.icss.poie.tools.excel.DataValidation;
-import com.icss.poie.tools.excel.Scope;
+import com.icss.poie.tools.excel.model.DataValidation;
+import com.icss.poie.tools.excel.model.Scope;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.DVConstraint;
 import org.apache.poi.hssf.usermodel.HSSFDataValidation;

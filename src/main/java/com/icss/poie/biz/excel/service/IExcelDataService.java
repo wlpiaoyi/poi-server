@@ -2,6 +2,7 @@ package com.icss.poie.biz.excel.service;
 
 import com.icss.poie.biz.excel.domain.entity.ExcelData;
 import com.icss.poie.biz.excel.domain.vo.ExcelDataVo;
+import com.icss.poie.biz.excel.domain.vo.SheetDataVo;
 import com.icss.poie.service.IBaseMongoService;
 import org.bson.types.ObjectId;
 
@@ -16,9 +17,9 @@ import java.util.Collection;
  * {@code @date:}           2023/11/24 14:09
  * {@code @version:}:       1.0
  */
-public interface IExcelDataService <M extends ExcelData> extends IBaseMongoService<M> {
+public interface IExcelDataService extends IBaseMongoService<ExcelData> {
 
-    ExcelDataVo detail(ObjectId id);
+    ExcelDataVo<SheetDataVo> detail(ObjectId id);
 
 
     /**
@@ -27,7 +28,7 @@ public interface IExcelDataService <M extends ExcelData> extends IBaseMongoServi
      * @return
      * @throws IOException
      */
-    ExcelDataVo getExcelDataByInputStream(InputStream inputStream, String type, ObjectId excelId) throws IOException;
+    ExcelDataVo<SheetDataVo> getExcelDataByInputStream(InputStream inputStream, String type, ObjectId excelId) throws IOException;
 
     /**
      *
@@ -35,7 +36,7 @@ public interface IExcelDataService <M extends ExcelData> extends IBaseMongoServi
      * @param outputStream
      * @throws IOException
      */
-    void putOutputStreamByExcelData(ExcelDataVo excelDataVo, String fileType, OutputStream outputStream) throws IOException;
-    void putOutputStreamByExcelData(Collection<ExcelDataVo> excelDataVos, OutputStream outputStream) throws IOException;
+    void putOutputStreamByExcelData(ExcelDataVo<SheetDataVo> excelDataVo, String fileType, OutputStream outputStream) throws IOException;
+    void putOutputStreamByExcelData(Collection<ExcelDataVo<SheetDataVo>> excelDataVos, OutputStream outputStream) throws IOException;
 
 }

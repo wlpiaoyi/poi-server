@@ -5,7 +5,7 @@ import com.icss.poie.biz.excel.domain.entity.SheetData;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.biz.excel.domain.entity.CellData;
 import com.icss.poie.biz.excel.domain.model.CellValue;
-import com.icss.poie.tools.excel.*;
+import com.icss.poie.tools.excel.model.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -115,8 +115,15 @@ public class SheetDataVo extends SheetData implements ISheetData {
         this.cellDatas = datas;
     }
 
+
+
     @Override
     public IGridInfo gridInfo() {
+        return this.getGridInfo();
+    }
+
+    @Override
+    public ICacheMap cacheMap() {
         return this.getGridInfo();
     }
 

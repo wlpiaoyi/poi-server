@@ -35,6 +35,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -50,16 +51,16 @@ import java.util.zip.ZipOutputStream;
 @Slf4j
 @Service
 @Primary
-public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implements IExcelDataService<ExcelData> {
+public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implements IExcelDataService {
 
     @Autowired
     private ISheetDataService sheetDataService;
 
     @Override
-    public ExcelDataVo detail(ObjectId id) {
+    public ExcelDataVo<SheetDataVo> detail(ObjectId id) {
         long pointTime = System.currentTimeMillis();
         log.info("excel start detail dataId[{}]", id.toHexString());
-        ExcelDataVo excelDataVo = this.baseTemplate.findOne(new Query(Criteria.where("_id").is(id)),
+        ExcelDataVo<SheetDataVo> excelDataVo = this.baseTemplate.findOne(new Query(Criteria.where("_id").is(id)),
                 ExcelDataVo.class);
         if(excelDataVo == null){
             return null;
@@ -80,9 +81,9 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
     }
 
     @Override
-    public ExcelDataVo getExcelDataByInputStream(InputStream inputStream, String type, ObjectId excelId) throws IOException {
+    public ExcelDataVo<SheetDataVo> getExcelDataByInputStream(InputStream inputStream, String type, ObjectId excelId) throws IOException {
 
-        ExcelDataVo excelData = new ExcelDataVo();
+        ExcelDataVo<SheetDataVo> excelData = new ExcelDataVo<>();
         if(excelId != null){
             ExcelData db = this.findOne(excelId);
             if(db == null){
@@ -101,16 +102,15 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
                 ));
             }
         }
-        if("xlsx".equals(type.toLowerCase())){
+        if("xlsx".equalsIgnoreCase(type)){
             XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
             try{
-                Iterator<Sheet> iterator = workbook.iterator();
-                while (iterator.hasNext()){
-                    XSSFSheet sheet = (XSSFSheet)iterator.next();
+                for (Sheet rows : workbook) {
+                    XSSFSheet sheet = (XSSFSheet) rows;
                     SheetDataVo sheetData = new SheetDataVo();
                     XSSFDataUtils.parseData(sheetData, sheet, CellDataVo.class, CellValue.class);
                     SheetData sdDb = sdMap.get(sheetData.getSheetName());
-                    if(sdDb != null){
+                    if (sdDb != null) {
                         sheetData.setId(sdDb.getId());
                         sheetData.setCreateTime(sdDb.getCreateTime());
                         sheetData.setCellRandomTag(sdDb.getCellRandomTag());
@@ -123,17 +123,16 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
                 workbook.close();
             }
 
-        }else if("xls".equals(type.toLowerCase())){
+        }else if("xls".equalsIgnoreCase(type)){
             HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
             try{
                 excelData.setSheetDatas(new ArrayList<>());
-                Iterator<Sheet> iterator = workbook.iterator();
-                while (iterator.hasNext()){
-                    HSSFSheet sheet = (HSSFSheet)iterator.next();
+                for (Sheet rows : workbook) {
+                    HSSFSheet sheet = (HSSFSheet) rows;
                     SheetDataVo sheetData = new SheetDataVo();
                     HSSFDataUtils.parseData(sheetData, sheet, CellDataVo.class, CellValue.class);
                     SheetData sdDb = sdMap.get(sheetData.getSheetName());
-                    if(sdDb != null){
+                    if (sdDb != null) {
                         sheetData.setId(sdDb.getId());
                         sheetData.setCreateTime(sdDb.getCreateTime());
                         sheetData.setCellRandomTag(sdDb.getCellRandomTag());
@@ -150,10 +149,10 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
     }
 
     @Override
-    public void putOutputStreamByExcelData(ExcelDataVo excelDataVo, String fileType, OutputStream outputStream) throws IOException {
+    public void putOutputStreamByExcelData(ExcelDataVo<SheetDataVo> excelDataVo, String fileType, OutputStream outputStream) throws IOException {
         if(fileType.equals("xls")){
             HSSFWorkbook workbook = new HSSFWorkbook();
-            for (SheetDataVo sheetDataVo : ((ExcelDataVo<SheetDataVo>) excelDataVo).getSheetDatas()){
+            for (SheetDataVo sheetDataVo :  excelDataVo.getSheetDatas()){
                 DataHSSFUtils.parseSheet(workbook, sheetDataVo);
             }
             workbook.write(outputStream);
@@ -162,7 +161,7 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
             workbook.close();
         }else{
             XSSFWorkbook workbook = new XSSFWorkbook();
-            for (SheetDataVo sheetDataVo : ((ExcelDataVo<SheetDataVo>) excelDataVo).getSheetDatas()){
+            for (SheetDataVo sheetDataVo : excelDataVo.getSheetDatas()){
                 DataXSSFUtils.parseSheet(workbook, sheetDataVo);
             }
             workbook.write(outputStream);
@@ -176,17 +175,17 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
     public static File xssfWorkbookToFile(XSSFWorkbook wb, String name) {
         File file = new File(name);
         try {
-            OutputStream os = new FileOutputStream(file);
+            OutputStream os = Files.newOutputStream(file.toPath());
             wb.write(os);
             os.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("xssfWorkbookToFile error", e);
         }
         return file;
     }
 
     @Override
-    public void putOutputStreamByExcelData(Collection<ExcelDataVo> excelDataVos, OutputStream outputStream) throws IOException {
+    public void putOutputStreamByExcelData(Collection<ExcelDataVo<SheetDataVo>> excelDataVos, OutputStream outputStream) throws IOException {
         ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
         int index = 0;
         for (ExcelDataVo<SheetDataVo> excelDataVo : excelDataVos){
@@ -235,12 +234,13 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
         }
         log.info("excel start insert dataId[{}]", entity.getId().toHexString());
         if(entity instanceof ExcelDataVo){
-            ExcelDataVo<SheetDataVo> entityVo = (ExcelDataVo) entity;
+            ExcelDataVo<SheetDataVo> entityVo = (ExcelDataVo<SheetDataVo>) entity;
             if(ValueUtils.isNotBlank(entityVo.getSheetDatas())){
                 for (SheetDataVo sheetDataVo : entityVo.getSheetDatas()){
                     sheetDataVo.setExcelId(entity.getId());
                 }
-                this.sheetDataService.insertBatch(entityVo.getSheetDatas());
+                List sheetDatas = entityVo.getSheetDatas();
+                this.sheetDataService.insertBatch(sheetDatas);
             }
         }
         ExcelData iEntity = BaseWrapper.parseOne(entity, ExcelData.class);
@@ -278,9 +278,9 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
         if(entity instanceof ExcelDataVo){
             ExcelDataVo<SheetDataVo> entityVo = (ExcelDataVo) entity;
             if(ValueUtils.isNotBlank(entityVo.getSheetDatas())){
-                List<SheetDataVo> saves = new ArrayList<>();
-                List<SheetDataVo> updates = new ArrayList<>();
-                for (SheetDataVo sheetDataVo : entityVo.getSheetDatas()){
+                List<SheetData> saves = new ArrayList<>();
+                List<SheetData> updates = new ArrayList<>();
+                for (SheetData sheetDataVo : entityVo.getSheetDatas()){
                     sheetDataVo.setExcelId(entity.getId());
                     if(sheetDataVo.getId() != null){
                         updates.add(sheetDataVo);

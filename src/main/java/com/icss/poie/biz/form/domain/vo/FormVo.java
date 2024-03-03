@@ -9,7 +9,7 @@ import com.icss.poie.framework.common.exception.BusinessException;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.domain.entity.BaseEntity;
 import com.icss.poie.biz.excel.domain.entity.CellData;
-import com.icss.poie.tools.excel.Scope;
+import com.icss.poie.tools.excel.model.Scope;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

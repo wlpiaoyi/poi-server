@@ -1,4 +1,4 @@
-package com.icss.poie.tools.excel;
+package com.icss.poie.tools.excel.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,7 +14,7 @@ import java.util.List;
  * {@code @version:}:       1.0
  */
 @Data
-public class DataStyle {
+public class DataStyle extends StyleBase{
 
 
     /** 作用范围 **/
@@ -62,17 +62,34 @@ public class DataStyle {
     private Object dataFormat;
 
     public String toString(){
-        return "bg:" + this.getBg()
+        if(this._cacheToString_ != null){
+            return this._cacheToString_;
+        }
+        String text = "bg:" + this.bg
                 + ",ff:" + this.ff
                 + ",fc:" + this.fc
                 + ",it:" + this.it
-                + ", bl:" + this.bl
-                + ", fs:" + this.fs
+                + ",bl:" + this.bl
+                + ",fs:" + this.fs
                 + ",un:" + this.un
                 + ",vt:" + this.vt
                 + ",ht:" + this.ht
                 + ",tb:" + this.tb
+                + ",dfm:" + this.dfm
                 + ",dfmv:" + this.dfmv;
+
+        this._cacheToString_ = text;
+        return text;
+    }
+
+    public boolean equals(Object object){
+        if(this == object){
+            return true;
+        }
+        if(!(object instanceof DataStyle)){
+            return false;
+        }
+        return super.equals(object);
     }
 
 }

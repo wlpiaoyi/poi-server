@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @Primary
-public class CellDataServiceImpl extends BaseMongoServiceImpl<CellData> implements ICellDataService<CellData> {
+public class CellDataServiceImpl extends BaseMongoServiceImpl<CellData> implements ICellDataService {
 
     @Override
     public List<CellData> queryBySheetId(ObjectId sheetId, int randomTag) {

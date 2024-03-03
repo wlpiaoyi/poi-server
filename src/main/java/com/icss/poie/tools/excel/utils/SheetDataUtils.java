@@ -1,14 +1,14 @@
 package com.icss.poie.tools.excel.utils;
 
+import com.icss.poie.framework.common.tools.MapUtils;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.biz.excel.domain.model.CellValue;
-import com.icss.poie.tools.excel.*;
+import com.icss.poie.tools.excel.model.*;
+import com.icss.poie.tools.excel.model.BorderStyle;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
-import org.apache.poi.xssf.usermodel.XSSFPicture;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -22,7 +22,7 @@ import java.util.*;
  */
 public class SheetDataUtils {
     public interface CellDataRun{
-        void run(Cell cell, DataStyle curDataStyle);
+        void run(Cell cell, Map<String, StyleBase> styleBaseMap);
 
     }
     public interface CellDataEnd{
@@ -41,7 +41,8 @@ public class SheetDataUtils {
         List<ICellData> cellDatas = new ArrayList<>();
         sheetData.putCellDatas(cellDatas);
         //TODO 数据验证 sheet.getDataValidations();
-        Map<String, DataStyle> dataStyleMap = new HashMap<>();
+        Map<String, StyleBase> styleBaseMap = new HashMap<>();
+        sheetData.putGridInfo(sheetData.newInstanceGridInfo());
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
             Iterator<Cell> cellIterator = row.cellIterator();
@@ -49,8 +50,10 @@ public class SheetDataUtils {
                 Cell cell = cellIterator.next();
                 ICellData cellData = cdClazz.newInstance();
                 setCellData(cellData, cell, cvClass);
-                DataStyle curDataStyle = new DataStyle();
-                cellDataRun.run(cell, curDataStyle);
+                cellDataRun.run(cell, styleBaseMap);
+                DataStyle curDataStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_DATA_STYLE_CACHE);
+                BorderStyle curBorderStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_BORDER_DATA_CACHE);
+                styleBaseMap.clear();;
                 DataStyle dataStyle = dataStyleMap.get(curDataStyle.toString());
                 if(dataStyle == null){
                     dataStyle = curDataStyle;
@@ -64,7 +67,6 @@ public class SheetDataUtils {
                 cellDatas.add(cellData);
             }
         }
-        sheetData.putGridInfo(sheetData.newInstanceGridInfo());
         sheetData.gridInfo().setCellMerges(new ArrayList<>());
         if(ValueUtils.isNotBlank(dataStyleMap)){
             sheetData.gridInfo().setDataStyles(new ArrayList(){{ addAll(dataStyleMap.values());}});
@@ -81,7 +83,7 @@ public class SheetDataUtils {
         }else{
             sheetData.gridInfo().setFrozenWindow(null);
         }
-        List<com.icss.poie.tools.excel.Picture> pictures = new ArrayList<>();
+        List<com.icss.poie.tools.excel.model.Picture> pictures = new ArrayList<>();
         setPicture(pictures, sheet);
         if(ValueUtils.isNotBlank(pictures)){
             sheetData.gridInfo().setPictures(pictures);
@@ -93,25 +95,25 @@ public class SheetDataUtils {
      * @param pictures
      * @param sheet
      */
-    public static void setPicture(List<com.icss.poie.tools.excel.Picture> pictures, Sheet sheet){
+    public static void setPicture(List<com.icss.poie.tools.excel.model.Picture> pictures, Sheet sheet){
         if(sheet.getDrawingPatriarch() == null){
             return;
         }
-        Iterator iterator = sheet.getDrawingPatriarch().iterator();
+        Iterator<?> iterator = sheet.getDrawingPatriarch().iterator();
         while (iterator.hasNext()){
             Object object = iterator.next();
             if(object instanceof Picture){
                 Picture picture = (Picture) object;
-                com.icss.poie.tools.excel.Picture pictureValue = getPicture(picture);
+                com.icss.poie.tools.excel.model.Picture pictureValue = getPicture(picture);
                 pictures.add(pictureValue);
             }
         }
     }
 
     @NotNull
-    private static com.icss.poie.tools.excel.Picture getPicture(Picture picture) {
+    private static com.icss.poie.tools.excel.model.Picture getPicture(Picture picture) {
         PictureData pictureData = picture.getPictureData();
-        com.icss.poie.tools.excel.Picture pictureValue = new com.icss.poie.tools.excel.Picture();
+        com.icss.poie.tools.excel.model.Picture pictureValue = new com.icss.poie.tools.excel.model.Picture();
         pictureValue.setData(pictureData.getData());
         pictureValue.setPictureType(pictureData.getPictureType());
         ClientAnchor clientAnchor = picture.getClientAnchor();
@@ -133,22 +135,30 @@ public class SheetDataUtils {
      */
     public static void setRcValue(IGridInfo gridInfo, Sheet sheet){
         Iterator<Row> rowIterator = sheet.rowIterator();
-        gridInfo.setRowHeights(new ArrayList<>());
-        gridInfo.setColumnWidths(new ArrayList<>());
-        gridInfo.setHiddenColumns(new ArrayList<>());
-        gridInfo.setHiddenRows(new ArrayList<>());
+        List<Short> rowHeights = new ArrayList<>();
+        List<Short> columnWidths = new ArrayList<>();
+        List<Integer> hiddenColumns = new ArrayList<>();
+        List<Integer> hiddenRows = new ArrayList<>();
+        gridInfo.setRowHeights(rowHeights);
+        gridInfo.setColumnWidths(columnWidths);
+        gridInfo.setHiddenColumns(hiddenColumns);
+        gridInfo.setHiddenRows(hiddenRows);
         int maxC = 0;
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
+            int rowNum = row.getRowNum();
+            while (rowNum > rowHeights.size()){
+                rowHeights.add(null);
+            }
             maxC = Math.max(maxC, row.getLastCellNum());
             short value = (short) Math.max(10, row.getHeight());
-            gridInfo.getRowHeights().add(value);
+            rowHeights.add(value);
             if(row.getZeroHeight()){
-                gridInfo.getHiddenRows().add(row.getRowNum());
+                hiddenRows.add(row.getRowNum());
             }
         }
         for (int i = 0; i <= maxC; i ++){
-            gridInfo.getColumnWidths().add((short) sheet.getColumnWidth(i));
+            columnWidths.add((short) sheet.getColumnWidth(i));
             if (sheet.isColumnHidden(i)){
                 gridInfo.getHiddenColumns().add(i);
             }
@@ -167,7 +177,7 @@ public class SheetDataUtils {
         switch (cell.getCellType()) {
             case NUMERIC:{
                 cellData.v().setType(1);
-                cellData.v().setV(new BigDecimal(cell.getNumericCellValue()).toString());
+                cellData.v().setV(BigDecimal.valueOf(cell.getNumericCellValue()).toString());
             }
             break;
             case STRING:{
@@ -177,7 +187,7 @@ public class SheetDataUtils {
             break;
             case BOOLEAN:{
                 cellData.v().setType(1);
-                cellData.v().setV(new Boolean(cell.getStringCellValue()).toString());
+                cellData.v().setV(Boolean.valueOf(cell.getStringCellValue()).toString());
             }
             break;
             case FORMULA:{

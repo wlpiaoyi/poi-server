@@ -13,11 +13,11 @@ import java.util.List;
  * {@code @date:}           2023/11/24 12:35
  * {@code @version:}:       1.0
  */
-public interface ISheetDataService<M extends SheetData> extends IBaseMongoService<M> {
+public interface ISheetDataService extends IBaseMongoService<SheetData> {
 
 
      SheetDataVo detail(ObjectId id);
 
-     List<M> queryByExcelId(ObjectId excelId);
+     List<SheetData> queryByExcelId(ObjectId excelId);
 
 }

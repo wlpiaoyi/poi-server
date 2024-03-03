@@ -2,8 +2,8 @@ package com.icss.poie.biz.excel.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.icss.poie.framework.common.tools.ValueUtils;
-import com.icss.poie.tools.excel.ICellValue;
-import com.icss.poie.tools.excel.Scope;
+import com.icss.poie.tools.excel.model.ICellValue;
+import com.icss.poie.tools.excel.model.Scope;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

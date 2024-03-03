@@ -26,7 +26,8 @@ spring:
   data:
     mongodb:
 #      uri: mongodb://root:htData%402023*@36.138.30.68:27000,36.138.30.68:27001/?slaveOk=true&replicaSet=rs&readPreference=secondaryPreferred
-      uri: mongodb://root:htData%402023*@36.138.30.68:27000,36.138.30.68:27001
+#      uri: mongodb://root:htData%402023*@36.138.30.68:27000,36.138.30.68:27001
+      uri: mongodb://root:htData%402023*@36.138.30.68:37017
 #      host: 36.138.30.68
 #      port: 37017
 #      password: 'htData@2023*'

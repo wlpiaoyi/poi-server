@@ -7,6 +7,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,10 +24,9 @@ import java.util.*;
  */
 @SpringBootApplication(scanBasePackages = {
         "com.icss.poie"
-})
+}, exclude = { DataSourceAutoConfiguration.class })
 @ComponentScan(basePackages = {"com.icss.poie"})
-@MapperScan("com.icss.poie")
-//@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
+//@MapperScan("com.icss.poie")
 public class Application implements ApplicationContextAware {
 
     @PostConstruct

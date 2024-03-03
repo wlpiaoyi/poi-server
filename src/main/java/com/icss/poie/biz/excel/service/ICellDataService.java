@@ -14,7 +14,7 @@ import java.util.List;
  * {@code @date:}           2023/11/24 10:44
  * {@code @version:}:       1.0
  */
-public interface ICellDataService<M extends CellData> extends IBaseMongoService<M> {
+public interface ICellDataService extends IBaseMongoService<CellData> {
 
     /**
      * 根据SheetId获取CellDatas
@@ -22,10 +22,10 @@ public interface ICellDataService<M extends CellData> extends IBaseMongoService<
      * @param randomTag
      * @return
      */
-    List<M> queryBySheetId(ObjectId sheetId, int randomTag);
+    List<CellData> queryBySheetId(ObjectId sheetId, int randomTag);
 
 
-    UpdateResult update(M entity, int randomTag);
+    UpdateResult update(CellData entity, int randomTag);
 
     /**
      * 批量更新单元格
@@ -34,6 +34,6 @@ public interface ICellDataService<M extends CellData> extends IBaseMongoService<
      * @param randomTag
      * @return
      */
-    boolean updateBatch(Collection<M> entities, ObjectId sheetId, int randomTag);
+    boolean updateBatch(Collection<CellData> entities, ObjectId sheetId, int randomTag);
 
 }

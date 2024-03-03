@@ -1,6 +1,9 @@
 package com.icss.poie.biz.excel.controller;
 
+import cn.hutool.core.io.FileTypeUtil;
+import com.icss.poie.biz.excel.domain.entity.ExcelData;
 import com.icss.poie.biz.excel.domain.vo.ExcelDataVo;
+import com.icss.poie.biz.excel.domain.vo.SheetDataVo;
 import com.icss.poie.biz.excel.domain.wrapper.BaseWrapper;
 import com.icss.poie.framework.common.exception.BusinessException;
 import com.icss.poie.framework.common.tools.ValueUtils;
@@ -46,9 +49,9 @@ public class ExcelDataController {
     @GetMapping("/detail")
     @ApiOperationSupport(order = 1)
     @Operation(summary ="详情")
-    public R<ExcelDataVo> detail(@RequestParam(name = "id") String hexId) {
+    public R<ExcelDataVo<SheetDataVo>> detail(@RequestParam(name = "id") String hexId) {
         ObjectId objId = new ObjectId(hexId);
-        ExcelDataVo excelData = this.excelDataService.detail(objId);
+        ExcelDataVo<SheetDataVo> excelData = this.excelDataService.detail(objId);
         return R.success(excelData);
     }
 
@@ -57,9 +60,8 @@ public class ExcelDataController {
     @ApiOperationSupport(order = 2)
     @Operation(summary ="新增Excel")
     @ResponseBody
-    public R save(@RequestBody ExcelDataVo body) {
-        this.excelDataService.insert(body);
-        return R.success(body.getId().toHexString());
+    public R<ExcelData> save(@RequestBody ExcelDataVo<SheetDataVo> body) {
+        return R.success(this.excelDataService.insert(body));
     }
 
     @SneakyThrows
@@ -67,10 +69,13 @@ public class ExcelDataController {
     @ApiOperationSupport(order = 2)
     @Operation(summary ="上传Excel")
     @ResponseBody
-    public R uploadExcel(@RequestParam("file") MultipartFile file,
+    public R<String> uploadExcel(@RequestParam("file") MultipartFile file,
                          @RequestParam(name = "id", required = false) String excelId) {
+        if(ValueUtils.isBlank(file.getOriginalFilename())){
+            throw new BusinessException("源文件名称为空");
+        }
         String[] args = file.getOriginalFilename().split("\\.");
-        ExcelDataVo excelData =  this.excelDataService.getExcelDataByInputStream(file.getInputStream(),
+        ExcelDataVo<SheetDataVo> excelData =  this.excelDataService.getExcelDataByInputStream(file.getInputStream(),
                 args[args.length - 1],
                 ValueUtils.isNotBlank(excelId) ? new ObjectId(excelId) : null);
         excelData.setName(args[0]);
@@ -87,7 +92,7 @@ public class ExcelDataController {
     @ApiOperationSupport(order = 2)
     @Operation(summary ="修改Excel")
     @ResponseBody
-    public R update(@RequestBody ExcelDataVo body) {
+    public R<String> update(@RequestBody ExcelDataVo<SheetDataVo> body) {
         this.excelDataService.update(body);
         return R.success(body.getId().toHexString());
     }
@@ -99,7 +104,7 @@ public class ExcelDataController {
                               @RequestParam(required = false, defaultValue = "xlsx") String fileType,
                               HttpServletResponse response) throws IOException {
         ObjectId objId = new ObjectId(hexId);
-        ExcelDataVo excelData = this.excelDataService.detail(objId);
+        ExcelDataVo<SheetDataVo> excelData = this.excelDataService.detail(objId);
         if(excelData == null){
             throw new BusinessException("没有找到Excel数据");
         }
@@ -121,7 +126,7 @@ public class ExcelDataController {
     @GetMapping("/remove")
     @ApiOperationSupport(order = 4)
     @Operation(summary ="删除Excel")
-    public R remove(@RequestParam String hexIds) {
+    public R<Long> remove(@RequestParam String hexIds) {
         List<ObjectId> objIds = new ArrayList<>();
         for(String hexId : hexIds.split(",")){
             objIds.add(new ObjectId(hexId));

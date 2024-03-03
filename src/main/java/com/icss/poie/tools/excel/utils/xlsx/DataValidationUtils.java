@@ -1,8 +1,8 @@
 package com.icss.poie.tools.excel.utils.xlsx;
 
 import com.icss.poie.framework.common.tools.ValueUtils;
-import com.icss.poie.tools.excel.DataValidation;
-import com.icss.poie.tools.excel.Scope;
+import com.icss.poie.tools.excel.model.DataValidation;
+import com.icss.poie.tools.excel.model.Scope;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFDataValidation;

@@ -22,11 +22,11 @@ import java.lang.annotation.*;
         exceptionExpression = "#{message.contains('WriteConflict error')}",
         maxAttempts = 128,
         backoff = @Backoff(delay = 500))
-@Transactional(
-        transactionManager = "mongoTransactionManager",
-        propagation = Propagation.REQUIRED,
-        rollbackFor = Exception.class,
-        timeout = 120)
+//@Transactional(
+//        transactionManager = "mongoTransactionManager",
+//        propagation = Propagation.REQUIRED,
+//        rollbackFor = Exception.class,
+//        timeout = 120)
 public @interface MongoTransactional {
 
     /**
@@ -40,6 +40,6 @@ public @interface MongoTransactional {
      * 前六个策略类似于EJB CMT，第七个（PROPAGATION_NESTED）是Spring所提供的一个特殊变量。
      * @return
      */
-    @AliasFor(annotation = Transactional.class, attribute = "propagation")
+//    @AliasFor(annotation = Transactional.class, attribute = "propagation")
     Propagation propagation() default Propagation.REQUIRED;
 }

@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @Primary
-public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implements ISheetDataService<SheetData> {
+public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implements ISheetDataService {
 
     @Autowired
     private ICellDataService cellDataService;
@@ -87,7 +87,7 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
                 for (CellData cellData : entityVo.getCellDatas()){
                     cellData.setSheetId(entity.getId());
                 }
-                this.cellDataService.insertBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(entityVo.getCellRandomTag()));
+                this.cellDataService.insertBatch((List) entityVo.getCellDatas(), SheetData.cellDataCollectionName(entityVo.getCellRandomTag()));
             }
             if(entityVo.getGridInfo() != null){
                 entityVo.getGridInfo().setSheetId(entityVo.getId());
@@ -124,7 +124,7 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
                         cellData.setSheetId(entity.getId());
                     }
                     log.info("sheet start insertBath insertCellBatch dataId[{}][{}]", entities.hashCode(), entity.hashCode());
-                    this.cellDataService.insertBatch(entityVo.getCellDatas(),
+                    this.cellDataService.insertBatch((List)entityVo.getCellDatas(),
                             SheetData.cellDataCollectionName(entityVo.getCellRandomTag()));
                     log.info("sheet end insertBath insertCellBatch dataId[{}][{}]", entities.hashCode(), entity.hashCode());
 
@@ -164,11 +164,11 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
                 for (CellData cellData : entityVo.getCellDatas()){
                     cellData.setSheetId(entity.getId());
                 }
-                List<CellData> removes = this.cellDataService.queryBySheetId(db.getId(), db.getCellRandomTag());
+                List<CellData> removes = (List) this.cellDataService.queryBySheetId(db.getId(), db.getCellRandomTag());
                 if(ValueUtils.isNotBlank(removes)){
                     this.cellDataService.removeBatch(removes.stream().map(CellData::getId).collect(Collectors.toList()), SheetData.cellDataCollectionName(db.getCellRandomTag()));
                 }
-                this.cellDataService.insertBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(db.getCellRandomTag()));
+                this.cellDataService.insertBatch((List) entityVo.getCellDatas(), SheetData.cellDataCollectionName(db.getCellRandomTag()));
 
                 if(entityVo.getGridInfo() != null){
                     entityVo.getGridInfo().setSheetId(entityVo.getId());
@@ -212,11 +212,11 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
                 entityVo.removeBlankCellData();
                 entityVo.synCellMc();
                 log.info("sheet start updateBatch updateCellBatch dataId[{}][{}]", entities.hashCode(), entity.getId().toHexString());
-                List<CellData> removes = this.cellDataService.queryBySheetId(db.getId(), db.getCellRandomTag());
+                List<CellData> removes = (List) this.cellDataService.queryBySheetId(db.getId(), db.getCellRandomTag());
                 if(ValueUtils.isNotBlank(removes)){
                     this.cellDataService.removeBatch(removes.stream().map(CellData::getId).collect(Collectors.toList()), SheetData.cellDataCollectionName(db.getCellRandomTag()));
                 }
-                this.cellDataService.insertBatch(entityVo.getCellDatas(), SheetData.cellDataCollectionName(db.getCellRandomTag()));
+                this.cellDataService.insertBatch((List) entityVo.getCellDatas(), SheetData.cellDataCollectionName(db.getCellRandomTag()));
                 log.info("sheet end updateBatch updateCellBatch dataId[{}][{}]", entities.hashCode(), entity.getId().toHexString());
                 if(entityVo.getGridInfo() != null){
                     entityVo.getGridInfo().setSheetId(entityVo.getId());

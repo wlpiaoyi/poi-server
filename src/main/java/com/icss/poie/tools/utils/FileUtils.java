@@ -3,6 +3,7 @@ package com.icss.poie.tools.utils;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.springframework.web.multipart.MultipartFile;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
@@ -56,9 +57,10 @@ public class FileUtils extends DataUtils{
      * @param orgFile
      * @return
      */
+    @SneakyThrows
     public static String moveFileMD5(java.io.File orgFile, String savePath) {
         try{
-            final String fileName = DataUtils.MD5(orgFile);
+            final String fileName = DataUtils.MD(orgFile, DataUtils.KEY_MD5);
             String oPath = FileUtils.toMd5Path(fileName);
             java.io.File md5File = new java.io.File(savePath + "/" + oPath);
             if (!md5File.exists()) {// 判断目录是否存在

@@ -2,8 +2,8 @@ package com.icss.poie.tools.excel.utils;
 
 import com.icss.poie.framework.common.tools.PatternUtils;
 import com.icss.poie.framework.common.tools.ValueUtils;
-import com.icss.poie.tools.excel.*;
-import com.icss.poie.tools.excel.Picture;
+import com.icss.poie.tools.excel.model.*;
+import com.icss.poie.tools.excel.model.Picture;
 import lombok.SneakyThrows;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -12,12 +12,6 @@ import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,11 +100,10 @@ public class DataSheetUtils {
      * @param pictures
      */
     public static void setPictures(Sheet sheet, List<Picture> pictures){
-        Drawing drawing = sheet.createDrawingPatriarch();
+        Drawing<?> drawing = sheet.createDrawingPatriarch();
         for (Picture pictureValue : pictures){
             ClientAnchor anchor;
             if(sheet instanceof XSSFSheet){
-
                 anchor = new XSSFClientAnchor(pictureValue.getDx1(),
                         pictureValue.getDy1(),
                         pictureValue.getDx2(),
@@ -152,16 +145,16 @@ public class DataSheetUtils {
             }
             switch (cellData.v().getType()){
                 case 1:{
-                    cell.setCellType(CellType.NUMERIC);
+//                    cell.setCellType(CellType.NUMERIC);
                     cell.setCellValue(new Double(v));
                 }
                 break;
                 default:{
                     if(PatternUtils.isNumber(v) || PatternUtils.isFloat(v)){
-                        cell.setCellType(CellType.NUMERIC);
+//                        cell.setCellType(CellType.NUMERIC);
                         cell.setCellValue(new Double(v));
                     }else{
-                        cell.setCellType(CellType.STRING);
+//                        cell.setCellType(CellType.STRING);
                         cell.setCellValue(v);
                     }
                 }

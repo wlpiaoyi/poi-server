@@ -1,13 +1,15 @@
 package com.icss.poie.tools.excel.utils.xlsx;
 
-import com.icss.poie.tools.excel.ICellData;
-import com.icss.poie.tools.excel.ISheetData;
+import com.icss.poie.tools.excel.model.*;
 import com.icss.poie.tools.excel.utils.SheetDataUtils;
-import com.icss.poie.tools.excel.ICellValue;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * {@code @author:}         wlpiaoyi
@@ -26,10 +28,27 @@ public class XSSFDataUtils {
         }, (xsheet, isheetData) ->{
             isheetData.gridInfo().setDataValidations(new ArrayList<>());
             ValidationDataUtils.setData((XSSFSheet) xsheet, isheetData.gridInfo().getDataValidations());
+
         });
     }
 
 
+
+//    static void setBorder(IGridInfo gridInfo, XSSFCell cell, curDataStyle{
+//        Iterator<Row> rowIterator = sheet.rowIterator();
+//        while (rowIterator.hasNext()) {
+//            Row row = rowIterator.next();
+//            Iterator<Cell> cellIterator = row.cellIterator();
+//            while (cellIterator.hasNext()) {
+//                Point point = new Point();
+//                Cell cell = cellIterator.next();
+//                point.setC(cell.getColumnIndex());
+//                point.setR(row.getRowNum());
+//                BorderDataUtils.setBorder();
+//            }
+//        }
+//
+//    }
 
 
 }

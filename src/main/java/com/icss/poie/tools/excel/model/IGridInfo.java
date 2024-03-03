@@ -1,4 +1,4 @@
-package com.icss.poie.tools.excel;
+package com.icss.poie.tools.excel.model;
 
 import java.util.List;
 
@@ -46,4 +46,8 @@ public interface IGridInfo /** 行高 **/{
     /** 图片数据 **/
     List<Picture> getPictures();
     void setPictures(List<Picture> pictures);
+
+    /** 边框样式 **/
+    List<BorderStyle> getBorderStyles();
+    void setBorderStyles(List<BorderStyle> borderStyles);
 }

@@ -1,4 +1,4 @@
-package com.icss.poie.tools.excel;
+package com.icss.poie.tools.excel.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -28,5 +28,20 @@ public class Point {
 
     public String toString(){
         return "r:" + this.r + ",c:" + this.c;
+    }
+
+    public boolean equals(Object object){
+        if(this == object){
+            return true;
+        }
+        if(!(object instanceof Point)){
+            return false;
+        }
+        return this.c == ((Point) object).c && this.r == ((Point) object).r;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.r * 100000 + this.c;
     }
 }

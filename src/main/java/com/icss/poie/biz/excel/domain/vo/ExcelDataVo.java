@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.icss.poie.biz.excel.domain.entity.SheetData;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.biz.excel.domain.entity.ExcelData;
-import com.icss.poie.tools.excel.IExcelData;
-import com.icss.poie.tools.excel.ISheetData;
+import com.icss.poie.tools.excel.model.IExcelData;
+import com.icss.poie.tools.excel.model.ISheetData;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
