@@ -1,9 +1,7 @@
 package com.icss.poie.tools.excel.utils.xls;
 
-import com.icss.poie.tools.excel.model.ICellData;
-import com.icss.poie.tools.excel.model.ICellValue;
-import com.icss.poie.tools.excel.model.ISheetData;
-import com.icss.poie.tools.excel.utils.SheetDataUtils;
+import com.icss.poie.tools.excel.model.*;
+import com.icss.poie.tools.excel.utils.SheetToDataUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 
@@ -20,9 +18,11 @@ public class HSSFDataUtils {
     public static void parseData(ISheetData sheetData, HSSFSheet sheet,
                                  Class<? extends ICellData> cdClazz,
                                  Class<? extends ICellValue> cvClass){
-        SheetDataUtils.parseData(sheetData, sheet, cdClazz, cvClass, (cell, curDataStyle) -> {
+        SheetToDataUtils.parseToData(sheetData, sheet, cdClazz, cvClass, (cellData, cell, styleBaseMap) -> {
+            DataStyle curDataStyle = new DataStyle();
             StyleDataUtils.setDataStyle(curDataStyle, (HSSFCell) cell);
-        }, (hsheet, isheetData)->{
+            styleBaseMap.put(StyleBase.KEY_CUR_DATA_STYLE_CACHE, curDataStyle);
+        }, (isheetData, hsheet)->{
             isheetData.gridInfo().setDataValidations(new ArrayList<>());
             ValidationDataUtils.setData((HSSFSheet) hsheet, isheetData.gridInfo().getDataValidations());
         });

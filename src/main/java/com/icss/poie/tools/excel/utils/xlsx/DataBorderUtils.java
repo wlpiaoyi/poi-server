@@ -2,6 +2,7 @@ package com.icss.poie.tools.excel.utils.xlsx;
 
 import com.icss.poie.tools.excel.model.BorderStyle;
 import com.icss.poie.tools.excel.model.ICacheMap;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.extensions.XSSFCellBorder;
@@ -21,7 +22,8 @@ public class DataBorderUtils {
      * <p><b>{@code @author:}</b>       wlpiaoyi</p>
      * <p><b>{@code @version:}</b>      1.0</p>
      */
-    static void setBorder(BorderStyle borderData, ICacheMap cacheMap, XSSFCellStyle cellStyle){
+    static void setBorder(BorderStyle borderData, XSSFCell cell, ICacheMap cacheMap){
+        XSSFCellStyle cellStyle = cell.getCellStyle();
         BorderStyle.Border border = borderData.getTop();
         if(border != null){
             if(border.getColor() != null){

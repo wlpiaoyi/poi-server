@@ -20,60 +20,61 @@ import java.util.*;
  * {@code @date:}           2023/11/30 13:13
  * {@code @version:}:       1.0
  */
-public class SheetDataUtils {
+public class SheetToDataUtils {
     public interface CellDataRun{
-        void run(Cell cell, Map<String, StyleBase> styleBaseMap);
+        void run(ICellData cellData, Cell cell, Map<String, StyleBase> styleBaseMap);
 
     }
     public interface CellDataEnd{
-        void run(Sheet sheet, ISheetData sheetData);
+        void run(ISheetData sheetData, Sheet sheet);
     }
 
 
     @SneakyThrows
-    public static void parseData(ISheetData sheetData, Sheet sheet,
-                                 Class<? extends ICellData> cdClazz,
-                                 Class<? extends ICellValue> cvClass,
-                                 CellDataRun cellDataRun,
-                                 CellDataEnd cellDataEnd){
+    public static void parseToData(ISheetData sheetData, Sheet sheet,
+                                   Class<? extends ICellData> cdClazz,
+                                   Class<? extends ICellValue> cvClass,
+                                   CellDataRun cellDataRun,
+                                   CellDataEnd cellDataEnd){
         sheetData.putSheetName(sheet.getSheetName());
         Iterator<Row> rowIterator = sheet.rowIterator();
         List<ICellData> cellDatas = new ArrayList<>();
         sheetData.putCellDatas(cellDatas);
         //TODO 数据验证 sheet.getDataValidations();
+        IGridInfo gridInfo = sheetData.newInstanceGridInfo();
+        sheetData.putGridInfo(gridInfo);
+        gridInfo.setDataStyles(new ArrayList<>());
+        gridInfo.setBorderStyles(new ArrayList<>());
         Map<String, StyleBase> styleBaseMap = new HashMap<>();
-        sheetData.putGridInfo(sheetData.newInstanceGridInfo());
+        //遍历行
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
             Iterator<Cell> cellIterator = row.cellIterator();
+            int rowIndex = row.getRowNum();
+            //遍历单元格
             while (cellIterator.hasNext()) {
                 Cell cell = cellIterator.next();
                 ICellData cellData = cdClazz.newInstance();
+                //设置单元格类容
                 setCellData(cellData, cell, cvClass);
-                cellDataRun.run(cell, styleBaseMap);
+                cellDataRun.run(cellData, cell, styleBaseMap);
                 DataStyle curDataStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_DATA_STYLE_CACHE);
                 BorderStyle curBorderStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_BORDER_DATA_CACHE);
-                styleBaseMap.clear();;
-                DataStyle dataStyle = dataStyleMap.get(curDataStyle.toString());
-                if(dataStyle == null){
-                    dataStyle = curDataStyle;
-                    dataStyleMap.put(dataStyle.toString(), dataStyle);
-                    dataStyle.setPoints(new ArrayList<>());
+                styleBaseMap.clear();
+                Point point = new Point().setR(rowIndex).setC(cell.getColumnIndex());
+                if(curDataStyle != null){
+                    StyleBase.mergeIn(gridInfo.getDataStyles(), curDataStyle, point);
                 }
-                Point point = new Point();
-                point.setR(cellData.getR());
-                point.setC(cellData.getC());
-                dataStyle.getPoints().add(point);
+                if(curBorderStyle != null){
+                    StyleBase.mergeIn(gridInfo.getBorderStyles(), curBorderStyle, point);
+                }
                 cellDatas.add(cellData);
             }
         }
         sheetData.gridInfo().setCellMerges(new ArrayList<>());
-        if(ValueUtils.isNotBlank(dataStyleMap)){
-            sheetData.gridInfo().setDataStyles(new ArrayList(){{ addAll(dataStyleMap.values());}});
-        }
         setMergedRegions(sheetData.gridInfo().getCellMerges(), sheet);
         setRcValue(sheetData.gridInfo(), sheet);
-        cellDataEnd.run(sheet, sheetData);
+        cellDataEnd.run(sheetData, sheet);
 
         if(sheet.getPaneInformation() != null && sheet.getPaneInformation().isFreezePane()){
             Point point = new Point();
@@ -167,7 +168,7 @@ public class SheetDataUtils {
 
 
 
-    public static boolean setCellData(ICellData cellData, Cell cell, Class<? extends ICellValue> cvClass) throws InstantiationException, IllegalAccessException {
+    private static boolean setCellData(ICellData cellData, Cell cell, Class<? extends ICellValue> cvClass) throws InstantiationException, IllegalAccessException {
         cellData.setR(cell.getRowIndex());
         cellData.setC(cell.getColumnIndex());
         cellData.putV(cvClass.newInstance());

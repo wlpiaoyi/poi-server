@@ -7,6 +7,7 @@ import lombok.Data;
 import org.springframework.data.annotation.Transient;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -23,25 +24,29 @@ public class StyleBase{
 
     /** 作用范围 **/
     @Schema(description = "作用范围")
-    private final List<Point> points = new ArrayList<>();
+    private List<Point> points = new ArrayList<>();
 
-    @JsonIgnore
-    @Transient
-    protected String _cacheToString_;
+//    @JsonIgnore
+//    @Transient
+//    protected String _cacheToString_;
 
-    public void cleanCacheData(){
-        this._cacheToString_ = null;
-    }
+//    public void cleanCacheData(){
+//        this._cacheToString_ = null;
+//    }
 
-    public boolean mergeIn(StyleBase styleBase, Point point){
-        if(!this.equals(styleBase)){
-            return false;
+    public static <T extends StyleBase> void mergeIn(List<T> styleBases, T styleBase, Point point){
+        int index = styleBases.indexOf(styleBase);
+        if(index < 0){
+            styleBase.getPoints().clear();
+            styleBase.getPoints().add(point);
+            styleBases.add(styleBase);
+          return;
         }
-        if(this.points.contains(point)){
-            return true;
+        T orgSB = styleBases.get(index);
+        if(orgSB.getPoints().contains(point)){
+            return;
         }
-        this.points.add(point);
-        return true;
+        orgSB.getPoints().add(point);
     }
 
     public boolean equals(Object object){

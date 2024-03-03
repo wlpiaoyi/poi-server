@@ -1,8 +1,11 @@
 package com.icss.poie.tools.excel.utils;
 
+import com.icss.poie.biz.excel.domain.entity.CellData;
+import com.icss.poie.framework.common.tools.MapUtils;
 import com.icss.poie.framework.common.tools.PatternUtils;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.tools.excel.model.*;
+import com.icss.poie.tools.excel.model.BorderStyle;
 import com.icss.poie.tools.excel.model.Picture;
 import lombok.SneakyThrows;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
@@ -22,10 +25,10 @@ import java.util.Map;
  * {@code @date:}           2023/11/30 12:49
  * {@code @version:}:       1.0
  */
-public class DataSheetUtils {
+public class DataToSheetUtils {
 
     public interface CellDataRun{
-        void run(Cell cell, DataStyle dataStyle, ICellData cellData);
+        void run(Cell cell, ICellData cellData, Map<String, StyleBase> styleBaseMap);
 
     }
 
@@ -36,11 +39,68 @@ public class DataSheetUtils {
 
 
     @SneakyThrows
-    public static void parseSheet(Workbook workbook, ISheetData sheetData, CellDataRun cellDataRun, CellDataEnd cellDataEnd){
-
+    public static Sheet parseSheet(Workbook workbook,
+                                   ISheetData sheetData,
+                                   CellDataRun cellDataRun,
+                                   CellDataEnd cellDataEnd){
         Sheet sheet = workbook.createSheet(sheetData.sheetName());
-        Map<Integer, Row> rowMap = new HashMap<>();
         DataStyle defaultDataStyle = new DataStyle();
+        Map<Point, Map<String, Object>> cellDataMap = new HashMap<>();
+        Map<Integer, Row> rowMap = new HashMap<>();
+        if(sheetData.gridInfo() != null){
+            List<DataStyle> dataStyles = sheetData.gridInfo().getDataStyles();
+            List<BorderStyle> borderStyles = sheetData.gridInfo().getBorderStyles();
+            if(ValueUtils.isNotBlank(dataStyles)){
+                for(DataStyle item : dataStyles){
+                    if(item.getPoints() == null || ValueUtils.isBlank(item.getPoints())){
+                        continue;
+                    }
+                    for (Point point : item.getPoints()){
+                        Map<String, Object> cdMap = cellDataMap.get(point);
+                        if(cdMap == null){
+                            cdMap = new HashMap<>();
+                            cellDataMap.put(point, cdMap);
+                        }
+                        cdMap.put("dataStyle", item);
+                        Row row = rowMap.get(point.getR());
+                        if(row == null){
+                            row = sheet.createRow(point.getR());
+                            rowMap.put(point.getR(), row);
+                        }
+                        Cell cell = MapUtils.get(cdMap, "cell");
+                        if(cell == null){
+                            cell = row.createCell(point.getC());
+                            cdMap.put("cell", cell);
+                        }
+                    }
+                }
+            }
+            if(ValueUtils.isNotBlank(borderStyles)){
+                for(BorderStyle item : borderStyles){
+                    if(item.getPoints() == null || ValueUtils.isBlank(item.getPoints())){
+                        continue;
+                    }
+                    for (Point point : item.getPoints()){
+                        Map<String, Object> cdMap = cellDataMap.get(point);
+                        if(cdMap == null){
+                            cdMap = new HashMap<>();
+                            cellDataMap.put(point, cdMap);
+                        }
+                        cdMap.put("borderStyle", item);
+                        Row row = rowMap.get(point.getR());
+                        if(row == null){
+                            row = sheet.createRow(point.getR());
+                            rowMap.put(point.getR(), row);
+                        }
+                        Cell cell = MapUtils.get(cdMap, "cell");
+                        if(cell == null){
+                            cell = row.createCell(point.getC());
+                            cdMap.put("cell", cell);
+                        }
+                    }
+                }
+            }
+        }
         if(ValueUtils.isNotBlank(sheetData.cellDatas())){
             for (ICellData cellData : sheetData.cellDatas()){
                 if(cellData.v() == null){
@@ -49,42 +109,50 @@ public class DataSheetUtils {
                 if(ValueUtils.isBlank(cellData.v().getF()) && ValueUtils.isBlank(cellData.v().getV())){
                     continue;
                 }
-                Row row = rowMap.get(cellData.getR());
-                if(row == null){
-                    row = sheet.createRow(cellData.getR());
-                    rowMap.put(cellData.getR(), row);
+                Point point = new Point().setC(cellData.getC()).setR(cellData.getR());
+                Map<String, Object> cdMap = cellDataMap.get(point);
+                if(cdMap == null){
+                    cdMap = new HashMap<>();
+                    cellDataMap.put(point, cdMap);
                 }
-                Cell cell = row.createCell(cellData.getC());
-                DataStyle dataStyle = null;
-                if(sheetData.gridInfo() != null && ValueUtils.isNotBlank(sheetData.gridInfo().getDataStyles())){
-                    for(DataStyle item : sheetData.gridInfo().getDataStyles()){
-                        if(item.getPoints() == null || ValueUtils.isBlank(item.getPoints())){
-                            dataStyle = item;
-                            break;
-                        }
-                        for (Point point : item.getPoints()){
-                            if(point.getC() == cellData.getC() && point.getR() == cellData.getR()){
-                                dataStyle = item;
-                                break;
-                            }
-                        }
-                        if(dataStyle != null){
-                            break;
-                        }
-                    }
-                }
-                if(dataStyle == null){
-                    dataStyle = defaultDataStyle;
-                }
-                setCellData(cell, cellData);
-                cellDataRun.run(cell, dataStyle, cellData);
-
+                cdMap.put("cellData", cellData);
             }
         }
 
+        if(ValueUtils.isNotBlank(cellDataMap)){
+            Map<String, StyleBase> styleBaseMap = new HashMap();
+            for (Map.Entry<Point, Map<String, Object>> entry : cellDataMap.entrySet()){
+                ICellData cellData = MapUtils.get(entry.getValue(), "cellData");
+                Cell cell = MapUtils.get(entry.getValue(), "cell");;
+                if(cellData != null){
+                    Row row = rowMap.get(cellData.getR());
+                    if(row == null){
+                        row = sheet.createRow(cellData.getR());
+                        rowMap.put(cellData.getR(), row);
+                    }
+                    if(cell == null){
+                        cell = row.createCell(cellData.getC());
+                        entry.getValue().put("cell", cell);
+                    }
+                    setCellData(cell, cellData);
+                }
+                DataStyle curDataStyle = MapUtils.get(entry.getValue(), "dataStyle");
+                BorderStyle curBorderStyle = MapUtils.get(entry.getValue(), "borderStyle");;
+                if(curDataStyle == null){
+                    curDataStyle = defaultDataStyle;
+                }
+                styleBaseMap.put(StyleBase.KEY_CUR_DATA_STYLE_CACHE, curDataStyle);
+                if(curBorderStyle != null){
+                    styleBaseMap.put(StyleBase.KEY_CUR_BORDER_DATA_CACHE, curBorderStyle);
+                }
+                cellDataRun.run(cell, cellData, styleBaseMap);
+                styleBaseMap.clear();
+
+            }
+        }
+        cellDataEnd.run(sheet, sheetData);
         if(sheetData.gridInfo() != null){
-            cellDataEnd.run(sheet, sheetData);
-            DataSheetUtils.setRCValue(sheet, sheetData.gridInfo());
+            DataToSheetUtils.setRCValue(sheet, sheetData.gridInfo());
             if(sheetData.gridInfo().getFrozenWindow() != null){
                 sheet.createFreezePane(sheetData.gridInfo().getFrozenWindow().getC(), sheetData.gridInfo().getFrozenWindow().getR());
             }
@@ -92,6 +160,7 @@ public class DataSheetUtils {
                 setPictures(sheet, sheetData.gridInfo().getPictures());
             }
         }
+        return sheet;
     }
 
     /**

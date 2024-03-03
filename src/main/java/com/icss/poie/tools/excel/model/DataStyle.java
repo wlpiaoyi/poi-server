@@ -16,10 +16,6 @@ import java.util.List;
 @Data
 public class DataStyle extends StyleBase{
 
-
-    /** 作用范围 **/
-    @Schema(description = "作用范围")
-    private List<Point> points = null;
     /** 背景色 **/
     @Schema(description = "背景色")
     private String bg = "#FFFFFF";
@@ -62,9 +58,6 @@ public class DataStyle extends StyleBase{
     private Object dataFormat;
 
     public String toString(){
-        if(this._cacheToString_ != null){
-            return this._cacheToString_;
-        }
         String text = "bg:" + this.bg
                 + ",ff:" + this.ff
                 + ",fc:" + this.fc
@@ -77,8 +70,6 @@ public class DataStyle extends StyleBase{
                 + ",tb:" + this.tb
                 + ",dfm:" + this.dfm
                 + ",dfmv:" + this.dfmv;
-
-        this._cacheToString_ = text;
         return text;
     }
 

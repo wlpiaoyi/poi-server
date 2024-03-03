@@ -1,13 +1,15 @@
 package com.icss.poie.tools.excel.utils.xlsx;
 
+import com.icss.poie.framework.common.tools.MapUtils;
 import com.icss.poie.framework.common.tools.ValueUtils;
-import com.icss.poie.tools.excel.model.ISheetData;
-import com.icss.poie.tools.excel.model.Scope;
-import com.icss.poie.tools.excel.utils.DataSheetUtils;
+import com.icss.poie.tools.excel.model.*;
+import com.icss.poie.tools.excel.utils.DataToSheetUtils;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * {@code @author:}         wlpiaoyi
@@ -26,8 +28,15 @@ public class DataXSSFUtils {
      * @date: 2023/12/25 11:46
      */
     public static void parseSheet(XSSFWorkbook workbook, ISheetData sheetData){
-        DataSheetUtils.parseSheet(workbook, sheetData, (cell, dataStyle, cellData) -> {
-            DataStyleUtils.setCellStyle((XSSFCell) cell, dataStyle);
+        DataToSheetUtils.parseSheet(workbook, sheetData, (cell, cellData,styleBaseMap) -> {
+            DataStyle curDataStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_DATA_STYLE_CACHE);
+            BorderStyle curBorderStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_BORDER_DATA_CACHE);
+            if(cell != null && curBorderStyle != null){
+                DataStyleUtils.setCellStyle((XSSFCell) cell, curDataStyle);
+            }
+            if(cell != null && curBorderStyle != null){
+                DataBorderUtils.setBorder(curBorderStyle, ((XSSFCell) cell), sheetData.cacheMap());
+            }
         }, (sheet, iSheetData) -> {
             if(sheet == null){
                 return;

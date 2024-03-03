@@ -1,15 +1,12 @@
 package com.icss.poie.tools.excel.utils.xlsx;
 
+import com.icss.poie.framework.common.tools.MapUtils;
 import com.icss.poie.tools.excel.model.*;
-import com.icss.poie.tools.excel.utils.SheetDataUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import com.icss.poie.tools.excel.utils.SheetToDataUtils;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * {@code @author:}         wlpiaoyi
@@ -23,13 +20,25 @@ public class XSSFDataUtils {
     public static void parseData(ISheetData sheetData, XSSFSheet sheet,
                                  Class<? extends ICellData> cdClazz,
                                  Class<? extends ICellValue> cvClass){
-        SheetDataUtils.parseData(sheetData, sheet, cdClazz, cvClass, (cell, curDataStyle) -> {
+        SheetToDataUtils.parseToData(sheetData, sheet, cdClazz, cvClass, (cellData, cell, styleBaseMap) -> {
+            DataStyle curDataStyle = new DataStyle();
+            BorderStyle curBorderStyle = new BorderStyle();
             StyleDataUtils.setDataStyle(curDataStyle, (XSSFCell) cell);
-        }, (xsheet, isheetData) ->{
+            BorderDataUtils.setBorder((XSSFCell) cell, curBorderStyle);
+            styleBaseMap.put(StyleBase.KEY_CUR_DATA_STYLE_CACHE, curDataStyle);
+            styleBaseMap.put(StyleBase.KEY_CUR_BORDER_DATA_CACHE, curBorderStyle);
+        }, (isheetData, xsheet) ->{
             isheetData.gridInfo().setDataValidations(new ArrayList<>());
             ValidationDataUtils.setData((XSSFSheet) xsheet, isheetData.gridInfo().getDataValidations());
 
         });
+//        SheetToDataUtils.parseToData(sheetData, sheet, cdClazz, cvClass, (cell, curDataStyle) -> {
+//            StyleDataUtils.setDataStyle(curDataStyle, (XSSFCell) cell);
+//        }, (xsheet, isheetData) ->{
+//            isheetData.gridInfo().setDataValidations(new ArrayList<>());
+//            ValidationDataUtils.setData((XSSFSheet) xsheet, isheetData.gridInfo().getDataValidations());
+//
+//        });
     }
 
 

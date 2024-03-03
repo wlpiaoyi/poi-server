@@ -2,6 +2,7 @@ package com.icss.poie.tools.excel.utils.xlsx;
 
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.tools.excel.model.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.extensions.XSSFCellBorder;
@@ -33,9 +34,9 @@ class BorderDataUtils {
      * <p><b>{@code @return:}</b>{@link XSSFCellStyle}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    static void setBorder(XSSFCellStyle cellStyle, Point point, IGridInfo gridInfo){
+    static void setBorder(XSSFCell cell, BorderStyle borderData){
+        XSSFCellStyle cellStyle = cell.getCellStyle();
         XSSFColor color = cellStyle.getBorderColor(XSSFCellBorder.BorderSide.TOP);
-        BorderStyle borderData = new BorderStyle();
         if(color != null){
             if(borderData.getTop() == null){
                 borderData.setTop(new BorderStyle.Border());
@@ -91,17 +92,6 @@ class BorderDataUtils {
             }
             borderData.getLeft().setStyleCode(borderStyle.getCode());
         }
-        if(gridInfo.getBorderStyles() == null){
-            gridInfo.setBorderStyles(new ArrayList<>());
-        }
-        BorderStyle target;
-        if(gridInfo.getBorderStyles().contains(borderData)){
-            target = gridInfo.getBorderStyles().get(gridInfo.getBorderStyles().indexOf(borderData));
-        }else{
-            target = borderData;
-            gridInfo.getBorderStyles().add(borderData);
-        }
-        target.mergeIn(borderData, point);
     }
 
 }

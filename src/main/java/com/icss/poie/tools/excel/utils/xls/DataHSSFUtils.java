@@ -1,9 +1,12 @@
 package com.icss.poie.tools.excel.utils.xls;
 
+import com.icss.poie.framework.common.tools.MapUtils;
 import com.icss.poie.framework.common.tools.ValueUtils;
+import com.icss.poie.tools.excel.model.DataStyle;
 import com.icss.poie.tools.excel.model.ISheetData;
 import com.icss.poie.tools.excel.model.Scope;
-import com.icss.poie.tools.excel.utils.DataSheetUtils;
+import com.icss.poie.tools.excel.model.StyleBase;
+import com.icss.poie.tools.excel.utils.DataToSheetUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
@@ -18,8 +21,9 @@ import java.util.List;
 public class DataHSSFUtils {
 
     public static void parseSheet(HSSFWorkbook workbook, ISheetData sheetData){
-        DataSheetUtils.parseSheet(workbook, sheetData, (cell, dataStyle, cellData) -> {
-            DataStyleUtils.setCellStyle((HSSFCell) cell, dataStyle);
+        DataToSheetUtils.parseSheet(workbook, sheetData, (cell, cellData,styleBaseMap) -> {
+            DataStyle curDataStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_DATA_STYLE_CACHE);
+            DataStyleUtils.setCellStyle((HSSFCell) cell, curDataStyle);
         }, (sheet, iSheetData) -> {
             if(sheet == null){
                 return;

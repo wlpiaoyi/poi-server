@@ -2,7 +2,7 @@ package com.icss.poie.tools.excel.utils.xlsx;
 
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.tools.excel.model.DataStyle;
-import com.icss.poie.tools.excel.utils.DataSheetUtils;
+import com.icss.poie.tools.excel.utils.DataToSheetUtils;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -23,7 +23,7 @@ class DataStyleUtils {
         //单元格背景
         if(ValueUtils.isNotBlank(dataStyle.getBg())){
             XSSFColor color = new XSSFColor();
-            color.setRGB(DataSheetUtils.hexToBytes(dataStyle.getBg()));
+            color.setRGB(DataToSheetUtils.hexToBytes(dataStyle.getBg()));
             cellStyle.setFillForegroundColor(color);
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         }
@@ -104,7 +104,7 @@ class DataStyleUtils {
         }
         if(ValueUtils.isNotBlank(dataStyle.getFc())){
             XSSFColor color = new XSSFColor();
-            color.setRGB(DataSheetUtils.hexToBytes(dataStyle.getFc()));
+            color.setRGB(DataToSheetUtils.hexToBytes(dataStyle.getFc()));
             font.setColor(color);
         }
         font.setItalic(dataStyle.getIt() == 1);
