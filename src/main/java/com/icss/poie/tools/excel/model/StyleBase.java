@@ -24,6 +24,7 @@ public class StyleBase{
     public static final String KEY_CUR_BORDER_DATA_CACHE = "curBorderData";
 
     /** 点集合 **/
+    @JsonIgnore
     @Transient
     private List<Point> points = new ArrayList<>();
 
