@@ -6,6 +6,7 @@ import com.icss.poie.framework.common.tools.PatternUtils;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.tools.excel.model.*;
 import com.icss.poie.tools.excel.model.BorderStyle;
+import com.icss.poie.tools.excel.model.Comment;
 import com.icss.poie.tools.excel.model.Picture;
 import lombok.SneakyThrows;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
@@ -51,6 +52,7 @@ public class DataToSheetUtils {
         if(sheetData.gridInfo() != null){
             List<DataStyle> dataStyles = sheetData.gridInfo().getDataStyles();
             List<BorderStyle> borderStyles = sheetData.gridInfo().getBorderStyles();
+            List<Comment> comments = sheetData.gridInfo().getComments();
             if(ValueUtils.isNotBlank(dataStyles)){
                 for(DataStyle item : dataStyles){
                     if(ValueUtils.isBlank(item.getScopes())){
@@ -105,6 +107,18 @@ public class DataToSheetUtils {
                     item.getPoints().clear();
                 }
             }
+
+            if(ValueUtils.isNotBlank(comments)){
+                for(Comment item : comments){
+                    Point point = item.getPoint();
+                    Map<String, Object> cdMap = cellDataMap.get(point);
+                    if(cdMap == null){
+                        cdMap = new HashMap<>();
+                        cellDataMap.put(point, cdMap);
+                    }
+                    cdMap.put("comment", item);
+                }
+            }
         }
         if(ValueUtils.isNotBlank(sheetData.cellDatas())){
             for (ICellData cellData : sheetData.cellDatas()){
@@ -141,6 +155,10 @@ public class DataToSheetUtils {
                     }
                     setCellData(cell, cellData);
                 }
+                Comment comment = MapUtils.get(entry.getValue(), "comment");
+                if(comment != null){
+                    ExcelUtils.setCellComment(sheet, cell, comment);
+                }
                 DataStyle curDataStyle = MapUtils.get(entry.getValue(), "dataStyle");
                 BorderStyle curBorderStyle = MapUtils.get(entry.getValue(), "borderStyle");;
                 if(curDataStyle == null){
@@ -150,9 +168,9 @@ public class DataToSheetUtils {
                 if(curBorderStyle != null){
                     styleBaseMap.put(StyleBase.KEY_CUR_BORDER_DATA_CACHE, curBorderStyle);
                 }
+
                 cellDataRun.doing(cell, cellData, styleBaseMap);
                 styleBaseMap.clear();
-
             }
         }
         cellDataRun.end(sheet, sheetData);

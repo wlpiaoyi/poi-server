@@ -50,4 +50,8 @@ public interface IGridInfo /** 行高 **/{
     /** 边框样式 **/
     List<BorderStyle> getBorderStyles();
     IGridInfo setBorderStyles(List<BorderStyle> borderStyles);
+
+    /** 批注 **/
+    List<Comment> getComments();
+    IGridInfo setComments(List<Comment> comments);
 }

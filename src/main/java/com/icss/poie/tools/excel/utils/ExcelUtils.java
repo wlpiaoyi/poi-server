@@ -2,12 +2,15 @@ package com.icss.poie.tools.excel.utils;
 
 import com.icss.poie.framework.common.exception.BusinessException;
 import com.icss.poie.framework.common.tools.ValueUtils;
+import com.icss.poie.tools.excel.model.Comment;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellValue;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFComment;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.util.ArrayList;
@@ -23,23 +26,42 @@ import java.util.Map;
  */
 public class ExcelUtils {
 
+    public static Comment getCellComment(Cell cell){
+        if(cell instanceof XSSFCell){
+            return  com.icss.poie.tools.excel.utils.xlsx.ExcelUtils.getCellComment((XSSFCell) cell);
+        }else if(cell instanceof HSSFCell){
+            return com.icss.poie.tools.excel.utils.xls.ExcelUtils.getCellComment((HSSFCell) cell);
+        }else{
+            throw new BusinessException("不支持的cell类型");
+        }
+    }
+    public static void setCellComment(Sheet sheet, Cell cell, Comment comment){
+        if(sheet instanceof XSSFSheet && cell instanceof XSSFCell){
+            com.icss.poie.tools.excel.utils.xlsx.ExcelUtils.setCellComment((XSSFSheet) sheet, (XSSFCell) cell, comment);
+        }else if(sheet instanceof HSSFSheet && cell instanceof HSSFCell){
+            com.icss.poie.tools.excel.utils.xls.ExcelUtils.setCellComment((HSSFSheet) sheet, (HSSFCell) cell, comment);
+        }else{
+            throw new BusinessException("不支持的sheet或cell类型");
+        }
+
+    }
 
     public static void formulaEvaluatorAll(Workbook workbook){
-        if(workbook instanceof  HSSFWorkbook){
-            com.icss.poie.tools.excel.utils.xls.ExcelUtils.formulaEvaluatorAll((HSSFWorkbook) workbook);
-        } else if (workbook instanceof XSSFWorkbook) {
+        if (workbook instanceof XSSFWorkbook) {
             com.icss.poie.tools.excel.utils.xlsx.ExcelUtils.formulaEvaluatorAll((XSSFWorkbook) workbook);
-        }else {
+        }else if(workbook instanceof  HSSFWorkbook){
+            com.icss.poie.tools.excel.utils.xls.ExcelUtils.formulaEvaluatorAll((HSSFWorkbook) workbook);
+        }else{
             throw new BusinessException("不支持的workbook类型");
         }
     }
 
     public static Map<Cell, CellValue> formulaEvaluatorCells(Workbook workbook, List<Cell> cells){
-        if(workbook instanceof  HSSFWorkbook){
-            return com.icss.poie.tools.excel.utils.xls.ExcelUtils.formulaEvaluatorCells((HSSFWorkbook) workbook, cells);
-        } else if (workbook instanceof XSSFWorkbook) {
+        if (workbook instanceof XSSFWorkbook) {
             return com.icss.poie.tools.excel.utils.xlsx.ExcelUtils.formulaEvaluatorCells((XSSFWorkbook) workbook, cells);
-        }else {
+        }else if(workbook instanceof  HSSFWorkbook){
+            return com.icss.poie.tools.excel.utils.xls.ExcelUtils.formulaEvaluatorCells((HSSFWorkbook) workbook, cells);
+        }else{
             throw new BusinessException("不支持的workbook类型");
         }
     }

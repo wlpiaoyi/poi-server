@@ -5,6 +5,7 @@ import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.biz.excel.domain.model.CellValue;
 import com.icss.poie.tools.excel.model.*;
 import com.icss.poie.tools.excel.model.BorderStyle;
+import com.icss.poie.tools.excel.model.Comment;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Picture;
@@ -42,6 +43,7 @@ public class SheetToDataUtils {
         sheetData.putGridInfo(gridInfo);
         gridInfo.setDataStyles(new ArrayList<>());
         gridInfo.setBorderStyles(new ArrayList<>());
+        gridInfo.setComments(new ArrayList<>());
         Map<String, StyleBase> styleBaseMap = new HashMap<>();
         cellDataRun.start(sheetData, sheet);
         //遍历行
@@ -69,6 +71,10 @@ public class SheetToDataUtils {
                 }
                 if(curBorderStyle != null && !curBorderStyle.isEmpty()){
                     StyleBase.mergeIn(gridInfo.getBorderStyles(), curBorderStyle, point);
+                }
+                Comment comment = ExcelUtils.getCellComment(cell);
+                if(comment != null){
+                    gridInfo.getComments().add(comment);
                 }
                 cellDatas.add(cellData);
             }
@@ -99,7 +105,7 @@ public class SheetToDataUtils {
         if(sheet.getPaneInformation() != null && sheet.getPaneInformation().isFreezePane()){
             Point point = new Point();
             point.setC(sheet.getPaneInformation().getVerticalSplitLeftColumn());
-            point.setR(sheet.getPaneInformation().getHorizontalSplitTopRow());
+            point.setR(sheet.getPaneInformation().getHorizontalSplitPosition());
             sheetData.gridInfo().setFrozenWindow(point);
         }else{
             sheetData.gridInfo().setFrozenWindow(null);

@@ -71,6 +71,10 @@ public class GridInfo extends BaseMongoEntity implements IGridInfo, ICacheMap {
     @Schema(description = "图片数据")
     private List<Picture> pictures;
 
+//    @Transient
+    @Schema(description = "批注")
+    private List<Comment> comments;
+
     @JsonIgnore
     @Transient
     private final Map cacheMap = new HashMap<>();
