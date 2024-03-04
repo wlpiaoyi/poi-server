@@ -19,31 +19,19 @@ public class BorderStyle extends StyleBase{
     private Border left;
 
     public boolean isEmpty(){
-        if(this.top == null){
-            return true;
+        if(this.top != null && !this.top.isEmpty()){
+            return false;
         }
-        if(this.top.isEmpty()){
-            return true;
+        if(this.left != null && !this.left.isEmpty()){
+            return false;
         }
-        if(this.left == null){
-            return true;
+        if(this.bottom != null && !this.bottom.isEmpty()){
+            return false;
         }
-        if(this.left.isEmpty()){
-            return true;
+        if(this.right != null && !this.right.isEmpty()){
+            return false;
         }
-        if(this.bottom == null){
-            return true;
-        }
-        if(this.bottom.isEmpty()){
-            return true;
-        }
-        if(this.right == null){
-            return true;
-        }
-        if(this.right.isEmpty()){
-            return true;
-        }
-        return false;
+        return true;
     }
 
     @Data
@@ -56,13 +44,13 @@ public class BorderStyle extends StyleBase{
         private String color;
 
         public boolean isEmpty(){
-            if(ValueUtils.isBlank(this.styleCode)){
-                return true;
+            if(ValueUtils.isNotBlank(this.styleCode)){
+                return false;
             }
-            if(ValueUtils.isBlank(this.color)){
-                return true;
+            if(ValueUtils.isNotBlank(this.color)){
+                return false;
             }
-            return false;
+            return true;
         }
         @Override
         public String toString() {

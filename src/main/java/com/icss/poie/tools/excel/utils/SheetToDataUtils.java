@@ -49,6 +49,10 @@ public class SheetToDataUtils {
             Row row = rowIterator.next();
             Iterator<Cell> cellIterator = row.cellIterator();
             int rowIndex = row.getRowNum();
+            int rowFlag = 7;
+            if(rowFlag == rowIndex){
+                System.out.printf("");
+            }
             //遍历单元格
             while (cellIterator.hasNext()) {
                 Cell cell = cellIterator.next();
@@ -67,6 +71,24 @@ public class SheetToDataUtils {
                     StyleBase.mergeIn(gridInfo.getBorderStyles(), curBorderStyle, point);
                 }
                 cellDatas.add(cellData);
+            }
+        }
+        if(ValueUtils.isNotBlank(gridInfo.getDataStyles())){
+            for (DataStyle dataStyle : gridInfo.getDataStyles()){
+                if(ValueUtils.isBlank(dataStyle.getPoints())){
+                    continue;
+                }
+                dataStyle.setScopes(StyleBase.parsePointsToScopes(dataStyle.getPoints()));
+                dataStyle.getPoints().clear();
+            }
+        }
+        if(ValueUtils.isNotBlank(gridInfo.getBorderStyles())){
+            for (BorderStyle borderStyle : gridInfo.getBorderStyles()){
+                if(ValueUtils.isBlank(borderStyle.getPoints())){
+                    continue;
+                }
+                borderStyle.setScopes(StyleBase.parsePointsToScopes(borderStyle.getPoints()));
+                borderStyle.getPoints().clear();
             }
         }
         sheetData.gridInfo().setCellMerges(new ArrayList<>());

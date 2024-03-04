@@ -66,6 +66,7 @@ public class GridInfo extends BaseMongoEntity implements IGridInfo, ICacheMap {
 //    @Transient
     @Schema(description = "边框样式")
     private List<BorderStyle> borderStyles;
+
 //    @Transient
     @Schema(description = "图片数据")
     private List<Picture> pictures;

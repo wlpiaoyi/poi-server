@@ -12,21 +12,30 @@ import lombok.Data;
 @Data
 public class Scope extends Point{
 
+
     /** 列数量 **/
     private int cs;
 
     /** 行数量 **/
     private int rs;
 
+    public Scope(){
+
+    }
+
+    public Scope(Point start, Point end){
+        this.setC(start.getC());
+        this.setR(start.getR());
+        this.setCs(end.getC() - start.getC() + 1);
+        this.setRs(end.getR() - start.getR() + 1);
+    }
+
+
+
+
     @JsonIgnore
-    public boolean notEmpty(){
-        if(this.getC() >= 0 && this.getCs() > 0){
-            return true;
-        }
-        if(this.getR() >= 0 && this.getRs() > 0){
-            return true;
-        }
-        return false;
+    public boolean isEmpty(){
+        return this.getC() == 0 && this.getR() == 0 && this.getCs() == 0 && this.getRs() == 0;
     }
 
     /**
@@ -55,5 +64,12 @@ public class Scope extends Point{
 
     public String toString(){
         return super.toString() + ",rs:" + this.rs + ",cs:" + this.cs;
+    }
+
+    public Scope copy() {
+        Scope scope = new Scope();
+        scope.setC(this.getC()).setR(this.getR());
+        scope.setCs(this.getCs()).setRs(this.getRs());
+        return scope;
     }
 }

@@ -53,9 +53,10 @@ public class DataToSheetUtils {
             List<BorderStyle> borderStyles = sheetData.gridInfo().getBorderStyles();
             if(ValueUtils.isNotBlank(dataStyles)){
                 for(DataStyle item : dataStyles){
-                    if(item.getPoints() == null || ValueUtils.isBlank(item.getPoints())){
+                    if(ValueUtils.isBlank(item.getScopes())){
                         continue;
                     }
+                    item.setPoints(StyleBase.parseScopesToPoints(item.getScopes()));
                     for (Point point : item.getPoints()){
                         Map<String, Object> cdMap = cellDataMap.get(point);
                         if(cdMap == null){
@@ -74,13 +75,15 @@ public class DataToSheetUtils {
                             cdMap.put("cell", cell);
                         }
                     }
+                    item.getPoints().clear();
                 }
             }
             if(ValueUtils.isNotBlank(borderStyles)){
                 for(BorderStyle item : borderStyles){
-                    if(item.getPoints() == null || ValueUtils.isBlank(item.getPoints())){
+                    if(ValueUtils.isBlank(item.getScopes())){
                         continue;
                     }
+                    item.setPoints(StyleBase.parseScopesToPoints(item.getScopes()));
                     for (Point point : item.getPoints()){
                         Map<String, Object> cdMap = cellDataMap.get(point);
                         if(cdMap == null){
@@ -99,6 +102,7 @@ public class DataToSheetUtils {
                             cdMap.put("cell", cell);
                         }
                     }
+                    item.getPoints().clear();
                 }
             }
         }

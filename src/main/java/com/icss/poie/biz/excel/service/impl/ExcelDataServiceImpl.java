@@ -152,27 +152,29 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
     @Override
     public void putOutputStreamByExcelData(ExcelDataVo<SheetDataVo> excelDataVo, String fileType, OutputStream outputStream) throws IOException {
         if(fileType.equals("xls")){
+            long currentTimeMillis = System.currentTimeMillis();
             HSSFWorkbook workbook = new HSSFWorkbook();
             for (SheetDataVo sheetDataVo :  excelDataVo.getSheetDatas()){
                 DataHSSFUtils.parseSheet(workbook, sheetDataVo);
             }
-            long currentTimeMillis = System.currentTimeMillis();
-            log.info("ExcelUtils.formulaEvaluatorAll start:{}", currentTimeMillis);
+            log.debug("DataHSSFUtils.parseSheet endDur:{}", System.currentTimeMillis() - currentTimeMillis);
+            currentTimeMillis = System.currentTimeMillis();
             ExcelUtils.formulaEvaluatorAll(workbook);
-            log.info("ExcelUtils.formulaEvaluatorAll endDur:{}", System.currentTimeMillis() - currentTimeMillis);
+            log.debug("ExcelUtils.formulaEvaluatorAll endDur:{}", System.currentTimeMillis() - currentTimeMillis);
             workbook.write(outputStream);
             outputStream.flush();
             outputStream.close();
             workbook.close();
         }else{
+            long currentTimeMillis = System.currentTimeMillis();
             XSSFWorkbook workbook = new XSSFWorkbook();
             for (SheetDataVo sheetDataVo : excelDataVo.getSheetDatas()){
                 DataXSSFUtils.parseSheet(workbook, sheetDataVo);
             }
-            long currentTimeMillis = System.currentTimeMillis();
-            log.info("ExcelUtils.formulaEvaluatorAll start:{}", currentTimeMillis);
+            log.debug("DataXSSFUtils.parseSheet endDur:{}", System.currentTimeMillis() - currentTimeMillis);
+            currentTimeMillis = System.currentTimeMillis();
             ExcelUtils.formulaEvaluatorAll(workbook);
-            log.info("ExcelUtils.formulaEvaluatorAll endDur:{}", System.currentTimeMillis() - currentTimeMillis);
+            log.debug("ExcelUtils.formulaEvaluatorAll endDur:{}", System.currentTimeMillis() - currentTimeMillis);
             workbook.write(outputStream);
             outputStream.flush();
             outputStream.close();
