@@ -18,8 +18,7 @@ import org.apache.poi.xssf.usermodel.*;
 class DataStyleUtils {
 
 
-    static XSSFCellStyle setCellStyle(XSSFCell cell, DataStyle dataStyle){
-        XSSFCellStyle cellStyle = cell.getRow().getSheet().getWorkbook().createCellStyle();
+    static void setCellStyle(XSSFCell cell, XSSFCellStyle cellStyle, DataStyle dataStyle){
         //单元格背景
         if(ValueUtils.isNotBlank(dataStyle.getBg())){
             XSSFColor color = new XSSFColor();
@@ -77,7 +76,6 @@ class DataStyleUtils {
         cellStyle.setFont(font);
         synCellBorderStyle(cellStyle);
         cell.setCellStyle(cellStyle);
-        return cellStyle;
 
     }
 

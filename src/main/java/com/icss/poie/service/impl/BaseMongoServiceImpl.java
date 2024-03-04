@@ -2,6 +2,7 @@ package com.icss.poie.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.icss.poie.biz.excel.domain.entity.CellData;
 import com.icss.poie.domain.entity.BaseMongoEntity;
 import com.icss.poie.framework.common.exception.BusinessException;
 import com.icss.poie.framework.common.tools.MongoTransactional;
@@ -209,7 +210,7 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
         BulkOperations operations = this.baseTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, this.currentEntityClass());
         for (M entity : entities) {
             Update update = entity.parseForUpdate(null);
-            operations.updateOne(Query.query(Criteria.where("id").is(entity.getId())), update);
+            operations.updateOne(Query.query(Criteria.where("_id").is(entity.getId())), update);
         }
         return operations.execute();
     }
@@ -220,7 +221,7 @@ public class BaseMongoServiceImpl<M extends BaseMongoEntity> implements IBaseMon
         BulkOperations operations = this.baseTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, collectionName);
         for (M entity : entities) {
             Update update = entity.parseForUpdate(null);
-            operations.updateOne(Query.query(Criteria.where("id").is(entity.getId())), update);
+            operations.updateOne(Query.query(Criteria.where("_id").is(entity.getId())), update);
         }
         return operations.execute();
     }

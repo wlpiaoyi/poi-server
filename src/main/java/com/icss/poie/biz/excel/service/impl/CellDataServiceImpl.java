@@ -2,6 +2,7 @@ package com.icss.poie.biz.excel.service.impl;
 
 import com.icss.poie.biz.excel.domain.entity.SheetData;
 import com.icss.poie.biz.excel.domain.wrapper.BaseWrapper;
+import com.icss.poie.framework.common.tools.MongoTransactional;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.framework.common.exception.BusinessException;
 import com.icss.poie.biz.excel.domain.entity.CellData;
@@ -36,8 +37,7 @@ public class CellDataServiceImpl extends BaseMongoServiceImpl<CellData> implemen
     @Override
     public List<CellData> queryBySheetId(ObjectId sheetId, int randomTag) {
         Criteria criteria = Criteria.where("sheetId").is(sheetId);
-        List<CellData> datas = this.queryList(criteria, SheetData.cellDataCollectionName(randomTag));
-        return datas;
+        return this.queryList(criteria, SheetData.cellDataCollectionName(randomTag));
     }
 
     @Override
@@ -75,65 +75,42 @@ public class CellDataServiceImpl extends BaseMongoServiceImpl<CellData> implemen
     }
 
 
+    @MongoTransactional
     @Override
     public BulkWriteResult updateBatch(List<CellData> entities) {
         List<CellData> iEntities = BaseWrapper.parseList(entities, CellData.class);
         return super.updateBatch(iEntities);
     }
+    @MongoTransactional
     @Override
     public BulkWriteResult updateBatch(List<CellData> entities, String collectionName) {
         List<CellData> iEntities = BaseWrapper.parseList(entities, CellData.class);
         return super.updateBatch(iEntities, collectionName);
     }
 
+    @MongoTransactional
     @Override
     public UpdateResult update(CellData entity, int randomTag) {
         CellData iEntity = BaseWrapper.parseOne(entity, CellData.class);
         return super.update(iEntity, SheetData.cellDataCollectionName(randomTag));
     }
 
+
+    public Collection<CellData> insertBatch(List<CellData> entities, ObjectId sheetId, int randomTag) {
+        for (CellData cellData : entities){
+            cellData.setSheetId(sheetId);
+        }
+        return super.insertBatch(entities,SheetData.cellDataCollectionName(randomTag));
+
+    }
+
+    @MongoTransactional
     @Override
-    public boolean updateBatch(Collection<CellData> entities, ObjectId sheetId, int randomTag) {
-        List<CellData> dbs = this.queryBySheetId(sheetId, randomTag);
-        Map<String, CellData> dbMaps = dbs.stream().collect(Collectors.toMap(
-                CellData::mapKey, Function.identity()
-        ));
-        List<CellData> opts = new ArrayList(){{addAll(entities);}};
-        List<CellData> adds = new ArrayList<>();
-        List<CellData> updates = new ArrayList<>();
-        List<CellData> removes = new ArrayList<>();
-        for(CellData entity : opts){
-            if(dbMaps.containsKey(entity.mapKey())){
-                updates.add(entity);
-            }else{
-                if(entity.getId() == null){
-                    entity.setId(ObjectId.get());
-                }
-                adds.add(entity);
-            }
+    public boolean updateBatch(List<CellData> entities, ObjectId sheetId, int randomTag) {
+        for (CellData cellData : entities){
+            cellData.setSheetId(sheetId);
         }
-        opts.removeAll(adds);
-        opts.removeAll(updates);
-        if(ValueUtils.isNotBlank(opts)){
-            Map<String, CellData> optMaps = opts.stream().collect(Collectors.toMap(
-                    CellData::mapKey, Function.identity()
-            ));
-            for (CellData entity : dbs){
-                if(!optMaps.containsKey(entity.mapKey())){
-                    removes.add(entity);
-                }
-            }
-        }
-        if(ValueUtils.isNotBlank(updates)){
-            this.updateBatch(updates, SheetData.cellDataCollectionName(randomTag));
-        }
-        if(ValueUtils.isNotBlank(adds)){
-            super.insertBatch(adds, SheetData.cellDataCollectionName(randomTag));
-        }
-        if(ValueUtils.isNotBlank(removes)){
-            List<ObjectId> ids = removes.stream().map(CellData::getId).collect(Collectors.toList());
-            super.removeBatch(ids, SheetData.cellDataCollectionName(randomTag));
-        }
+        this.updateBatch(entities, SheetData.cellDataCollectionName(randomTag));
         return true;
     }
 

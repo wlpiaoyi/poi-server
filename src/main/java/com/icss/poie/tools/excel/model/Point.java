@@ -15,7 +15,6 @@ import javax.validation.constraints.NotNull;
  * {@code @version:}:       1.0
  */
 @Data
-@Accessors(chain = true)
 public class Point {
 
     /** 列 **/

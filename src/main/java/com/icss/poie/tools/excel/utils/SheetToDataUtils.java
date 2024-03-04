@@ -22,11 +22,10 @@ import java.util.*;
  */
 public class SheetToDataUtils {
     public interface CellDataRun{
-        void run(ICellData cellData, Cell cell, Map<String, StyleBase> styleBaseMap);
+        void start(ISheetData sheetData, Sheet sheet);
+        void doing(ICellData cellData, Cell cell, Map<String, StyleBase> styleBaseMap);
+        void end(ISheetData sheetData, Sheet sheet);
 
-    }
-    public interface CellDataEnd{
-        void run(ISheetData sheetData, Sheet sheet);
     }
 
 
@@ -34,18 +33,17 @@ public class SheetToDataUtils {
     public static void parseToData(ISheetData sheetData, Sheet sheet,
                                    Class<? extends ICellData> cdClazz,
                                    Class<? extends ICellValue> cvClass,
-                                   CellDataRun cellDataRun,
-                                   CellDataEnd cellDataEnd){
+                                   CellDataRun cellDataRun){
         sheetData.putSheetName(sheet.getSheetName());
         Iterator<Row> rowIterator = sheet.rowIterator();
         List<ICellData> cellDatas = new ArrayList<>();
         sheetData.putCellDatas(cellDatas);
-        //TODO 数据验证 sheet.getDataValidations();
         IGridInfo gridInfo = sheetData.newInstanceGridInfo();
         sheetData.putGridInfo(gridInfo);
         gridInfo.setDataStyles(new ArrayList<>());
         gridInfo.setBorderStyles(new ArrayList<>());
         Map<String, StyleBase> styleBaseMap = new HashMap<>();
+        cellDataRun.start(sheetData, sheet);
         //遍历行
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
@@ -57,7 +55,7 @@ public class SheetToDataUtils {
                 ICellData cellData = cdClazz.newInstance();
                 //设置单元格类容
                 setCellData(cellData, cell, cvClass);
-                cellDataRun.run(cellData, cell, styleBaseMap);
+                cellDataRun.doing(cellData, cell, styleBaseMap);
                 DataStyle curDataStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_DATA_STYLE_CACHE);
                 BorderStyle curBorderStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_BORDER_DATA_CACHE);
                 styleBaseMap.clear();
@@ -65,7 +63,7 @@ public class SheetToDataUtils {
                 if(curDataStyle != null){
                     StyleBase.mergeIn(gridInfo.getDataStyles(), curDataStyle, point);
                 }
-                if(curBorderStyle != null){
+                if(curBorderStyle != null && !curBorderStyle.isEmpty()){
                     StyleBase.mergeIn(gridInfo.getBorderStyles(), curBorderStyle, point);
                 }
                 cellDatas.add(cellData);
@@ -74,7 +72,7 @@ public class SheetToDataUtils {
         sheetData.gridInfo().setCellMerges(new ArrayList<>());
         setMergedRegions(sheetData.gridInfo().getCellMerges(), sheet);
         setRcValue(sheetData.gridInfo(), sheet);
-        cellDataEnd.run(sheetData, sheet);
+        cellDataRun.end(sheetData, sheet);
 
         if(sheet.getPaneInformation() != null && sheet.getPaneInformation().isFreezePane()){
             Point point = new Point();

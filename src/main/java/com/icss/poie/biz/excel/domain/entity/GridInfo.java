@@ -56,15 +56,17 @@ public class GridInfo extends BaseMongoEntity implements IGridInfo, ICacheMap {
     @Schema(description = "合并单元格")
     private List<Scope> cellMerges;
 
-    @Schema(description = "单元格样式")
-    private List<DataStyle> dataStyles;
-
-    @Schema(description = "边框样式")
-    private List<BorderStyle> borderStyles;
-
     @Schema(description = "单元格数据验证")
     private List<DataValidation> dataValidations;
 
+//    @Transient
+    @Schema(description = "单元格样式")
+    private List<DataStyle> dataStyles;
+
+//    @Transient
+    @Schema(description = "边框样式")
+    private List<BorderStyle> borderStyles;
+//    @Transient
     @Schema(description = "图片数据")
     private List<Picture> pictures;
 

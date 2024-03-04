@@ -22,8 +22,7 @@ public class DataBorderUtils {
      * <p><b>{@code @author:}</b>       wlpiaoyi</p>
      * <p><b>{@code @version:}</b>      1.0</p>
      */
-    static void setBorder(BorderStyle borderData, XSSFCell cell, ICacheMap cacheMap){
-        XSSFCellStyle cellStyle = cell.getCellStyle();
+    static void setBorder(BorderStyle borderData, XSSFCellStyle cellStyle, ICacheMap cacheMap){
         BorderStyle.Border border = borderData.getTop();
         if(border != null){
             if(border.getColor() != null){

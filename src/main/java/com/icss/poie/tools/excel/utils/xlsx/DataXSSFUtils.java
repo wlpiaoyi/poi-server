@@ -5,6 +5,8 @@ import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.tools.excel.model.*;
 import com.icss.poie.tools.excel.utils.DataToSheetUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 
@@ -28,30 +30,43 @@ public class DataXSSFUtils {
      * @date: 2023/12/25 11:46
      */
     public static void parseSheet(XSSFWorkbook workbook, ISheetData sheetData){
-        DataToSheetUtils.parseSheet(workbook, sheetData, (cell, cellData,styleBaseMap) -> {
-            DataStyle curDataStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_DATA_STYLE_CACHE);
-            BorderStyle curBorderStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_BORDER_DATA_CACHE);
-            if(cell != null && curBorderStyle != null){
-                DataStyleUtils.setCellStyle((XSSFCell) cell, curDataStyle);
+        DataToSheetUtils.parseSheet(workbook, sheetData, new DataToSheetUtils.CellDataRun() {
+            @Override
+            public void start(Sheet sheet, ISheetData sheetData) {
+
             }
-            if(cell != null && curBorderStyle != null){
-                DataBorderUtils.setBorder(curBorderStyle, ((XSSFCell) cell), sheetData.cacheMap());
+
+            @Override
+            public void doing(Cell cell, ICellData cellData, Map<String, StyleBase> styleBaseMap) {
+                DataStyle curDataStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_DATA_STYLE_CACHE);
+                BorderStyle curBorderStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_BORDER_DATA_CACHE);
+                CellStyle cellStyle = cell.getRow().getSheet().getWorkbook().createCellStyle();;
+                if(curDataStyle != null){
+                    DataStyleUtils.setCellStyle((XSSFCell) cell, ((XSSFCellStyle) cellStyle), curDataStyle);
+                }
+                if(curBorderStyle != null){
+                    DataBorderUtils.setBorder(curBorderStyle, ((XSSFCellStyle) cellStyle), sheetData.cacheMap());
+                    cell.setCellStyle(cellStyle);
+                }
             }
-        }, (sheet, iSheetData) -> {
-            if(sheet == null){
-                return;
-            }
-            if(iSheetData == null){
-                return;
-            }
-            if(iSheetData.gridInfo() == null){
-                return;
-            }
-            if(ValueUtils.isNotBlank(iSheetData.gridInfo().getCellMerges())){
-                setMergedRegions((XSSFSheet) sheet, iSheetData.gridInfo().getCellMerges());
-            }
-            if(ValueUtils.isNotBlank(iSheetData.gridInfo().getDataValidations())){
-                DataValidationUtils.setValidation((XSSFSheet) sheet, iSheetData.gridInfo().getDataValidations());
+
+            @Override
+            public void end(Sheet xsheet, ISheetData iSheetData) {
+                if(xsheet == null){
+                    return;
+                }
+                if(iSheetData == null){
+                    return;
+                }
+                if(iSheetData.gridInfo() == null){
+                    return;
+                }
+                if(ValueUtils.isNotBlank(iSheetData.gridInfo().getCellMerges())){
+                    setMergedRegions((XSSFSheet) xsheet, iSheetData.gridInfo().getCellMerges());
+                }
+                if(ValueUtils.isNotBlank(iSheetData.gridInfo().getDataValidations())){
+                    DataValidationUtils.setValidation((XSSFSheet) xsheet, iSheetData.gridInfo().getDataValidations());
+                }
             }
         });
     }

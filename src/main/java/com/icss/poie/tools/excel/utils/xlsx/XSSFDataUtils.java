@@ -3,10 +3,13 @@ package com.icss.poie.tools.excel.utils.xlsx;
 import com.icss.poie.framework.common.tools.MapUtils;
 import com.icss.poie.tools.excel.model.*;
 import com.icss.poie.tools.excel.utils.SheetToDataUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * {@code @author:}         wlpiaoyi
@@ -20,17 +23,27 @@ public class XSSFDataUtils {
     public static void parseData(ISheetData sheetData, XSSFSheet sheet,
                                  Class<? extends ICellData> cdClazz,
                                  Class<? extends ICellValue> cvClass){
-        SheetToDataUtils.parseToData(sheetData, sheet, cdClazz, cvClass, (cellData, cell, styleBaseMap) -> {
-            DataStyle curDataStyle = new DataStyle();
-            BorderStyle curBorderStyle = new BorderStyle();
-            StyleDataUtils.setDataStyle(curDataStyle, (XSSFCell) cell);
-            BorderDataUtils.setBorder((XSSFCell) cell, curBorderStyle);
-            styleBaseMap.put(StyleBase.KEY_CUR_DATA_STYLE_CACHE, curDataStyle);
-            styleBaseMap.put(StyleBase.KEY_CUR_BORDER_DATA_CACHE, curBorderStyle);
-        }, (isheetData, xsheet) ->{
-            isheetData.gridInfo().setDataValidations(new ArrayList<>());
-            ValidationDataUtils.setData((XSSFSheet) xsheet, isheetData.gridInfo().getDataValidations());
+        SheetToDataUtils.parseToData(sheetData, sheet, cdClazz, cvClass, new SheetToDataUtils.CellDataRun() {
+            @Override
+            public void start(ISheetData sheetData, Sheet sheet) {
 
+            }
+
+            @Override
+            public void doing(ICellData cellData, Cell cell, Map<String, StyleBase> styleBaseMap) {
+                DataStyle curDataStyle = new DataStyle();
+                BorderStyle curBorderStyle = new BorderStyle();
+                StyleDataUtils.setDataStyle(curDataStyle, (XSSFCell) cell);
+                BorderDataUtils.setBorder((XSSFCell) cell, curBorderStyle);
+                styleBaseMap.put(StyleBase.KEY_CUR_DATA_STYLE_CACHE, curDataStyle);
+                styleBaseMap.put(StyleBase.KEY_CUR_BORDER_DATA_CACHE, curBorderStyle);
+            }
+
+            @Override
+            public void end(ISheetData isheetData, Sheet xsheet) {
+                isheetData.gridInfo().setDataValidations(new ArrayList<>());
+                ValidationDataUtils.setData((XSSFSheet) xsheet, isheetData.gridInfo().getDataValidations());
+            }
         });
 //        SheetToDataUtils.parseToData(sheetData, sheet, cdClazz, cvClass, (cell, curDataStyle) -> {
 //            StyleDataUtils.setDataStyle(curDataStyle, (XSSFCell) cell);

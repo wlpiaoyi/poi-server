@@ -65,28 +65,28 @@ class BorderDataUtils {
             borderData.getLeft().setColor("#" + ValueUtils.bytesToHex(color.getRGB()));
         }
         org.apache.poi.ss.usermodel.BorderStyle borderStyle = cellStyle.getBorderTop();
-        if(borderStyle != null){
+        if(borderStyle != null && ValueUtils.isNotBlank(borderStyle.getCode())){
             if(borderData.getTop() == null){
                 borderData.setTop(new BorderStyle.Border());
             }
             borderData.getTop().setStyleCode(borderStyle.getCode());
         }
         borderStyle = cellStyle.getBorderRight();
-        if(borderStyle != null){
+        if(borderStyle != null && ValueUtils.isNotBlank(borderStyle.getCode())){
             if(borderData.getRight() == null){
                 borderData.setRight(new BorderStyle.Border());
             }
             borderData.getRight().setStyleCode(borderStyle.getCode());
         }
         borderStyle = cellStyle.getBorderBottom();
-        if(borderStyle != null){
+        if(borderStyle != null && ValueUtils.isNotBlank(borderStyle.getCode())){
             if(borderData.getBottom() == null){
                 borderData.setBottom(new BorderStyle.Border());
             }
             borderData.getBottom().setStyleCode(borderStyle.getCode());
         }
         borderStyle = cellStyle.getBorderLeft();
-        if(borderStyle != null){
+        if(borderStyle != null && ValueUtils.isNotBlank(borderStyle.getCode())){
             if(borderData.getLeft() == null){
                 borderData.setLeft(new BorderStyle.Border());
             }

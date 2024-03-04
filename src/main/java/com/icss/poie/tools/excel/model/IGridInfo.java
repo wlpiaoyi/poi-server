@@ -13,41 +13,41 @@ public interface IGridInfo /** 行高 **/{
 
     /** 行高 **/
     List<Short> getRowHeights();
-    void setRowHeights(List<Short> rowHeights);
+    IGridInfo setRowHeights(List<Short> rowHeights);
 
     /** 列宽 **/
     List<Short> getColumnWidths();
-    void setColumnWidths(List<Short> columnWidths);
+    IGridInfo setColumnWidths(List<Short> columnWidths);
 
     /** 冻结窗格 **/
     Point getFrozenWindow();
-    void setFrozenWindow(Point frozenWindow);
+    IGridInfo setFrozenWindow(Point frozenWindow);
 
     /** 隐藏行 **/
     List<Integer> getHiddenRows();
-    void setHiddenRows(List<Integer> hiddenRows);
+    IGridInfo setHiddenRows(List<Integer> hiddenRows);
 
     /** 隐藏列 **/
     List<Integer> getHiddenColumns();
-    void setHiddenColumns(List<Integer> hiddenColumns);
+    IGridInfo setHiddenColumns(List<Integer> hiddenColumns);
 
     /** 合并单元格 **/
     List<Scope> getCellMerges();
-    void setCellMerges(List<Scope> cellMerges);
+    IGridInfo setCellMerges(List<Scope> cellMerges);
 
     /** 单元格样式 **/
     List<DataStyle> getDataStyles();
-    void setDataStyles(List<DataStyle> dataStyles);
+    IGridInfo setDataStyles(List<DataStyle> dataStyles);
 
     /** 单元格数据验证 **/
     List<DataValidation> getDataValidations();
-    void setDataValidations(List<DataValidation> dataValidations);
+    IGridInfo setDataValidations(List<DataValidation> dataValidations);
 
     /** 图片数据 **/
     List<Picture> getPictures();
-    void setPictures(List<Picture> pictures);
+    IGridInfo setPictures(List<Picture> pictures);
 
     /** 边框样式 **/
     List<BorderStyle> getBorderStyles();
-    void setBorderStyles(List<BorderStyle> borderStyles);
+    IGridInfo setBorderStyles(List<BorderStyle> borderStyles);
 }

@@ -14,6 +14,7 @@ import com.icss.poie.biz.excel.domain.vo.CellDataVo;
 import com.icss.poie.biz.excel.domain.wrapper.BaseWrapper;
 import com.icss.poie.biz.excel.service.IExcelDataService;
 import com.icss.poie.service.impl.BaseMongoServiceImpl;
+import com.icss.poie.tools.excel.utils.ExcelUtils;
 import com.icss.poie.tools.excel.utils.xls.DataHSSFUtils;
 import com.icss.poie.tools.excel.utils.xls.HSSFDataUtils;
 import com.icss.poie.tools.excel.utils.xlsx.DataXSSFUtils;
@@ -155,6 +156,10 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
             for (SheetDataVo sheetDataVo :  excelDataVo.getSheetDatas()){
                 DataHSSFUtils.parseSheet(workbook, sheetDataVo);
             }
+            long currentTimeMillis = System.currentTimeMillis();
+            log.info("ExcelUtils.formulaEvaluatorAll start:{}", currentTimeMillis);
+            ExcelUtils.formulaEvaluatorAll(workbook);
+            log.info("ExcelUtils.formulaEvaluatorAll endDur:{}", System.currentTimeMillis() - currentTimeMillis);
             workbook.write(outputStream);
             outputStream.flush();
             outputStream.close();
@@ -164,6 +169,10 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
             for (SheetDataVo sheetDataVo : excelDataVo.getSheetDatas()){
                 DataXSSFUtils.parseSheet(workbook, sheetDataVo);
             }
+            long currentTimeMillis = System.currentTimeMillis();
+            log.info("ExcelUtils.formulaEvaluatorAll start:{}", currentTimeMillis);
+            ExcelUtils.formulaEvaluatorAll(workbook);
+            log.info("ExcelUtils.formulaEvaluatorAll endDur:{}", System.currentTimeMillis() - currentTimeMillis);
             workbook.write(outputStream);
             outputStream.flush();
             outputStream.close();

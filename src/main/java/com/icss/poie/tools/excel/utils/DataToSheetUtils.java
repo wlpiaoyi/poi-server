@@ -28,12 +28,13 @@ import java.util.Map;
 public class DataToSheetUtils {
 
     public interface CellDataRun{
-        void run(Cell cell, ICellData cellData, Map<String, StyleBase> styleBaseMap);
+        void start(Sheet sheet, ISheetData sheetData);
+        void doing(Cell cell, ICellData cellData, Map<String, StyleBase> styleBaseMap);
+        void end(Sheet sheet, ISheetData sheetData);
 
     }
 
     public interface CellDataEnd{
-        void run(Sheet sheet, ISheetData sheetData);
 
     }
 
@@ -41,12 +42,12 @@ public class DataToSheetUtils {
     @SneakyThrows
     public static Sheet parseSheet(Workbook workbook,
                                    ISheetData sheetData,
-                                   CellDataRun cellDataRun,
-                                   CellDataEnd cellDataEnd){
+                                   CellDataRun cellDataRun){
         Sheet sheet = workbook.createSheet(sheetData.sheetName());
         DataStyle defaultDataStyle = new DataStyle();
         Map<Point, Map<String, Object>> cellDataMap = new HashMap<>();
         Map<Integer, Row> rowMap = new HashMap<>();
+        cellDataRun.start(sheet, sheetData);
         if(sheetData.gridInfo() != null){
             List<DataStyle> dataStyles = sheetData.gridInfo().getDataStyles();
             List<BorderStyle> borderStyles = sheetData.gridInfo().getBorderStyles();
@@ -120,7 +121,7 @@ public class DataToSheetUtils {
         }
 
         if(ValueUtils.isNotBlank(cellDataMap)){
-            Map<String, StyleBase> styleBaseMap = new HashMap();
+            Map<String, StyleBase> styleBaseMap = new HashMap<>();
             for (Map.Entry<Point, Map<String, Object>> entry : cellDataMap.entrySet()){
                 ICellData cellData = MapUtils.get(entry.getValue(), "cellData");
                 Cell cell = MapUtils.get(entry.getValue(), "cell");;
@@ -145,12 +146,12 @@ public class DataToSheetUtils {
                 if(curBorderStyle != null){
                     styleBaseMap.put(StyleBase.KEY_CUR_BORDER_DATA_CACHE, curBorderStyle);
                 }
-                cellDataRun.run(cell, cellData, styleBaseMap);
+                cellDataRun.doing(cell, cellData, styleBaseMap);
                 styleBaseMap.clear();
 
             }
         }
-        cellDataEnd.run(sheet, sheetData);
+        cellDataRun.end(sheet, sheetData);
         if(sheetData.gridInfo() != null){
             DataToSheetUtils.setRCValue(sheet, sheetData.gridInfo());
             if(sheetData.gridInfo().getFrozenWindow() != null){

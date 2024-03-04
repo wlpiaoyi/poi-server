@@ -1,5 +1,6 @@
 package com.icss.poie.tools.excel.model;
 
+import com.icss.poie.framework.common.tools.ValueUtils;
 import lombok.Data;
 
 /**
@@ -18,16 +19,28 @@ public class BorderStyle extends StyleBase{
     private Border left;
 
     public boolean isEmpty(){
-        if(this.top != null && !this.top.isEmpty()){
+        if(this.top == null){
             return true;
         }
-        if(this.right != null && !this.right.isEmpty()){
+        if(this.top.isEmpty()){
             return true;
         }
-        if(this.bottom != null && !this.bottom.isEmpty()){
+        if(this.left == null){
             return true;
         }
-        if(this.left != null && !this.left.isEmpty()){
+        if(this.left.isEmpty()){
+            return true;
+        }
+        if(this.bottom == null){
+            return true;
+        }
+        if(this.bottom.isEmpty()){
+            return true;
+        }
+        if(this.right == null){
+            return true;
+        }
+        if(this.right.isEmpty()){
             return true;
         }
         return false;
@@ -38,15 +51,15 @@ public class BorderStyle extends StyleBase{
         /**
          * {@link org.apache.poi.ss.usermodel.BorderStyle}
          */
-        private Short styleCode;
+        private Short styleCode = 0;
 
         private String color;
 
         public boolean isEmpty(){
-            if(this.styleCode != null){
+            if(ValueUtils.isBlank(this.styleCode)){
                 return true;
             }
-            if(this.color != null && this.color.length() > 0){
+            if(ValueUtils.isBlank(this.color)){
                 return true;
             }
             return false;

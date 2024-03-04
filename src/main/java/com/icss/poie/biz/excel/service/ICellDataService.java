@@ -24,6 +24,7 @@ public interface ICellDataService extends IBaseMongoService<CellData> {
      */
     List<CellData> queryBySheetId(ObjectId sheetId, int randomTag);
 
+    Collection<CellData> insertBatch(List<CellData> entities, ObjectId sheetId, int randomTag);
 
     UpdateResult update(CellData entity, int randomTag);
 
@@ -34,6 +35,6 @@ public interface ICellDataService extends IBaseMongoService<CellData> {
      * @param randomTag
      * @return
      */
-    boolean updateBatch(Collection<CellData> entities, ObjectId sheetId, int randomTag);
+    boolean updateBatch(List<CellData> entities, ObjectId sheetId, int randomTag);
 
 }

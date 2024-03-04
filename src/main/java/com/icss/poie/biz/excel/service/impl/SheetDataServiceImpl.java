@@ -2,12 +2,14 @@ package com.icss.poie.biz.excel.service.impl;
 
 import com.icss.poie.biz.excel.domain.entity.GridInfo;
 import com.icss.poie.biz.excel.domain.entity.SheetData;
+import com.icss.poie.biz.excel.domain.ro.SheetDataRo;
 import com.icss.poie.biz.excel.domain.vo.CellDataVo;
 import com.icss.poie.biz.excel.domain.vo.SheetDataVo;
 import com.icss.poie.biz.excel.domain.wrapper.BaseWrapper;
 import com.icss.poie.biz.excel.service.ICellDataService;
 import com.icss.poie.biz.excel.service.IGridInfoService;
 import com.icss.poie.biz.excel.service.ISheetDataService;
+import com.icss.poie.domain.ModelWrapper;
 import com.icss.poie.framework.common.exception.BusinessException;
 import com.icss.poie.framework.common.tools.MongoTransactional;
 import com.icss.poie.framework.common.tools.ValueUtils;
@@ -42,9 +44,35 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
 
     @Autowired
     private ICellDataService cellDataService;
+
     @Autowired
     private IGridInfoService<GridInfo> gridInfoService;
 
+
+    @MongoTransactional
+    @Override
+    public void update(SheetDataRo.Update update) {
+        SheetData sheetData = ModelWrapper.parseOne(update, SheetData.class);
+
+        if(sheetData.getId() == null){
+            throw new BusinessException("Id不能为空");
+        }
+        SheetData db = this.findOne(sheetData.getId());
+        if(db == null){
+            throw new BusinessException("没有找到数据");
+        }
+        super.update(sheetData);
+        if(ValueUtils.isNotBlank(update.getUpdateCells())){
+            this.cellDataService.updateBatch(update.getUpdateCells(), db.getId(), db.getCellRandomTag());
+        }
+        if(ValueUtils.isNotBlank(update.getAddCells())){
+            this.cellDataService.insertBatch(update.getAddCells(), db.getId(), db.getCellRandomTag());
+        }
+        if(ValueUtils.isNotBlank(update.getRemoveCellIds())){
+            this.cellDataService.removeBatch(update.getRemoveCellIds(), SheetData.cellDataCollectionName(db.getCellRandomTag()));
+        }
+
+    }
 
     @Override
     public SheetDataVo detail(ObjectId id) {
