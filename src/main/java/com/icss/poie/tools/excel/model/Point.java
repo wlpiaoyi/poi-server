@@ -15,7 +15,14 @@ import javax.validation.constraints.NotNull;
  * {@code @version:}:       1.0
  */
 @Data
-public class Point {
+@Accessors(chain = false)
+public class Point implements IPoint{
+
+    public Point(){}
+    public Point(int c, int r){
+        this.c = c;
+        this.r = r;
+    }
 
     /** 列 **/
     @Schema(description =  "列")
@@ -28,7 +35,7 @@ public class Point {
     private int r = -1;
 
     public String toString(){
-        return "r:" + this.r + ",c:" + this.c;
+        return ":" + this.r + ":" + this.c;
     }
 
     public boolean equals(Object object){

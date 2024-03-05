@@ -12,7 +12,6 @@ import lombok.Data;
 @Data
 public class BorderStyle extends StyleBase{
 
-
     private Border top;
     private Border right;
     private Border bottom;
@@ -39,7 +38,7 @@ public class BorderStyle extends StyleBase{
         /**
          * {@link org.apache.poi.ss.usermodel.BorderStyle}
          */
-        private Short styleCode = 0;
+        private short styleCode = 0;
 
         private String color;
 
@@ -72,27 +71,27 @@ public class BorderStyle extends StyleBase{
         String text = "";
         Border b = this.top;
         if(b != null){
-            text += "top:" + b.toString();
+            text += ":" + b.toString();
         }else{
-            text += "top:null";
+            text += ":null";
         }
         b = this.right;
         if(b != null){
-            text += "right:" + b.toString();
+            text += ":" + b.toString();
         }else{
-            text += "right:null";
+            text += ":null";
         }
         b = this.bottom;
         if(b != null){
-            text += "bottom:" + b.toString();
+            text += ":" + b.toString();
         }else{
-            text += "bottom:null";
+            text += ":null";
         }
         b = this.left;
         if(b != null){
-            text += "left:" + b.toString();
+            text += ":" + b.toString();
         }else{
-            text += "left:null";
+            text += ":null";
         }
         return text;
     }

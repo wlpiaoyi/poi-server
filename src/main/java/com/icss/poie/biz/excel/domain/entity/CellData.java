@@ -25,10 +25,10 @@ import java.util.List;
  * {@code @version:}: 		1.0
  */
 @Data
-@Accessors(chain=false)
+@Accessors(chain = false)
 @Schema(description = "")
 @EqualsAndHashCode(callSuper = true)
-public class CellData extends BaseMongoEntity {
+public class CellData extends BaseMongoEntity{
 
     public static final String COLLECTION_NAME = "poi_cell_data";
 

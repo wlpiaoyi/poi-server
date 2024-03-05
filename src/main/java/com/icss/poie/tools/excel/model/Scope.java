@@ -39,36 +39,45 @@ public class Scope extends Point{
     }
 
     /**
+     * <p><b>{@code @description:}</b>
      * 单元格是否在范围以内
-     * @param cellData
-     * @return
+     * </p>
+     *
+     * <p><b>@param</b> <b>point</b>
+     * {@link Point}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2023/12/5 17:45</p>
+     * <p><b>{@code @return:}</b>{@link boolean}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public boolean inScope(ICellData cellData){
-        if(this.getC() == cellData.getC() && this.getR() == cellData.getR()){
+    public boolean inScope(IPoint point){
+        if(this.getC() == point.getC() && this.getR() == point.getR()){
             return true;
         }
-        if(this.getC() > cellData.getC()){
+        if(this.getC() > point.getC()){
             return false;
         }
-        if(this.getR() > cellData.getR()){
+        if(this.getR() > point.getR()){
             return false;
         }
-        if(this.getC() + this.getCs() > cellData.getC()){
+        if(this.getC() + this.getCs() > point.getC()){
             return false;
         }
-        if(this.getR() + this.getRs() > cellData.getR()){
+        if(this.getR() + this.getRs() > point.getR()){
             return false;
         }
         return true;
     }
 
     public String toString(){
-        return super.toString() + ",rs:" + this.rs + ",cs:" + this.cs;
+        return super.toString() + ":" + this.rs + ":" + this.cs;
     }
 
     public Scope copy() {
         Scope scope = new Scope();
-        scope.setC(this.getC()).setR(this.getR());
+        scope.setC(this.getC());
+        scope.setR(this.getR());
         scope.setCs(this.getCs()).setRs(this.getRs());
         return scope;
     }

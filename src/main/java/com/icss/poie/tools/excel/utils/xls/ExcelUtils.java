@@ -34,7 +34,7 @@ public class ExcelUtils {
         ClientAnchor clientAnchor = comment.getClientAnchor();
         String author = comment.getAuthor();
         return new com.icss.poie.tools.excel.model.Comment(
-                clientAnchor, new Point().setC(cell.getColumnIndex()).setR(cell.getRowIndex()), text, author
+                clientAnchor, new Point(cell.getColumnIndex(),cell.getRowIndex()), text, author
         );
     }
     public static void setCellComment(HSSFSheet sheet, HSSFCell cell, com.icss.poie.tools.excel.model.Comment comment){

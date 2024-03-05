@@ -65,19 +65,18 @@ public class DataStyle extends StyleBase{
     private final Map<String, CellStyle> cacheCellStyle = new HashMap<>();
 
     public String toString(){
-        String text = "bg:" + this.bg
-                + ",ff:" + this.ff
-                + ",fc:" + this.fc
-                + ",it:" + this.it
-                + ",bl:" + this.bl
-                + ",fs:" + this.fs
-                + ",un:" + this.un
-                + ",vt:" + this.vt
-                + ",ht:" + this.ht
-                + ",tb:" + this.tb
-                + ",dfm:" + this.dfm
-                + ",dfmv:" + this.dfmv;
-        return text;
+        return ":" + this.bg
+                + ":" + this.ff
+                + ":" + this.fc
+                + ":" + this.it
+                + ":" + this.bl
+                + ":" + this.fs
+                + ":" + this.un
+                + ":" + this.vt
+                + ":" + this.ht
+                + ":" + this.tb
+                + ":" + this.dfm
+                + ":" + this.dfmv;
     }
 
     public boolean equals(Object object){

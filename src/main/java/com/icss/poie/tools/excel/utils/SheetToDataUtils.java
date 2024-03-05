@@ -65,7 +65,7 @@ public class SheetToDataUtils {
                 DataStyle curDataStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_DATA_STYLE_CACHE);
                 BorderStyle curBorderStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_BORDER_DATA_CACHE);
                 styleBaseMap.clear();
-                Point point = new Point().setR(rowIndex).setC(cell.getColumnIndex());
+                Point point = new Point(cell.getColumnIndex(), rowIndex);
                 if(curDataStyle != null){
                     StyleBase.mergeIn(gridInfo.getDataStyles(), curDataStyle, point);
                 }

@@ -31,7 +31,7 @@ public class DataBorderUtils {
                 XSSFColor color = cacheMap.getCacheXSSFColor(border.getColor());
                 cellStyle.setBorderColor(XSSFCellBorder.BorderSide.TOP, color);
             }
-            if(border.getStyleCode() != null){
+            if(border.getStyleCode() != 0){
                 org.apache.poi.ss.usermodel.BorderStyle borderStyle = org.apache.poi.ss.usermodel.BorderStyle.valueOf(border.getStyleCode());
                 cellStyle.setBorderTop(borderStyle);
             }
@@ -42,7 +42,7 @@ public class DataBorderUtils {
                 XSSFColor color = cacheMap.getCacheXSSFColor(border.getColor());
                 cellStyle.setBorderColor(XSSFCellBorder.BorderSide.RIGHT, color);
             }
-            if(border.getStyleCode() != null){
+            if(border.getStyleCode() != 0){
                 org.apache.poi.ss.usermodel.BorderStyle borderStyle = org.apache.poi.ss.usermodel.BorderStyle.valueOf(border.getStyleCode());
                 cellStyle.setBorderRight(borderStyle);
             }
@@ -53,7 +53,7 @@ public class DataBorderUtils {
                 XSSFColor color = cacheMap.getCacheXSSFColor(border.getColor());
                 cellStyle.setBorderColor(XSSFCellBorder.BorderSide.BOTTOM, color);
             }
-            if(border.getStyleCode() != null){
+            if(border.getStyleCode() != 0){
                 org.apache.poi.ss.usermodel.BorderStyle borderStyle = org.apache.poi.ss.usermodel.BorderStyle.valueOf(border.getStyleCode());
                 cellStyle.setBorderBottom(borderStyle);
             }
@@ -64,7 +64,7 @@ public class DataBorderUtils {
                 XSSFColor color = cacheMap.getCacheXSSFColor(border.getColor());
                 cellStyle.setBorderColor(XSSFCellBorder.BorderSide.LEFT, color);
             }
-            if(border.getStyleCode() != null){
+            if(border.getStyleCode() != 0){
                 org.apache.poi.ss.usermodel.BorderStyle borderStyle = org.apache.poi.ss.usermodel.BorderStyle.valueOf(border.getStyleCode());
                 cellStyle.setBorderLeft(borderStyle);
             }

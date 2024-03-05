@@ -47,7 +47,7 @@ public class StyleBase{
             for (int r = scope.getR(); r < rm; r ++){
                 int cm = scope.getC() + scope.getCs();
                 for (int c = scope.getC(); c < cm; c ++){
-                    points.add(new Point().setC(c).setR(r));
+                    points.add(new Point(c, r));
                 }
             }
         }

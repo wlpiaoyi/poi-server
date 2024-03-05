@@ -7,15 +7,8 @@ package com.icss.poie.tools.excel.model;
  * {@code @date:}           2023/9/21 14:43
  * {@code @version:}:       1.0
  */
-public interface ICellData {
+public interface ICellData extends IPoint{
 
-    int getC();
-
-    void setC(int c);
-
-    int getR();
-
-    void setR(int r);
 
     ICellValue v();
 

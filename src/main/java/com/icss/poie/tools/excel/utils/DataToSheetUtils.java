@@ -130,7 +130,7 @@ public class DataToSheetUtils {
                 if(ValueUtils.isBlank(cellData.v().getF()) && ValueUtils.isBlank(cellData.v().getV())){
                     continue;
                 }
-                Point point = new Point().setC(cellData.getC()).setR(cellData.getR());
+                Point point = new Point(cellData.getC(), cellData.getR());
                 Map<String, Object> cdMap = cellDataMap.get(point);
                 if(cdMap == null){
                     cdMap = new HashMap<>();
