@@ -2,6 +2,8 @@ package com.icss.poie.tools.excel.utils.xlsx;
 
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.tools.excel.model.Point;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 
@@ -16,8 +18,15 @@ import java.util.Map;
  * <p><b>{@code @author:}</b>       wlpiaoyi</p>
  * <p><b>{@code @version:}</b>      1.0</p>
  */
+@Slf4j
 public class ExcelUtils {
 
+    public static byte[] getHSSFColorBytesByIndex(int index){
+        HSSFColor hssfColor = HSSFColor.getIndexHash().get(index);
+        if (hssfColor == null) return null;
+        short[] rgbShort = hssfColor.getTriplet();
+        return new byte[] {(byte) rgbShort[0], (byte) rgbShort[1], (byte) rgbShort[2]};
+    }
 
     public static com.icss.poie.tools.excel.model.Comment getCellComment(XSSFCell cell){
         XSSFComment comment = cell.getCellComment();
@@ -67,7 +76,14 @@ public class ExcelUtils {
             if(ValueUtils.isBlank(cell.getCellFormula())){
                 continue;
             }
-            CellValue cellValue = formulaEvaluator.evaluate(cell);
+            CellValue cellValue;
+
+            try{
+                cellValue = formulaEvaluator.evaluate(cell);
+            }catch (Exception e){
+                log.error("公式解析异常", e);
+                continue;
+            }
             if(cellValue == null){
                 continue;
             }
@@ -84,7 +100,13 @@ public class ExcelUtils {
             if(ValueUtils.isBlank(cell.getCellFormula())){
                 continue;
             }
-            XSSFCell xcell= formulaEvaluator.evaluateInCell(cell);
+            XSSFCell xcell;
+            try{
+                xcell= formulaEvaluator.evaluateInCell(cell);
+            }catch (Exception e){
+                log.error("公式解析异常", e);
+                continue;
+            }
             if(xcell == null){
                 continue;
             }

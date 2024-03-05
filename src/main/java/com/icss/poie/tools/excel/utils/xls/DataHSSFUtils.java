@@ -28,7 +28,7 @@ public class DataHSSFUtils {
             }
 
             @Override
-            public void doing(Cell cell, ICellData cellData, Map<String, StyleBase> styleBaseMap) {
+            public void doing(Cell cell, ICellData cellData, Map<String, Object> styleBaseMap) {
                 DataStyle curDataStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_DATA_STYLE_CACHE);
                 DataStyleUtils.setCellStyle((HSSFCell) cell, curDataStyle);
             }

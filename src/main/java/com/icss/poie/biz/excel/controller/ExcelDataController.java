@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,22 +103,18 @@ public class ExcelDataController {
     @Operation(summary ="下载Excel")
     public void downloadExcel(@RequestParam(name = "id") String hexId,
                               @RequestParam(required = false, defaultValue = "xlsx") String fileType,
+                              @RequestParam(required = false, defaultValue = "0") int isFormulaEvaluator,
                               HttpServletResponse response) throws IOException {
         ObjectId objId = new ObjectId(hexId);
         ExcelDataVo<SheetDataVo> excelData = this.excelDataService.detail(objId);
         if(excelData == null){
             throw new BusinessException("没有找到Excel数据");
         }
-        if(fileType.equals("xls")){
-
-        }else{
-            fileType = "xlsx";
-        }
-        response.setCharacterEncoding(Charsets.UTF_8.name());
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("content-Disposition","attachment;filename=" + URLEncoder.encode(excelData.getName(), response.getCharacterEncoding()) + "." + fileType);
         response.setStatus(200);
-        this.excelDataService.putOutputStreamByExcelData(excelData, fileType, response.getOutputStream());
+        this.excelDataService.putOutputStreamByExcelData(excelData, fileType, isFormulaEvaluator, response.getOutputStream());
     }
 
     /**

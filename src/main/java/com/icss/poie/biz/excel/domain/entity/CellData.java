@@ -32,6 +32,10 @@ public class CellData extends BaseMongoEntity {
 
     public static final String COLLECTION_NAME = "poi_cell_data";
 
+    public static String mapKey(int c, int r){
+        return c + "_" + r;
+    }
+
     public String mapKey(){
         if(this.c < 0){
             return super.mapKey();
@@ -39,7 +43,7 @@ public class CellData extends BaseMongoEntity {
         if(this.r < 0){
             return super.mapKey();
         }
-        return this.c + "_" + this.r;
+        return CellData.mapKey(this.c, this.r);
     }
 
     public void synKey(int offc, int offr){

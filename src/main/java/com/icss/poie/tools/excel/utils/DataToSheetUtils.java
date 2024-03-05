@@ -9,6 +9,7 @@ import com.icss.poie.tools.excel.model.BorderStyle;
 import com.icss.poie.tools.excel.model.Comment;
 import com.icss.poie.tools.excel.model.Picture;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.usermodel.*;
@@ -26,11 +27,12 @@ import java.util.Map;
  * {@code @date:}           2023/11/30 12:49
  * {@code @version:}:       1.0
  */
+@Slf4j
 public class DataToSheetUtils {
 
     public interface CellDataRun{
         void start(Sheet sheet, ISheetData sheetData);
-        void doing(Cell cell, ICellData cellData, Map<String, StyleBase> styleBaseMap);
+        void doing(Cell cell, ICellData cellData, Map<String, Object> styleBaseMap);
         void end(Sheet sheet, ISheetData sheetData);
 
     }
@@ -58,6 +60,7 @@ public class DataToSheetUtils {
                     if(ValueUtils.isBlank(item.getScopes())){
                         continue;
                     }
+                    long curTimer = System.currentTimeMillis();
                     item.setPoints(StyleBase.parseScopesToPoints(item.getScopes()));
                     for (Point point : item.getPoints()){
                         Map<String, Object> cdMap = cellDataMap.get(point);
@@ -85,6 +88,7 @@ public class DataToSheetUtils {
                     if(ValueUtils.isBlank(item.getScopes())){
                         continue;
                     }
+                    long curTimer = System.currentTimeMillis();
                     item.setPoints(StyleBase.parseScopesToPoints(item.getScopes()));
                     for (Point point : item.getPoints()){
                         Map<String, Object> cdMap = cellDataMap.get(point);
@@ -107,7 +111,6 @@ public class DataToSheetUtils {
                     item.getPoints().clear();
                 }
             }
-
             if(ValueUtils.isNotBlank(comments)){
                 for(Comment item : comments){
                     Point point = item.getPoint();
@@ -139,7 +142,7 @@ public class DataToSheetUtils {
         }
 
         if(ValueUtils.isNotBlank(cellDataMap)){
-            Map<String, StyleBase> styleBaseMap = new HashMap<>();
+            Map<String, Object> styleBaseMap = new HashMap<>();
             for (Map.Entry<Point, Map<String, Object>> entry : cellDataMap.entrySet()){
                 ICellData cellData = MapUtils.get(entry.getValue(), "cellData");
                 Cell cell = MapUtils.get(entry.getValue(), "cell");;
@@ -288,6 +291,10 @@ public class DataToSheetUtils {
         if(ValueUtils.isNotBlank(gridInfo.getHiddenRows())){
             for (Integer value : gridInfo.getHiddenRows()){
                 Row row = sheet.getRow(value);
+                if(row == null){
+                    log.warn("sheet name:{} row index {} is notfund", sheet.getSheetName(), value);
+                    continue;
+                }
                 row.setZeroHeight(true);
             }
         }

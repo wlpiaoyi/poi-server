@@ -1,6 +1,7 @@
 package com.icss.poie.biz.excel.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import com.icss.poie.biz.excel.domain.entity.CellData;
 import com.icss.poie.biz.excel.domain.entity.SheetData;
 import com.icss.poie.biz.excel.domain.vo.ExcelDataVo;
 import com.icss.poie.biz.excel.domain.vo.SheetDataVo;
@@ -25,7 +26,7 @@ import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bson.types.ObjectId;
@@ -36,6 +37,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Function;
@@ -149,18 +151,94 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
         throw new BusinessException("不支持的格式");
     }
 
+
+    public void formulaEvaluatorAll(Workbook workbook, ExcelDataVo<SheetDataVo> excelDataVo) {
+        long currentTimeMillis = System.currentTimeMillis();
+        Iterator<Sheet> sheetIterator = workbook.iterator();
+        int sheetIndex = 0;
+        int formulaCount = 0;
+        while (sheetIterator.hasNext()){
+            Sheet sheet = sheetIterator.next();
+            SheetDataVo sheetData =  excelDataVo.getSheetDatas().get(sheetIndex ++);
+            if(ValueUtils.isBlank(sheetData.getCellDatas())){
+                continue;
+            }
+            List<Cell> cells = new ArrayList<>();
+            Iterator<Row> rowIterator = sheet.rowIterator();
+            while (rowIterator.hasNext()){
+                Row row = rowIterator.next();
+                Iterator<Cell> cellIterator = row.cellIterator();
+                while (cellIterator.hasNext()){
+                    Cell cell = cellIterator.next();
+                    if(cell.getCellType() != CellType.FORMULA){
+                        continue;
+                    }
+                    if(ValueUtils.isBlank(cell.getCellFormula())){
+                        continue;
+                    }
+                    cells.add(cell);
+                    formulaCount ++;
+                }
+            }
+
+            if(ValueUtils.isBlank(cells)){
+                return;
+            }
+            Map<Cell, org.apache.poi.ss.usermodel.CellValue> cellCellValueMap;
+            try{
+                long timeMillis = System.currentTimeMillis();
+                cellCellValueMap = ExcelUtils.formulaEvaluatorCells(workbook, cells);
+                log.info("ExcelUtils.formulaEvaluatorInCells endDur:{}", System.currentTimeMillis() - timeMillis);
+            }catch (Exception e){
+                throw new BusinessException("Excel存在严重问题, 不可解析");
+            }
+            Map<String, CellData> cellDataMap = sheetData.getCellDatas().stream().collect(Collectors.toMap(
+                    CellData::mapKey, Function.identity()
+            ));
+            for (Map.Entry<Cell, org.apache.poi.ss.usermodel.CellValue> entry : cellCellValueMap.entrySet()){
+                Cell cell = entry.getKey();
+                CellData cellData = cellDataMap.get(CellData.mapKey(cell.getColumnIndex(), cell.getRowIndex()));
+                if(cellData == null){
+                    continue;
+                }
+                try{
+                    org.apache.poi.ss.usermodel.CellValue cv = entry.getValue();
+                    CellValue v = new CellValue();
+                    switch (cv.getCellType()){
+                        case STRING:{
+                            v.setType(0);
+                            v.setV(cv.getStringValue());
+                            cell.setCellValue(cv.getStringValue());
+                        }
+                        break;
+                        case NUMERIC:{
+                            v.setType(1);
+                            v.setV(BigDecimal.valueOf(cv.getNumberValue()).toString());
+                            cell.setCellValue(cv.getNumberValue());
+                        }
+                        break;
+                    }
+                    cellData.setV(v);
+                }catch (Exception e){
+                    log.error("Set cell value error", e);
+                }
+            }
+        }
+        log.info("server.formulaEvaluatorAll endDur:{} formulaCount:{}", System.currentTimeMillis() - currentTimeMillis, formulaCount);
+    }
+
     @Override
-    public void putOutputStreamByExcelData(ExcelDataVo<SheetDataVo> excelDataVo, String fileType, OutputStream outputStream) throws IOException {
+    public void putOutputStreamByExcelData(ExcelDataVo<SheetDataVo> excelDataVo, String fileType, int isFormulaEvaluator, OutputStream outputStream) throws IOException {
         if(fileType.equals("xls")){
             long currentTimeMillis = System.currentTimeMillis();
             HSSFWorkbook workbook = new HSSFWorkbook();
             for (SheetDataVo sheetDataVo :  excelDataVo.getSheetDatas()){
                 DataHSSFUtils.parseSheet(workbook, sheetDataVo);
             }
-            log.debug("DataHSSFUtils.parseSheet endDur:{}", System.currentTimeMillis() - currentTimeMillis);
-            currentTimeMillis = System.currentTimeMillis();
-            ExcelUtils.formulaEvaluatorAll(workbook);
-            log.debug("ExcelUtils.formulaEvaluatorAll endDur:{}", System.currentTimeMillis() - currentTimeMillis);
+            log.info("DataHSSFUtils.parseSheet endDur:{}", System.currentTimeMillis() - currentTimeMillis);
+            if(isFormulaEvaluator != 0){
+                this.formulaEvaluatorAll(workbook, excelDataVo);
+            }
             workbook.write(outputStream);
             outputStream.flush();
             outputStream.close();
@@ -171,10 +249,10 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
             for (SheetDataVo sheetDataVo : excelDataVo.getSheetDatas()){
                 DataXSSFUtils.parseSheet(workbook, sheetDataVo);
             }
-            log.debug("DataXSSFUtils.parseSheet endDur:{}", System.currentTimeMillis() - currentTimeMillis);
-            currentTimeMillis = System.currentTimeMillis();
-            ExcelUtils.formulaEvaluatorAll(workbook);
-            log.debug("ExcelUtils.formulaEvaluatorAll endDur:{}", System.currentTimeMillis() - currentTimeMillis);
+            log.info("DataXSSFUtils.parseSheet endDur:{}", System.currentTimeMillis() - currentTimeMillis);
+            if(isFormulaEvaluator != 0){
+                this.formulaEvaluatorAll(workbook, excelDataVo);
+            }
             workbook.write(outputStream);
             outputStream.flush();
             outputStream.close();

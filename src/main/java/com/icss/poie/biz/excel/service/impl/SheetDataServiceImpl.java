@@ -77,14 +77,20 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
     @Override
     public SheetDataVo detail(ObjectId id) {
         long pointTime = System.currentTimeMillis();
+        long curTime = System.currentTimeMillis();
         log.info("sheet start detail dataId[{}]", id.toHexString());
         SheetDataVo sheetDataVo = this.baseTemplate.findOne(new Query(Criteria.where("_id").is(id)),
                 SheetDataVo.class);
+        log.info("sheet doing detail getSheetDataVo dataId[{}], duriTime:{}ms", id.toHexString(), System.currentTimeMillis() - curTime);
         if(sheetDataVo == null){
             return null;
         };
+        curTime = System.currentTimeMillis();
         sheetDataVo.setGridInfo(this.gridInfoService.findOneBySheetId(sheetDataVo.getId(), sheetDataVo.getGiRandomTag()));
+        log.info("sheet doing detail findGridInfoBySheetId dataId[{}], duriTime:{}ms", id.toHexString(), System.currentTimeMillis() - curTime);
+        curTime = System.currentTimeMillis();
         List<CellData> cellDatas = this.cellDataService.queryBySheetId(sheetDataVo.getId(), sheetDataVo.getCellRandomTag());
+        log.info("sheet doing detail queryCellDataBySheetId dataId[{}], duriTime:{}ms", id.toHexString(), System.currentTimeMillis() - curTime);
         if(ValueUtils.isNotBlank(cellDatas)){
             sheetDataVo.setCellDatas(BaseWrapper.parseList(cellDatas, CellDataVo.class));
         }
