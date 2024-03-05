@@ -1,10 +1,9 @@
-package com.icss.poie.tools.excel.utils;
+package com.icss.poie.tools.excel.utils.xlsx;
 
 import lombok.Getter;
 
 @Getter
 public enum ColorIndex {
-
 
     BLACK1(0,"#000000"),
     WHITE1(1,"#FFFFFF"),

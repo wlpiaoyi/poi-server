@@ -19,7 +19,6 @@ public class CellValue implements ICellValue {
 
     /**
      * 是否为空
-     * @return
      */
     @JsonIgnore
     public boolean notEmpty(){
@@ -35,7 +34,7 @@ public class CellValue implements ICellValue {
         return false;
     }
 
-    /** 0:String 1:数字 2:日期 **/
+    /** 0:String 1:数字 **/
     private int type;
     /** 数据值 **/
     private String v;

@@ -6,7 +6,9 @@ import lombok.Data;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.springframework.data.annotation.Transient;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * {@code @author:}         wlpiaoyi
@@ -60,7 +62,7 @@ public class DataStyle extends StyleBase{
 
     @Transient
     @JsonIgnore
-    private CellStyle cacheCellStyle;
+    private final Map<String, CellStyle> cacheCellStyle = new HashMap<>();
 
     public String toString(){
         String text = "bg:" + this.bg

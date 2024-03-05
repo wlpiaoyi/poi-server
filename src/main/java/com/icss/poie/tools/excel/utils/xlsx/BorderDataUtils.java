@@ -22,18 +22,7 @@ class BorderDataUtils {
 
 
     public static byte[] getRGB(XSSFColor color){
-        if(color == null){
-            return null;
-        }
-        byte[] rgb = color.getRGB();
-        if(rgb != null){
-            return rgb;
-        }
-        rgb = color.getRGBWithTint();
-        if(rgb != null){
-            return rgb;
-        }
-        return ExcelUtils.getHSSFColorBytesByIndex(color.getIndex());
+        return ExcelUtils.getColorBytes(color);
     }
 
 

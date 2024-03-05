@@ -2,6 +2,8 @@ package com.icss.poie.tools.excel.utils.xlsx;
 
 import com.icss.poie.tools.excel.model.BorderStyle;
 import com.icss.poie.tools.excel.model.ICacheMap;
+import com.icss.poie.tools.excel.utils.DataToSheetUtils;
+import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
@@ -67,5 +69,17 @@ public class DataBorderUtils {
                 cellStyle.setBorderLeft(borderStyle);
             }
         }
+    }
+
+    private static final XSSFColor DEFAULT_BORDER_COLOR = new XSSFColor(DataToSheetUtils.hexToBytes("#D9D9D9"), new DefaultIndexedColorMap());
+    static void setBorderDefault(XSSFCellStyle cellStyle){
+        cellStyle.setBorderColor(XSSFCellBorder.BorderSide.TOP, DEFAULT_BORDER_COLOR);
+        cellStyle.setBorderColor(XSSFCellBorder.BorderSide.LEFT, DEFAULT_BORDER_COLOR);
+        cellStyle.setBorderColor(XSSFCellBorder.BorderSide.BOTTOM, DEFAULT_BORDER_COLOR);
+        cellStyle.setBorderColor(XSSFCellBorder.BorderSide.RIGHT, DEFAULT_BORDER_COLOR);
+        cellStyle.setBorderTop(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+        cellStyle.setBorderLeft(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+        cellStyle.setBorderBottom(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+        cellStyle.setBorderRight(org.apache.poi.ss.usermodel.BorderStyle.THIN);
     }
 }

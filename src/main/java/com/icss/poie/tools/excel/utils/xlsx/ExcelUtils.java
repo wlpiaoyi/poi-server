@@ -21,8 +21,19 @@ import java.util.Map;
 @Slf4j
 public class ExcelUtils {
 
-    public static byte[] getHSSFColorBytesByIndex(int index){
-        HSSFColor hssfColor = HSSFColor.getIndexHash().get(index);
+    public static byte[] getColorBytes(XSSFColor color){
+        if(color == null){
+            return null;
+        }
+        byte[] rgb = color.getRGBWithTint();
+        if(rgb != null){
+            return rgb;
+        }
+        rgb = color.getRGB();
+        if(rgb != null){
+            return rgb;
+        }
+        HSSFColor hssfColor = HSSFColor.getIndexHash().get(color.getIndex());
         if (hssfColor == null) return null;
         short[] rgbShort = hssfColor.getTriplet();
         return new byte[] {(byte) rgbShort[0], (byte) rgbShort[1], (byte) rgbShort[2]};

@@ -9,6 +9,7 @@ import com.icss.poie.tools.excel.model.*;
 import com.icss.poie.tools.excel.utils.DataToSheetUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
@@ -91,8 +92,7 @@ public class GridInfo extends BaseMongoEntity implements IGridInfo, ICacheMap {
         }
         XSSFColor color = cacheColorMap.get(rgb);
         if(color == null){
-            color = new XSSFColor();
-            color.setRGB(DataToSheetUtils.hexToBytes(rgb));
+            color = new XSSFColor(DataToSheetUtils.hexToBytes(rgb), new DefaultIndexedColorMap());
             cacheColorMap.put(rgb, color);
         }
         return color;

@@ -18,19 +18,29 @@ import java.util.Locale;
 class StyleDataUtils {
 
     /**
-     * @description: 读取Excel单元格格式同步到数据对象内
-     * @param dataStyle
-     * @param cell
-     * @return: boolean
-     * @author: wlpia
-     * @date: 2023/12/25 11:42
+     * <p><b>{@code @description:}</b>
+     * 读取Excel单元格格式同步到数据对象内
+     * </p>
+     *
+     * <p><b>@param</b> <b>dataStyle</b>
+     * {@link DataStyle}
+     * </p>
+     *
+     * <p><b>@param</b> <b>cell</b>
+     * {@link XSSFCell}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2023/12/25 11:42</p>
+     * <p><b>{@code @return:}</b>{@link boolean}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
      */
     static boolean setDataStyle(DataStyle dataStyle, XSSFCell cell) {
 
         XSSFCellStyle cellStyle = cell.getCellStyle();
         XSSFColor bgColor = cellStyle.getFillForegroundColorColor();
-        if(bgColor != null && bgColor.getRGB() != null){
-            dataStyle.setBg("#" + ValueUtils.bytesToHex(bgColor.getRGB()).toUpperCase(Locale.ROOT));
+        byte[] rgb;
+        if(bgColor != null && (rgb = ExcelUtils.getColorBytes(bgColor)) != null){
+            dataStyle.setBg("#" + ValueUtils.bytesToHex(rgb).toUpperCase(Locale.ROOT));
         }
 
         synFont(dataStyle, cell);
@@ -70,13 +80,22 @@ class StyleDataUtils {
         }
         return true;
     }
+
     /**
-     * @description: 同步单元格字体到数据对象中
-     * @param dataStyle
-     * @param cell
-     * @return: void
-     * @author: wlpia
-     * @date: 2023/12/25 11:43
+     * <p><b>{@code @description:}</b>
+     * 同步单元格字体到数据对象中
+     * </p>
+     *
+     * <p><b>@param</b> <b>dataStyle</b>
+     * {@link DataStyle}
+     * </p>
+     *
+     * <p><b>@param</b> <b>cell</b>
+     * {@link XSSFCell}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2023/12/25 11:43</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
      */
     private static void synFont(DataStyle dataStyle,XSSFCell cell) {
         XSSFFont font = cell.getCellStyle().getFont();
@@ -89,7 +108,7 @@ class StyleDataUtils {
             dataStyle.setFf("宋体");
         }
         if(font.getXSSFColor() != null){
-            dataStyle.setFc("#" + ValueUtils.bytesToHex(font.getXSSFColor().getRGB()).toUpperCase(Locale.ROOT));
+            dataStyle.setFc("#" + ValueUtils.bytesToHex(ExcelUtils.getColorBytes(font.getXSSFColor())).toUpperCase(Locale.ROOT));
         }
         dataStyle.setIt((byte) (font.getItalic() ? 1 : 0));
         dataStyle.setBl((byte) (font.getBold() ? 1 : 0));

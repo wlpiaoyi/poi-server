@@ -4,6 +4,7 @@ import com.icss.poie.biz.excel.domain.entity.ExcelData;
 import com.icss.poie.biz.excel.domain.vo.ExcelDataVo;
 import com.icss.poie.biz.excel.domain.vo.SheetDataVo;
 import com.icss.poie.service.IBaseMongoService;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.bson.types.ObjectId;
 
 import java.io.IOException;
@@ -30,6 +31,23 @@ public interface IExcelDataService extends IBaseMongoService<ExcelData> {
      */
     ExcelDataVo<SheetDataVo> getExcelDataByInputStream(InputStream inputStream, String type, ObjectId excelId) throws IOException;
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * 解析公式
+     * </p>
+     *
+     * <p><b>@param</b> <b>workbook</b>
+     * {@link Workbook}
+     * </p>
+     *
+     * <p><b>@param</b> <b>excelDataVo</b>
+     * {@link ExcelDataVo<SheetDataVo>}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/3/5 13:57</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    void formulaEvaluatorAll(Workbook workbook, ExcelDataVo<SheetDataVo> excelDataVo);
     /**
      *
      * @param excelDataVo

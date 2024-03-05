@@ -8,6 +8,7 @@ import com.icss.poie.biz.excel.domain.wrapper.BaseWrapper;
 import com.icss.poie.framework.common.exception.BusinessException;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.biz.excel.service.IExcelDataService;
+import com.icss.poie.tools.excel.utils.xlsx.DataXSSFUtils;
 import com.icss.poie.tools.response.R;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.Charsets;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -50,9 +52,19 @@ public class ExcelDataController {
     @GetMapping("/detail")
     @ApiOperationSupport(order = 1)
     @Operation(summary ="详情")
-    public R<ExcelDataVo<SheetDataVo>> detail(@RequestParam(name = "id") String hexId) {
+    public R<ExcelDataVo<SheetDataVo>> detail(@RequestParam(name = "id") String hexId,
+                                              @RequestParam(required = false, defaultValue = "0") int isFormulaEvaluator) {
         ObjectId objId = new ObjectId(hexId);
         ExcelDataVo<SheetDataVo> excelData = this.excelDataService.detail(objId);
+        if(isFormulaEvaluator != 0){
+            long currentTimeMillis = System.currentTimeMillis();
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            for (SheetDataVo sheetDataVo : excelData.getSheetDatas()){
+                DataXSSFUtils.parseSheet(workbook, sheetDataVo);
+            }
+            log.info("DataXSSFUtils.parseSheet endDur:{}", System.currentTimeMillis() - currentTimeMillis);
+            this.excelDataService.formulaEvaluatorAll(workbook, excelData);
+        }
         return R.success(excelData);
     }
 

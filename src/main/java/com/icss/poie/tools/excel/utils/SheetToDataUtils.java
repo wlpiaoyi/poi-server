@@ -202,14 +202,14 @@ public class SheetToDataUtils {
             cellData.putV(new CellValue());
         }
         switch (cell.getCellType()) {
-            case NUMERIC:{
-                cellData.v().setType(1);
-                cellData.v().setV(BigDecimal.valueOf(cell.getNumericCellValue()).toString());
-            }
-            break;
             case STRING:{
                 cellData.v().setType(0);
                 cellData.v().setV(cell.getStringCellValue());
+            }
+            break;
+            case NUMERIC:{
+                cellData.v().setType(1);
+                cellData.v().setV(BigDecimal.valueOf(cell.getNumericCellValue()).toString());
             }
             break;
             case BOOLEAN:{

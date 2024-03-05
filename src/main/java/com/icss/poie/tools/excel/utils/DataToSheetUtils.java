@@ -88,7 +88,6 @@ public class DataToSheetUtils {
                     if(ValueUtils.isBlank(item.getScopes())){
                         continue;
                     }
-                    long curTimer = System.currentTimeMillis();
                     item.setPoints(StyleBase.parseScopesToPoints(item.getScopes()));
                     for (Point point : item.getPoints()){
                         Map<String, Object> cdMap = cellDataMap.get(point);
@@ -239,17 +238,18 @@ public class DataToSheetUtils {
                 v = cellData.v().getM();
             }
             switch (cellData.v().getType()){
+                case 0:{
+                    cell.setCellValue(v);
+                }
+                break;
                 case 1:{
-//                    cell.setCellType(CellType.NUMERIC);
                     cell.setCellValue(new Double(v));
                 }
                 break;
                 default:{
                     if(PatternUtils.isNumber(v) || PatternUtils.isFloat(v)){
-//                        cell.setCellType(CellType.NUMERIC);
                         cell.setCellValue(new Double(v));
                     }else{
-//                        cell.setCellType(CellType.STRING);
                         cell.setCellValue(v);
                     }
                 }
@@ -270,10 +270,12 @@ public class DataToSheetUtils {
         if(ValueUtils.isNotBlank(gridInfo.getRowHeights())){
             int index = 0;
             for (Short value : gridInfo.getRowHeights()){
-                if(sheet.getRow(index) != null){
-                    sheet.getRow(index).setHeight(value);
+                Row row = sheet.getRow(index ++);
+                if(row == null){
+                    log.warn("sheet name:{} row index {} is notfund", sheet.getSheetName(),  index - 1);
+                    continue;
                 }
-                index ++;
+                row.setHeight(value);
             }
         }
         if(ValueUtils.isNotBlank(gridInfo.getColumnWidths())){
@@ -304,12 +306,7 @@ public class DataToSheetUtils {
 
     public static byte[] hexToBytes(String fc) {
         if(fc.startsWith("#")){
-            try{
-                byte[] bytes = ValueUtils.hexToBytes(fc.substring(1));
-                return bytes;
-            }catch (Exception e){
-                throw e;
-            }
+            return ValueUtils.hexToBytes(fc.substring(1));
         }else if(fc.startsWith("rgb(")){
             Integer[] ints = ValueUtils.toIntegerArray(fc.substring(4, fc.length() - 1).replaceAll(" ", ""));
             byte[] bytes = new byte[]{0,0,0};
