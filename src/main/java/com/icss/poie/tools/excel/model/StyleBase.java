@@ -22,6 +22,9 @@ public class StyleBase{
 
     public static final String KEY_CUR_DATA_STYLE_CACHE = "curDataStyle";
     public static final String KEY_CUR_BORDER_DATA_CACHE = "curBorderData";
+    public static final String KEY_CACHE_MAP_CACHE = "cacheMap";
+
+
 
     /** 点集合 **/
     @JsonIgnore

@@ -1,14 +1,14 @@
-package com.icss.poie.tools.excel.utils.xlsx;
+package com.icss.poie.tools.excel.utils.xls;
 
 import com.icss.poie.tools.excel.model.BorderStyle;
 import com.icss.poie.tools.excel.model.ICacheMap;
-import com.icss.poie.tools.excel.utils.DataToSheetUtils;
 import com.icss.poie.tools.excel.utils.ExcelUtils;
-import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.extensions.XSSFCellBorder;
+import com.icss.poie.tools.excel.utils.xlsx.ColorIndex;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.IndexedColors;
+
+import java.awt.*;
 
 /**
  * <p><b>{@code @description:}</b>  向xlsx写入边框信息</p>
@@ -25,12 +25,12 @@ public class DataBorderUtils {
      * <p><b>{@code @author:}</b>       wlpiaoyi</p>
      * <p><b>{@code @version:}</b>      1.0</p>
      */
-    static void setBorder(BorderStyle borderData, XSSFCellStyle cellStyle, ICacheMap cacheMap){
+    static void setBorder(BorderStyle borderData, HSSFCellStyle cellStyle, ICacheMap cacheMap){
         BorderStyle.Border border = borderData.getTop();
         if(border != null){
             if(border.getColor() != null){
-                XSSFColor color = cacheMap.getCacheXSSFColor(border.getColor());
-                cellStyle.setBorderColor(XSSFCellBorder.BorderSide.TOP, color);
+                HSSFColor color = cacheMap.getCacheHSSFColor(border.getColor());
+                cellStyle.setTopBorderColor(color.getIndex());
             }
             if(border.getStyleCode() != 0){
                 org.apache.poi.ss.usermodel.BorderStyle borderStyle = org.apache.poi.ss.usermodel.BorderStyle.valueOf(border.getStyleCode());
@@ -40,8 +40,8 @@ public class DataBorderUtils {
         border = borderData.getRight();
         if(border != null){
             if(border.getColor() != null){
-                XSSFColor color = cacheMap.getCacheXSSFColor(border.getColor());
-                cellStyle.setBorderColor(XSSFCellBorder.BorderSide.RIGHT, color);
+                HSSFColor color = cacheMap.getCacheHSSFColor(border.getColor());
+                cellStyle.setRightBorderColor(color.getIndex());
             }
             if(border.getStyleCode() != 0){
                 org.apache.poi.ss.usermodel.BorderStyle borderStyle = org.apache.poi.ss.usermodel.BorderStyle.valueOf(border.getStyleCode());
@@ -51,8 +51,8 @@ public class DataBorderUtils {
         border = borderData.getBottom();
         if(border != null){
             if(border.getColor() != null){
-                XSSFColor color = cacheMap.getCacheXSSFColor(border.getColor());
-                cellStyle.setBorderColor(XSSFCellBorder.BorderSide.BOTTOM, color);
+                HSSFColor color = cacheMap.getCacheHSSFColor(border.getColor());
+                cellStyle.setBottomBorderColor(color.getIndex());
             }
             if(border.getStyleCode() != 0){
                 org.apache.poi.ss.usermodel.BorderStyle borderStyle = org.apache.poi.ss.usermodel.BorderStyle.valueOf(border.getStyleCode());
@@ -62,8 +62,8 @@ public class DataBorderUtils {
         border = borderData.getLeft();
         if(border != null){
             if(border.getColor() != null){
-                XSSFColor color = cacheMap.getCacheXSSFColor(border.getColor());
-                cellStyle.setBorderColor(XSSFCellBorder.BorderSide.LEFT, color);
+                HSSFColor color = cacheMap.getCacheHSSFColor(border.getColor());
+                cellStyle.setLeftBorderColor(color.getIndex());
             }
             if(border.getStyleCode() != 0){
                 org.apache.poi.ss.usermodel.BorderStyle borderStyle = org.apache.poi.ss.usermodel.BorderStyle.valueOf(border.getStyleCode());
@@ -72,12 +72,11 @@ public class DataBorderUtils {
         }
     }
 
-    private static final XSSFColor DEFAULT_BORDER_COLOR = new XSSFColor(ExcelUtils.parseRGBHexToBytes("#D9D9D9"), new DefaultIndexedColorMap());
-    static void setBorderDefault(XSSFCellStyle cellStyle){
-        cellStyle.setBorderColor(XSSFCellBorder.BorderSide.TOP, DEFAULT_BORDER_COLOR);
-        cellStyle.setBorderColor(XSSFCellBorder.BorderSide.LEFT, DEFAULT_BORDER_COLOR);
-        cellStyle.setBorderColor(XSSFCellBorder.BorderSide.BOTTOM, DEFAULT_BORDER_COLOR);
-        cellStyle.setBorderColor(XSSFCellBorder.BorderSide.RIGHT, DEFAULT_BORDER_COLOR);
+    static void setBorderDefault(HSSFCellStyle cellStyle){
+        cellStyle.setTopBorderColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        cellStyle.setRightBorderColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        cellStyle.setBottomBorderColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        cellStyle.setLeftBorderColor(IndexedColors.GREY_25_PERCENT.getIndex());
         cellStyle.setBorderTop(org.apache.poi.ss.usermodel.BorderStyle.THIN);
         cellStyle.setBorderLeft(org.apache.poi.ss.usermodel.BorderStyle.THIN);
         cellStyle.setBorderBottom(org.apache.poi.ss.usermodel.BorderStyle.THIN);

@@ -2,7 +2,9 @@ package com.icss.poie.tools.excel.utils.xlsx;
 
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.tools.excel.model.DataStyle;
+import com.icss.poie.tools.excel.model.ICacheMap;
 import com.icss.poie.tools.excel.utils.DataToSheetUtils;
+import com.icss.poie.tools.excel.utils.ExcelUtils;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -18,11 +20,10 @@ import org.apache.poi.xssf.usermodel.*;
 class DataStyleUtils {
 
 
-    static void setCellStyle(XSSFCell cell, XSSFCellStyle cellStyle, DataStyle dataStyle){
+    static void setCellStyle(XSSFCell cell, XSSFCellStyle cellStyle, DataStyle dataStyle, ICacheMap cacheMap){
         //单元格背景
         if(ValueUtils.isNotBlank(dataStyle.getBg())){
-            XSSFColor color = new XSSFColor();
-            color.setRGB(DataToSheetUtils.hexToBytes(dataStyle.getBg()));
+            XSSFColor color = cacheMap.getCacheXSSFColor(dataStyle.getBg());
             cellStyle.setFillForegroundColor(color);
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         }
@@ -72,37 +73,21 @@ class DataStyleUtils {
         }
 
         XSSFFont font = cell.getRow().getSheet().getWorkbook().createFont();
-        synFont(font, dataStyle);
+        synFont(font, dataStyle, cacheMap);
         cellStyle.setFont(font);
-        synCellBorderStyle(cellStyle);
         cell.setCellStyle(cellStyle);
 
     }
 
 
-    static void synCellBorderStyle(XSSFCellStyle cellStyle){
-        cellStyle.setBorderBottom(BorderStyle.THIN);
-        cellStyle.setBorderTop(BorderStyle.THIN);
-        cellStyle.setBorderLeft(BorderStyle.THIN);
-        cellStyle.setBorderRight(BorderStyle.THIN);
-
-        XSSFColor borderColor = new XSSFColor();
-        borderColor.setRGB(ValueUtils.hexToBytes("A1A1A1"));
-        cellStyle.setBottomBorderColor(borderColor);
-        cellStyle.setTopBorderColor(borderColor);
-        cellStyle.setLeftBorderColor(borderColor);
-        cellStyle.setRightBorderColor(borderColor);
-    }
-
-    static void synFont(XSSFFont font, DataStyle dataStyle) {
+    static void synFont(XSSFFont font, DataStyle dataStyle, ICacheMap cacheMap) {
         if(ValueUtils.isNotBlank(dataStyle.getFf())){
             font.setFontName(dataStyle.getFf());
         }else{
             font.setFontName("宋体");
         }
         if(ValueUtils.isNotBlank(dataStyle.getFc())){
-            XSSFColor color = new XSSFColor();
-            color.setRGB(DataToSheetUtils.hexToBytes(dataStyle.getFc()));
+            XSSFColor color = cacheMap.getCacheXSSFColor(dataStyle.getFc());
             font.setColor(color);
         }
         font.setItalic(dataStyle.getIt() == 1);

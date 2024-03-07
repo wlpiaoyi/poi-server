@@ -108,7 +108,7 @@ class StyleDataUtils {
             dataStyle.setFf("宋体");
         }
         if(font.getXSSFColor() != null){
-            dataStyle.setFc("#" + ValueUtils.bytesToHex(ExcelUtils.getColorBytes(font.getXSSFColor())).toUpperCase(Locale.ROOT));
+            dataStyle.setFc(ExcelUtils.getColorHex(font.getXSSFColor()));
         }
         dataStyle.setIt((byte) (font.getItalic() ? 1 : 0));
         dataStyle.setBl((byte) (font.getBold() ? 1 : 0));

@@ -46,80 +46,81 @@ public class DataToSheetUtils {
     public static Sheet parseSheet(Workbook workbook,
                                    ISheetData sheetData,
                                    CellDataRun cellDataRun){
+        if(sheetData.gridInfo() == null){
+            sheetData.putGridInfo(sheetData.newInstanceGridInfo());
+        }
         Sheet sheet = workbook.createSheet(sheetData.sheetName());
         DataStyle defaultDataStyle = new DataStyle();
         Map<Point, Map<String, Object>> cellDataMap = new HashMap<>();
         Map<Integer, Row> rowMap = new HashMap<>();
         cellDataRun.start(sheet, sheetData);
-        if(sheetData.gridInfo() != null){
-            List<DataStyle> dataStyles = sheetData.gridInfo().getDataStyles();
-            List<BorderStyle> borderStyles = sheetData.gridInfo().getBorderStyles();
-            List<Comment> comments = sheetData.gridInfo().getComments();
-            if(ValueUtils.isNotBlank(dataStyles)){
-                for(DataStyle item : dataStyles){
-                    if(ValueUtils.isBlank(item.getScopes())){
-                        continue;
-                    }
-                    long curTimer = System.currentTimeMillis();
-                    item.setPoints(StyleBase.parseScopesToPoints(item.getScopes()));
-                    for (Point point : item.getPoints()){
-                        Map<String, Object> cdMap = cellDataMap.get(point);
-                        if(cdMap == null){
-                            cdMap = new HashMap<>();
-                            cellDataMap.put(point, cdMap);
-                        }
-                        cdMap.put("dataStyle", item);
-                        Row row = rowMap.get(point.getR());
-                        if(row == null){
-                            row = sheet.createRow(point.getR());
-                            rowMap.put(point.getR(), row);
-                        }
-                        Cell cell = MapUtils.get(cdMap, "cell");
-                        if(cell == null){
-                            cell = row.createCell(point.getC());
-                            cdMap.put("cell", cell);
-                        }
-                    }
-                    item.getPoints().clear();
+        List<DataStyle> dataStyles = sheetData.gridInfo().getDataStyles();
+        List<BorderStyle> borderStyles = sheetData.gridInfo().getBorderStyles();
+        List<Comment> comments = sheetData.gridInfo().getComments();
+        if(ValueUtils.isNotBlank(dataStyles)){
+            for(DataStyle item : dataStyles){
+                if(ValueUtils.isBlank(item.getScopes())){
+                    continue;
                 }
-            }
-            if(ValueUtils.isNotBlank(borderStyles)){
-                for(BorderStyle item : borderStyles){
-                    if(ValueUtils.isBlank(item.getScopes())){
-                        continue;
-                    }
-                    item.setPoints(StyleBase.parseScopesToPoints(item.getScopes()));
-                    for (Point point : item.getPoints()){
-                        Map<String, Object> cdMap = cellDataMap.get(point);
-                        if(cdMap == null){
-                            cdMap = new HashMap<>();
-                            cellDataMap.put(point, cdMap);
-                        }
-                        cdMap.put("borderStyle", item);
-                        Row row = rowMap.get(point.getR());
-                        if(row == null){
-                            row = sheet.createRow(point.getR());
-                            rowMap.put(point.getR(), row);
-                        }
-                        Cell cell = MapUtils.get(cdMap, "cell");
-                        if(cell == null){
-                            cell = row.createCell(point.getC());
-                            cdMap.put("cell", cell);
-                        }
-                    }
-                    item.getPoints().clear();
-                }
-            }
-            if(ValueUtils.isNotBlank(comments)){
-                for(Comment item : comments){
-                    Point point = item.getPoint();
+                long curTimer = System.currentTimeMillis();
+                item.setPoints(StyleBase.parseScopesToPoints(item.getScopes()));
+                for (Point point : item.getPoints()){
                     Map<String, Object> cdMap = cellDataMap.get(point);
                     if(cdMap == null){
                         cdMap = new HashMap<>();
                         cellDataMap.put(point, cdMap);
                     }
-                    cdMap.put("comment", item);
+                    cdMap.put("dataStyle", item);
+                    Row row = rowMap.get(point.getR());
+                    if(row == null){
+                        row = sheet.createRow(point.getR());
+                        rowMap.put(point.getR(), row);
+                    }
+                    Cell cell = MapUtils.get(cdMap, "cell");
+                    if(cell == null){
+                        cell = row.createCell(point.getC());
+                        cdMap.put("cell", cell);
+                    }
                 }
+                item.getPoints().clear();
+            }
+        }
+        if(ValueUtils.isNotBlank(borderStyles)){
+            for(BorderStyle item : borderStyles){
+                if(ValueUtils.isBlank(item.getScopes())){
+                    continue;
+                }
+                item.setPoints(StyleBase.parseScopesToPoints(item.getScopes()));
+                for (Point point : item.getPoints()){
+                    Map<String, Object> cdMap = cellDataMap.get(point);
+                    if(cdMap == null){
+                        cdMap = new HashMap<>();
+                        cellDataMap.put(point, cdMap);
+                    }
+                    cdMap.put("borderStyle", item);
+                    Row row = rowMap.get(point.getR());
+                    if(row == null){
+                        row = sheet.createRow(point.getR());
+                        rowMap.put(point.getR(), row);
+                    }
+                    Cell cell = MapUtils.get(cdMap, "cell");
+                    if(cell == null){
+                        cell = row.createCell(point.getC());
+                        cdMap.put("cell", cell);
+                    }
+                }
+                item.getPoints().clear();
+            }
+        }
+        if(ValueUtils.isNotBlank(comments)){
+            for(Comment item : comments){
+                Point point = item.getPoint();
+                Map<String, Object> cdMap = cellDataMap.get(point);
+                if(cdMap == null){
+                    cdMap = new HashMap<>();
+                    cellDataMap.put(point, cdMap);
+                }
+                cdMap.put("comment", item);
             }
         }
         if(ValueUtils.isNotBlank(sheetData.cellDatas())){
@@ -170,20 +171,18 @@ public class DataToSheetUtils {
                 if(curBorderStyle != null){
                     styleBaseMap.put(StyleBase.KEY_CUR_BORDER_DATA_CACHE, curBorderStyle);
                 }
-
+                styleBaseMap.put(StyleBase.KEY_CACHE_MAP_CACHE, sheetData.gridInfo());
                 cellDataRun.doing(cell, cellData, styleBaseMap);
                 styleBaseMap.clear();
             }
         }
         cellDataRun.end(sheet, sheetData);
-        if(sheetData.gridInfo() != null){
-            DataToSheetUtils.setRCValue(sheet, sheetData.gridInfo());
-            if(sheetData.gridInfo().getFrozenWindow() != null){
-                sheet.createFreezePane(sheetData.gridInfo().getFrozenWindow().getC(), sheetData.gridInfo().getFrozenWindow().getR());
-            }
-            if(ValueUtils.isNotBlank(sheetData.gridInfo().getPictures())){
-                setPictures(sheet, sheetData.gridInfo().getPictures());
-            }
+        DataToSheetUtils.setRCValue(sheet, sheetData.gridInfo());
+        if(sheetData.gridInfo().getFrozenWindow() != null){
+            sheet.createFreezePane(sheetData.gridInfo().getFrozenWindow().getC(), sheetData.gridInfo().getFrozenWindow().getR());
+        }
+        if(ValueUtils.isNotBlank(sheetData.gridInfo().getPictures())){
+            setPictures(sheet, sheetData.gridInfo().getPictures());
         }
         return sheet;
     }
@@ -302,22 +301,4 @@ public class DataToSheetUtils {
         }
     }
 
-
-
-    public static byte[] hexToBytes(String fc) {
-        if(fc.startsWith("#")){
-            return ValueUtils.hexToBytes(fc.substring(1));
-        }else if(fc.startsWith("rgb(")){
-            Integer[] ints = ValueUtils.toIntegerArray(fc.substring(4, fc.length() - 1).replaceAll(" ", ""));
-            byte[] bytes = new byte[]{0,0,0};
-            int j = 0;
-            for (int i : ints){
-                bytes[j] = (byte) i;
-                j++;
-            }
-            return bytes;
-        }else{
-            return new byte[]{0,0,0};
-        }
-    }
 }

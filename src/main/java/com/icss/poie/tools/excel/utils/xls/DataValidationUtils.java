@@ -46,7 +46,7 @@ public class DataValidationUtils {
                         cellRange.getC() + cellRange.getCs());
             }
             HSSFDataValidation validation = (HSSFDataValidation)helper.createValidation(constraint, addressList);
-            validation.setSuppressDropDownArrow(true);
+            validation.setSuppressDropDownArrow(false);
             validation.setShowErrorBox(true);
             validation.setShowPromptBox(true);
             if(ValueUtils.isNotBlank(dataValidation.getErrorBoxText())){

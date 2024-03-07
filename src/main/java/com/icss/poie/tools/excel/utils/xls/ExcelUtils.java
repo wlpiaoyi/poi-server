@@ -3,12 +3,10 @@ package com.icss.poie.tools.excel.utils.xls;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.tools.excel.model.Point;
 import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p><b>{@code @description:}</b>  一些常用的函数</p>
@@ -18,6 +16,47 @@ import java.util.Map;
  */
 public class ExcelUtils {
 
+
+    public static String getColorHex(HSSFColor color){
+        return com.icss.poie.tools.excel.utils.ExcelUtils.parseRGBBytesToHex(ExcelUtils.getColorBytes(color));
+    }
+
+    public static int[] getColorInts(HSSFColor color){
+        short[] rgbShort = color.getTriplet();
+        return new int[] {(int) rgbShort[0], (int) rgbShort[1], (int) rgbShort[2]};
+    }
+    public static byte[] getColorBytes(HSSFColor color){
+        short[] rgbShort = color.getTriplet();
+        return new byte[] {(byte) rgbShort[0], (byte) rgbShort[1], (byte) rgbShort[2]};
+    }
+
+    private final static Map<Integer,HSSFColor> INDEX_HASH_COLOR_MAP = HSSFColor.getIndexHash();
+    public static HSSFColor getColor(int colorIndex){
+        return INDEX_HASH_COLOR_MAP.get(colorIndex);
+    }
+    public static byte[] getColorBytes(int colorIndex){
+        HSSFColor hssfColor = INDEX_HASH_COLOR_MAP.get(colorIndex);
+        if (hssfColor == null) return null;
+        return getColorBytes(hssfColor);
+    }
+
+    public static HSSFColor getColorByHex(String rgbHex){
+        int[] ints = com.icss.poie.tools.excel.utils.ExcelUtils.parseRGBHexToInts(rgbHex);
+        int dv = Integer.MAX_VALUE;
+        HSSFColor hssfColor = null;
+        for (Map.Entry<Integer, HSSFColor> entry : INDEX_HASH_COLOR_MAP.entrySet()){
+            short[] rgbShort = entry.getValue().getTriplet();
+            int dvt = 0;
+            dvt += Math.abs(ints[0] - (int)rgbShort[0]);
+            dvt += Math.abs(ints[1] - (int)rgbShort[1]);
+            dvt += Math.abs(ints[2] - (int)rgbShort[2]);
+            if(dvt < dv){
+                dv = dvt;
+                hssfColor = entry.getValue();
+            }
+        }
+        return hssfColor;
+    }
 
     public static com.icss.poie.tools.excel.model.Comment getCellComment(HSSFCell cell){
         HSSFComment comment = cell.getCellComment();

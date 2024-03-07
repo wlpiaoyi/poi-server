@@ -49,6 +49,7 @@ public class DataXSSFUtils {
             public void doing(Cell cell, ICellData cellData, Map<String, Object> styleBaseMap) {
                 DataStyle curDataStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_DATA_STYLE_CACHE);
                 BorderStyle curBorderStyle = MapUtils.get(styleBaseMap, StyleBase.KEY_CUR_BORDER_DATA_CACHE);
+                ICacheMap cacheMap = MapUtils.get(styleBaseMap, StyleBase.KEY_CACHE_MAP_CACHE);
                 String ccskey = "blank";
                 if(curBorderStyle != null){
                     ccskey = curBorderStyle.toString();
@@ -58,7 +59,7 @@ public class DataXSSFUtils {
                     cellStyle = MapUtils.get(curDataStyle.getCacheCellStyle(), ccskey);
                     if(cellStyle == null){
                         cellStyle = cell.getRow().getSheet().getWorkbook().createCellStyle();
-                        DataStyleUtils.setCellStyle((XSSFCell) cell, ((XSSFCellStyle) cellStyle), curDataStyle);
+                        DataStyleUtils.setCellStyle((XSSFCell) cell, ((XSSFCellStyle) cellStyle), curDataStyle, cacheMap);
                         curDataStyle.getCacheCellStyle().put(ccskey, cellStyle);
                     }
                 }
@@ -124,7 +125,6 @@ public class DataXSSFUtils {
                     }
                     cell = row.createCell(c);
                     XSSFCellStyle cellStyle = cell.getRow().getSheet().getWorkbook().createCellStyle();
-                    DataStyleUtils.synCellBorderStyle(cellStyle);
                     cell.setCellStyle(cellStyle);
                 }
             }

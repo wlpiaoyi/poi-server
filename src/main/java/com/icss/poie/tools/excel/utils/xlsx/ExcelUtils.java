@@ -7,10 +7,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p><b>{@code @description:}</b>  一些常用的函数</p>
@@ -20,6 +17,11 @@ import java.util.Map;
  */
 @Slf4j
 public class ExcelUtils {
+
+
+    public static String getColorHex(XSSFColor color){
+        return com.icss.poie.tools.excel.utils.ExcelUtils.parseRGBBytesToHex(ExcelUtils.getColorBytes(color));
+    }
 
     public static byte[] getColorBytes(XSSFColor color){
         if(color == null){
@@ -33,7 +35,7 @@ public class ExcelUtils {
         if(rgb != null){
             return rgb;
         }
-        HSSFColor hssfColor = HSSFColor.getIndexHash().get(color.getIndex());
+        HSSFColor hssfColor = HSSFColor.getIndexHash().get((int) color.getIndex());
         if (hssfColor == null) return null;
         short[] rgbShort = hssfColor.getTriplet();
         return new byte[] {(byte) rgbShort[0], (byte) rgbShort[1], (byte) rgbShort[2]};

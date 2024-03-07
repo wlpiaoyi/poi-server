@@ -6,9 +6,12 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.icss.poie.domain.entity.BaseMongoEntity;
 import com.icss.poie.framework.common.tools.MapUtils;
 import com.icss.poie.tools.excel.model.*;
+import com.icss.poie.tools.excel.model.Point;
 import com.icss.poie.tools.excel.utils.DataToSheetUtils;
+import com.icss.poie.tools.excel.utils.ExcelUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.bson.types.ObjectId;
@@ -16,6 +19,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotNull;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,17 +89,22 @@ public class GridInfo extends BaseMongoEntity implements IGridInfo, ICacheMap {
         this.cacheMap.clear();
     }
     public XSSFColor getCacheXSSFColor(String rgb){
-        Map<String, XSSFColor> cacheColorMap = MapUtils.getMap(this.cacheMap, "cacheColor");
+        Map<String, XSSFColor> cacheColorMap = MapUtils.getMap(this.cacheMap, "cacheXColor");
         if(cacheColorMap == null){
             cacheColorMap = new HashMap<>();
-            this.cacheMap.put("cacheColor", cacheColorMap);
+            this.cacheMap.put("cacheXColor", cacheColorMap);
         }
         XSSFColor color = cacheColorMap.get(rgb);
         if(color == null){
-            color = new XSSFColor(DataToSheetUtils.hexToBytes(rgb), new DefaultIndexedColorMap());
+            color = new XSSFColor(ExcelUtils.parseRGBHexToBytes(rgb), new DefaultIndexedColorMap());
             cacheColorMap.put(rgb, color);
         }
         return color;
+    }
+
+    @Override
+    public HSSFColor getCacheHSSFColor(String rgb) {
+        return com.icss.poie.tools.excel.utils.xls.ExcelUtils.getColorByHex(rgb);
     }
 
 }
