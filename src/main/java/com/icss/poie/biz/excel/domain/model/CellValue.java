@@ -7,6 +7,8 @@ import com.icss.poie.tools.excel.model.Scope;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.beans.Transient;
+
 /**
  * {@code @author:}         wlpiaoyi
  * {@code @description:}    TODO
@@ -21,17 +23,21 @@ public class CellValue implements ICellValue {
      * 是否为空
      */
     @JsonIgnore
-    public boolean notEmpty(){
+    @Transient
+    public boolean isEmpty(){
         if(ValueUtils.isNotBlank(this.getV())){
-            return true;
+            return false;
         }
         if(ValueUtils.isNotBlank(this.getM())){
-            return true;
+            return false;
         }
         if(ValueUtils.isNotBlank(this.getF())){
-            return true;
+            return false;
         }
-        return false;
+        if(this.getMc() != null && !this.getMc().isEmpty()){
+            return false;
+        }
+        return true;
     }
 
     /** 0:String 1:数字 **/

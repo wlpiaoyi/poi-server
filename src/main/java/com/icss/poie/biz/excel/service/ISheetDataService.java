@@ -16,8 +16,7 @@ import java.util.List;
  * {@code @version:}:       1.0
  */
 public interface ISheetDataService extends IBaseMongoService<SheetData> {
-
-     <CellData> void update(SheetDataRo.Update update);
+     void update(SheetDataRo.Update update);
 
      SheetDataVo detail(ObjectId id);
 

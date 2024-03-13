@@ -12,7 +12,7 @@ public interface ICellValue {
      * 是否为空
      * @return
      */
-    boolean notEmpty();
+    boolean isEmpty();
     /** 0:String 1:数字**/
     int getType();
 

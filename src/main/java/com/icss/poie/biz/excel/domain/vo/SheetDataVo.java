@@ -53,7 +53,7 @@ public class SheetDataVo extends SheetData implements ISheetData {
                     removes.add(cellData);
                     continue;
                 }
-                if(cellData.getV().notEmpty()){
+                if(!cellData.getV().isEmpty()){
                     continue;
                 }
                 removes.add(cellData);

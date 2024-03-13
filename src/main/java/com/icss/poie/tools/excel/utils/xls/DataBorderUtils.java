@@ -2,13 +2,9 @@ package com.icss.poie.tools.excel.utils.xls;
 
 import com.icss.poie.tools.excel.model.BorderStyle;
 import com.icss.poie.tools.excel.model.ICacheMap;
-import com.icss.poie.tools.excel.utils.ExcelUtils;
-import com.icss.poie.tools.excel.utils.xlsx.ColorIndex;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.IndexedColors;
-
-import java.awt.*;
 
 /**
  * <p><b>{@code @description:}</b>  向xlsx写入边框信息</p>

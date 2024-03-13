@@ -1,4 +1,4 @@
-package com.icss.poie.tools.excel.utils.xlsx;
+package com.icss.poie.tools.excel.utils;
 
 import lombok.Getter;
 

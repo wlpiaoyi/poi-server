@@ -82,10 +82,9 @@ public class BaseEntity {
         String vp = property + new Random().nextInt() % 1000;
         MESSAGE_DIGEST.update(vp.getBytes(StandardCharsets.UTF_8));
         byte[] md5b = MESSAGE_DIGEST.digest();
-        String propertyCode = new String(DataUtils.base64Encode(md5b))
+        return new String(DataUtils.base64Encode(md5b))
                 .replaceAll("\\+", "")
                 .replaceAll("/", "")
                 .replaceAll("=", "");
-        return propertyCode;
     }
 }

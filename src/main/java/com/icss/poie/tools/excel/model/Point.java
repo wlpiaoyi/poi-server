@@ -50,6 +50,6 @@ public class Point implements IPoint{
 
     @Override
     public int hashCode() {
-        return this.r * 100000 + this.c;
+        return this.r + 100000 + this.c;
     }
 }

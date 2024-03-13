@@ -55,6 +55,5 @@ public interface IExcelDataService extends IBaseMongoService<ExcelData> {
      * @throws IOException
      */
     void putOutputStreamByExcelData(ExcelDataVo<SheetDataVo> excelDataVo, String fileType, int isFormulaEvaluator,OutputStream outputStream) throws IOException;
-    void putOutputStreamByExcelData(Collection<ExcelDataVo<SheetDataVo>> excelDataVos, OutputStream outputStream) throws IOException;
 
 }

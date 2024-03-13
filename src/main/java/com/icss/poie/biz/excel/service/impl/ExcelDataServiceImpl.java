@@ -261,58 +261,6 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
     }
 
 
-    public static File xssfWorkbookToFile(XSSFWorkbook wb, String name) {
-        File file = new File(name);
-        try {
-            OutputStream os = Files.newOutputStream(file.toPath());
-            wb.write(os);
-            os.close();
-        } catch (Exception e) {
-            log.error("xssfWorkbookToFile error", e);
-        }
-        return file;
-    }
-
-    @Override
-    public void putOutputStreamByExcelData(Collection<ExcelDataVo<SheetDataVo>> excelDataVos, OutputStream outputStream) throws IOException {
-        ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
-        int index = 0;
-        for (ExcelDataVo<SheetDataVo> excelDataVo : excelDataVos){
-            index ++;
-            XSSFWorkbook workbook = null;
-            try {
-                workbook = new XSSFWorkbook();
-                for (SheetDataVo sheetData : excelDataVo.getSheetDatas()){
-                    DataXSSFUtils.parseSheet(workbook, sheetData);
-                }
-                File file = xssfWorkbookToFile(workbook, excelDataVo.getName() + RandomUtil.randomString(8) + ".xlsx");
-                FileOutputStream fileOutputStream = new FileOutputStream(file);
-                FileInputStream fileInputStream = new FileInputStream(file);
-                workbook.write(fileOutputStream);
-                String organizationName = excelDataVo.getName() + "_" + index;
-                ZipEntry zipEntry = new ZipEntry(organizationName + ".xlsx");
-                zipOutputStream.putNextEntry(zipEntry);
-                byte[] bytes = new byte[1024 * 1024];
-                int length = 0;
-                while ((length = fileInputStream.read(bytes)) != -1) {
-                    zipOutputStream.write(bytes, 0, length);
-                }
-                zipOutputStream.closeEntry();
-                fileOutputStream.close();
-                fileInputStream.close();
-                file.delete();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }finally {
-                if(workbook != null){
-                    workbook.close();
-                }
-            }
-        }
-        zipOutputStream.flush();
-        zipOutputStream.close();
-    }
-
 
     @Override
     @MongoTransactional
