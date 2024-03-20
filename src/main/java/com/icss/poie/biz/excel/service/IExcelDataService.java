@@ -10,7 +10,6 @@ import org.bson.types.ObjectId;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
 
 /**
  * {@code @author:}         wlpiaoyi
@@ -41,7 +40,7 @@ public interface IExcelDataService extends IBaseMongoService<ExcelData> {
      * </p>
      *
      * <p><b>@param</b> <b>excelDataVo</b>
-     * {@link ExcelDataVo<SheetDataVo>}
+     * {@link ExcelDataVo< SheetDataVo >}
      * </p>
      *
      * <p><b>{@code @date:}</b>2024/3/5 13:57</p>
@@ -54,6 +53,6 @@ public interface IExcelDataService extends IBaseMongoService<ExcelData> {
      * @param outputStream
      * @throws IOException
      */
-    void putOutputStreamByExcelData(ExcelDataVo<SheetDataVo> excelDataVo, String fileType, int isFormulaEvaluator,OutputStream outputStream) throws IOException;
+    void putOutputStreamByExcelData(ExcelDataVo<SheetDataVo> excelDataVo, String fileType, int isFormulaEvaluator, OutputStream outputStream) throws IOException;
 
 }

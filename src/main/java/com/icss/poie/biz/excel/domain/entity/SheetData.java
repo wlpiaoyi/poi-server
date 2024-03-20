@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.icss.poie.domain.entity.BaseMongoEntity;
 import com.icss.poie.framework.common.tools.ValueUtils;
+import com.icss.poie.tools.excel.model.ISheetData;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,7 +29,7 @@ import java.math.BigInteger;
 @Schema(description = "Sheet基础内容")
 @Document(collection = "poi_sheet_data")
 @EqualsAndHashCode(callSuper = true)
-public class SheetData extends BaseMongoEntity {
+public class SheetData extends BaseMongoEntity implements ISheetData {
 
 
     public Update parseForUpdate(Update update){

@@ -114,7 +114,7 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
         }
         entity.createRandomTag();
         if(entity instanceof SheetDataVo){
-            SheetDataVo entityVo = (SheetDataVo) entity;
+            SheetDataVo<CellData> entityVo = (SheetDataVo) entity;
             entityVo.synCellMc();
             if(ValueUtils.isNotBlank(entityVo.getCellDatas())){
                 ((SheetDataVo) entity).removeBlankCellData();
@@ -150,7 +150,7 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
             entity.createRandomTag();
             if(entity instanceof SheetDataVo){
                 log.info("sheet start insertBath handle dataId[{}][{}]", entities.hashCode(), entity.hashCode());
-                SheetDataVo entityVo = (SheetDataVo) entity;
+                SheetDataVo<CellData> entityVo = (SheetDataVo) entity;
                 entityVo.synCellMc();
                 if(ValueUtils.isNotBlank(entityVo.getCellDatas())){
                     ((SheetDataVo) entity).removeBlankCellData();
@@ -191,7 +191,7 @@ public class SheetDataServiceImpl extends BaseMongoServiceImpl<SheetData> implem
             throw new BusinessException("没有找到数据");
         }
         if(entity instanceof SheetDataVo){
-            SheetDataVo entityVo = (SheetDataVo) entity;
+            SheetDataVo<CellData> entityVo = (SheetDataVo) entity;
             entityVo.synCellMc();
             if(ValueUtils.isNotBlank(entityVo.getCellDatas())){
                 ((SheetDataVo) entity).removeBlankCellData();

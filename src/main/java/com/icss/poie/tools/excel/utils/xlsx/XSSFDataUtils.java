@@ -1,6 +1,5 @@
 package com.icss.poie.tools.excel.utils.xlsx;
 
-import com.icss.poie.framework.common.tools.MapUtils;
 import com.icss.poie.tools.excel.model.*;
 import com.icss.poie.tools.excel.utils.SheetToDataUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -20,12 +19,12 @@ import java.util.Map;
 public class XSSFDataUtils {
 
 
-    public static void parseData(ISheetData sheetData, XSSFSheet sheet,
+    public static void parseData(ISheetDataEx sheetData, XSSFSheet sheet,
                                  Class<? extends ICellData> cdClazz,
                                  Class<? extends ICellValue> cvClass){
         SheetToDataUtils.parseToData(sheetData, sheet, cdClazz, cvClass, new SheetToDataUtils.CellDataRun() {
             @Override
-            public void start(ISheetData sheetData, Sheet sheet) {
+            public void start(ISheetDataEx sheetData, Sheet sheet) {
 
             }
 
@@ -40,7 +39,7 @@ public class XSSFDataUtils {
             }
 
             @Override
-            public void end(ISheetData isheetData, Sheet xsheet) {
+            public void end(ISheetDataEx isheetData, Sheet xsheet) {
                 isheetData.gridInfo().setDataValidations(new ArrayList<>());
                 ValidationDataUtils.setData((XSSFSheet) xsheet, isheetData.gridInfo().getDataValidations());
             }

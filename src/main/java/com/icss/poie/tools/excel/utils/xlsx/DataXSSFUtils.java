@@ -32,16 +32,16 @@ public class DataXSSFUtils {
      * </p>
      *
      * <p><b>@param</b> <b>sheetData</b>
-     * {@link ISheetData}
+     * {@link ISheetDataEx}
      * </p>
      *
      * <p><b>{@code @date:}</b>2023/12/25 11:46</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static void parseSheet(XSSFWorkbook workbook, ISheetData sheetData){
+    public static void parseSheet(XSSFWorkbook workbook, ISheetDataEx sheetData){
         DataToSheetUtils.parseSheet(workbook, sheetData, new DataToSheetUtils.CellDataRun() {
             @Override
-            public void start(Sheet sheet, ISheetData sheetData) {
+            public void start(Sheet sheet, ISheetDataEx sheetData) {
 
             }
 
@@ -72,7 +72,7 @@ public class DataXSSFUtils {
             }
 
             @Override
-            public void end(Sheet xsheet, ISheetData iSheetData) {
+            public void end(Sheet xsheet, ISheetDataEx iSheetData) {
                 if(xsheet == null){
                     return;
                 }

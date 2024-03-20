@@ -23,22 +23,22 @@ import java.util.*;
  */
 public class SheetToDataUtils {
     public interface CellDataRun{
-        void start(ISheetData sheetData, Sheet sheet);
+        void start(ISheetDataEx sheetData, Sheet sheet);
         void doing(ICellData cellData, Cell cell, Map<String, StyleBase> styleBaseMap);
-        void end(ISheetData sheetData, Sheet sheet);
+        void end(ISheetDataEx sheetData, Sheet sheet);
 
     }
 
 
     @SneakyThrows
-    public static void parseToData(ISheetData sheetData, Sheet sheet,
+    public static void parseToData(ISheetDataEx sheetData, Sheet sheet,
                                    Class<? extends ICellData> cdClazz,
                                    Class<? extends ICellValue> cvClass,
                                    CellDataRun cellDataRun){
-        sheetData.putSheetName(sheet.getSheetName());
+        sheetData.setSheetName(sheet.getSheetName());
         Iterator<Row> rowIterator = sheet.rowIterator();
         List<ICellData> cellDatas = new ArrayList<>();
-        sheetData.putCellDatas(cellDatas);
+        sheetData.setCellDatas(cellDatas);
         IGridInfo gridInfo = sheetData.newInstanceGridInfo();
         sheetData.putGridInfo(gridInfo);
         gridInfo.setDataStyles(new ArrayList<>());
@@ -197,35 +197,35 @@ public class SheetToDataUtils {
     private static boolean setCellData(ICellData cellData, Cell cell, Class<? extends ICellValue> cvClass) throws InstantiationException, IllegalAccessException {
         cellData.setR(cell.getRowIndex());
         cellData.setC(cell.getColumnIndex());
-        cellData.putV(cvClass.newInstance());
-        if(cellData.v() == null){
-            cellData.putV(new CellValue());
+        cellData.setV(cvClass.newInstance());
+        if(cellData.getV() == null){
+            cellData.setV(new CellValue());
         }
         switch (cell.getCellType()) {
             case STRING:{
-                cellData.v().setType(0);
-                cellData.v().setV(cell.getStringCellValue());
+                cellData.getV().setType(0);
+                cellData.getV().setV(cell.getStringCellValue());
             }
             break;
             case NUMERIC:{
-                cellData.v().setType(1);
-                cellData.v().setV(BigDecimal.valueOf(cell.getNumericCellValue()).toString());
+                cellData.getV().setType(1);
+                cellData.getV().setV(BigDecimal.valueOf(cell.getNumericCellValue()).toString());
             }
             break;
             case BOOLEAN:{
-                cellData.v().setType(1);
-                cellData.v().setV(Boolean.valueOf(cell.getStringCellValue()).toString());
+                cellData.getV().setType(1);
+                cellData.getV().setV(Boolean.valueOf(cell.getStringCellValue()).toString());
             }
             break;
             case FORMULA:{
-                cellData.v().setF("=" + cell.getCellFormula());
+                cellData.getV().setF("=" + cell.getCellFormula());
             }
             break;
             case BLANK:
-                cellData.v().setV(null);
+                cellData.getV().setV(null);
                 break;
             default:
-                cellData.v().setV("非法字符");
+                cellData.getV().setV("非法字符");
                 break;
         }
         return true;

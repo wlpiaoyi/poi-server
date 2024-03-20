@@ -1,6 +1,5 @@
 package com.icss.poie.tools.excel.utils;
 
-import com.icss.poie.biz.excel.domain.entity.CellData;
 import com.icss.poie.framework.common.tools.MapUtils;
 import com.icss.poie.framework.common.tools.PatternUtils;
 import com.icss.poie.framework.common.tools.ValueUtils;
@@ -31,9 +30,9 @@ import java.util.Map;
 public class DataToSheetUtils {
 
     public interface CellDataRun{
-        void start(Sheet sheet, ISheetData sheetData);
+        void start(Sheet sheet, ISheetDataEx sheetData);
         void doing(Cell cell, ICellData cellData, Map<String, Object> styleBaseMap);
-        void end(Sheet sheet, ISheetData sheetData);
+        void end(Sheet sheet, ISheetDataEx sheetData);
 
     }
 
@@ -44,12 +43,12 @@ public class DataToSheetUtils {
 
     @SneakyThrows
     public static Sheet parseSheet(Workbook workbook,
-                                   ISheetData sheetData,
+                                   ISheetDataEx sheetData,
                                    CellDataRun cellDataRun){
         if(sheetData.gridInfo() == null){
             sheetData.putGridInfo(sheetData.newInstanceGridInfo());
         }
-        Sheet sheet = workbook.createSheet(sheetData.sheetName());
+        Sheet sheet = workbook.createSheet(sheetData.getSheetName());
         DataStyle defaultDataStyle = new DataStyle();
         Map<Point, Map<String, Object>> cellDataMap = new HashMap<>();
         Map<Integer, Row> rowMap = new HashMap<>();
@@ -123,12 +122,13 @@ public class DataToSheetUtils {
                 cdMap.put("comment", item);
             }
         }
-        if(ValueUtils.isNotBlank(sheetData.cellDatas())){
-            for (ICellData cellData : sheetData.cellDatas()){
-                if(cellData.v() == null){
+        if(ValueUtils.isNotBlank(sheetData.getCellDatas())){
+            List<ICellData> cellDatas = sheetData.getCellDatas();
+            for (ICellData cellData : cellDatas){
+                if(cellData.getV() == null){
                     continue;
                 }
-                if(ValueUtils.isBlank(cellData.v().getF()) && ValueUtils.isBlank(cellData.v().getV())){
+                if(ValueUtils.isBlank(cellData.getV().getF()) && ValueUtils.isBlank(cellData.getV().getV())){
                     continue;
                 }
                 Point point = new Point(cellData.getC(), cellData.getR());
@@ -228,15 +228,15 @@ public class DataToSheetUtils {
      */
     public static boolean setCellData(Cell cell, ICellData cellData){
         // 判断数据的类型
-        if(ValueUtils.isNotBlank(cellData.v().getF())){
-            cell.setCellFormula(cellData.v().getF().substring(1));
+        if(ValueUtils.isNotBlank(cellData.getV().getF())){
+            cell.setCellFormula(cellData.getV().getF().substring(1));
         }
-        if(ValueUtils.isNotBlank(cellData.v().getV())){
-            String v = cellData.v().getV();
-            if(ValueUtils.isNotBlank(cellData.v().getM())){
-                v = cellData.v().getM();
+        if(ValueUtils.isNotBlank(cellData.getV().getV())){
+            String v = cellData.getV().getV();
+            if(ValueUtils.isNotBlank(cellData.getV().getM())){
+                v = cellData.getV().getM();
             }
-            switch (cellData.v().getType()){
+            switch (cellData.getV().getType()){
                 case 0:{
                     cell.setCellValue(v);
                 }

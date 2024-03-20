@@ -1,13 +1,13 @@
 package com.icss.poie.biz.excel.domain.vo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.icss.poie.biz.excel.domain.entity.SheetData;
 import com.icss.poie.framework.common.tools.ValueUtils;
 import com.icss.poie.biz.excel.domain.entity.ExcelData;
-import com.icss.poie.tools.excel.model.IExcelData;
-import com.icss.poie.tools.excel.model.ISheetData;
+import com.icss.poie.tools.excel.model.IExcelDataEx;
+import com.icss.poie.tools.excel.model.ISheetDataEx;
 import lombok.Data;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Transient;
 
 import java.util.List;
 
@@ -18,15 +18,17 @@ import java.util.List;
  * {@code @version:}:       1.0
  */
 @Data
-public class ExcelDataVo<S extends SheetDataVo> extends ExcelData  implements IExcelData {
+public class ExcelDataVo<SD extends ISheetDataEx> extends ExcelData  implements IExcelDataEx<SD> {
 
+    @Transient
     @TableField(exist = false)
-    private List<S> sheetDatas;
+    private List<SD> sheetDatas;
 
     public void clearDb(){
         super.clearDb();
         if(ValueUtils.isNotBlank(this.getSheetDatas())){
-            for (SheetData sheetData : this.getSheetDatas()){
+            List<SheetDataVo> sheetDatas = (List<SheetDataVo>) this.getSheetDatas();
+            for (SheetDataVo sheetData : sheetDatas){
                 sheetData.clearDb();
             }
         }
@@ -37,61 +39,11 @@ public class ExcelDataVo<S extends SheetDataVo> extends ExcelData  implements IE
             this.setId(ObjectId.get());
         }
         if(ValueUtils.isNotBlank(this.getSheetDatas())){
-            for (SheetDataVo sheetData : this.getSheetDatas()){
+            List<SheetDataVo> sheetDatas = (List<SheetDataVo>) this.getSheetDatas();
+            for (SheetDataVo sheetData : sheetDatas){
                 sheetData.setExcelId(this.getId());
                 sheetData.setAllId();
             }
         }
-    }
-
-//    public void synCellDataHead(){
-//        if(ValueUtils.isNotBlank(this.getSheetDatas())){
-//            for (SheetData sheetData : this.getSheetDatas()){
-//                sheetData.synCellDataHead();
-//            }
-//        }
-//    }
-//
-//
-//    public void synCellDataToFormHeadRela(){
-//
-//        if(ValueUtils.isNotBlank(this.getSheetDatas())){
-//            for (SheetData sheetData : this.getSheetDatas()){
-//                List<Form> forms = sheetData.getForms();
-//                List<CellData> cellDatas = sheetData.getCellDatas();
-//                SheetData.synCellDataToFormHeadRela(forms, cellDatas);
-//            }
-//        }
-//    }
-//
-//
-//
-//    public void synCellDataByHr(){
-//        if(ValueUtils.isNotBlank(this.getSheetDatas())){
-//            for (SheetData sheetData : this.getSheetDatas()){
-//                sheetData.synCellDataByHr();
-//            }
-//        }
-//    }
-//
-//    public void synProperties(){
-//        if(ValueUtils.isNotBlank(this.getSheetDatas())){
-//            for (SheetData sheetData : this.getSheetDatas()){
-//                sheetData.setEtype(this.getEtype());
-//                sheetData.synProperties();
-//            }
-//        }
-//    }
-
-    @Override
-    public List<ISheetData> sheetDatas() {
-        List datas = this.getSheetDatas();
-        return datas;
-    }
-
-    @Override
-    public void putSheetDatas(List<ISheetData> sheetDatas) {
-        List datas = sheetDatas;
-        this.setSheetDatas(datas);
     }
 }

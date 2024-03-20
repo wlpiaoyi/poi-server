@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.icss.poie.biz.excel.domain.model.CellValue;
 import com.icss.poie.domain.entity.BaseMongoEntity;
+import com.icss.poie.tools.excel.model.ICellData;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,11 +29,11 @@ import java.util.List;
 @Accessors(chain = false)
 @Schema(description = "")
 @EqualsAndHashCode(callSuper = true)
-public class CellData extends BaseMongoEntity{
+public class CellData extends BaseMongoEntity implements ICellData<CellValue>{
 
     public static final String COLLECTION_NAME = "poi_cell_data";
 
-    public static String mapKey(int c, int r){
+    public static String splicingMapKey(int c, int r){
         return c + "_" + r;
     }
 
@@ -43,7 +44,7 @@ public class CellData extends BaseMongoEntity{
         if(this.r < 0){
             return super.mapKey();
         }
-        return CellData.mapKey(this.c, this.r);
+        return CellData.splicingMapKey(this.c, this.r);
     }
 
     public void synKey(int offc, int offr){

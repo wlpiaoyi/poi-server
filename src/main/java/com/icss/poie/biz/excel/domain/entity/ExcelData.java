@@ -1,6 +1,7 @@
 package com.icss.poie.biz.excel.domain.entity;
 
 import com.icss.poie.domain.entity.BaseMongoEntity;
+import com.icss.poie.tools.excel.model.IExcelData;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,7 +23,7 @@ import javax.validation.constraints.NotBlank;
 @Schema(description = "Excel基础内容")
 @Document(collection = "poi_excel_data")
 @EqualsAndHashCode(callSuper = true)
-public class ExcelData extends BaseMongoEntity {
+public class ExcelData extends BaseMongoEntity implements IExcelData {
 
 //    public static String collectionName(){
 //        return "poi_excel_data";

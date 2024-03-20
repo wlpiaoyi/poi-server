@@ -1,6 +1,5 @@
 package com.icss.poie.biz.excel.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
 import com.icss.poie.biz.excel.domain.entity.CellData;
 import com.icss.poie.biz.excel.domain.entity.SheetData;
 import com.icss.poie.biz.excel.domain.vo.ExcelDataVo;
@@ -38,12 +37,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * {@code @author:}         wlpiaoyi
@@ -159,7 +155,7 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
         int formulaCount = 0;
         while (sheetIterator.hasNext()){
             Sheet sheet = sheetIterator.next();
-            SheetDataVo sheetData =  excelDataVo.getSheetDatas().get(sheetIndex ++);
+            SheetDataVo<CellData> sheetData =  excelDataVo.getSheetDatas().get(sheetIndex ++);
             if(ValueUtils.isBlank(sheetData.getCellDatas())){
                 continue;
             }
@@ -197,7 +193,7 @@ public class ExcelDataServiceImpl extends BaseMongoServiceImpl<ExcelData> implem
             ));
             for (Map.Entry<Cell, org.apache.poi.ss.usermodel.CellValue> entry : cellCellValueMap.entrySet()){
                 Cell cell = entry.getKey();
-                CellData cellData = cellDataMap.get(CellData.mapKey(cell.getColumnIndex(), cell.getRowIndex()));
+                CellData cellData = cellDataMap.get(CellData.splicingMapKey(cell.getColumnIndex(), cell.getRowIndex()));
                 if(cellData == null){
                     continue;
                 }

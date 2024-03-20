@@ -19,12 +19,12 @@ import java.util.Map;
 public class HSSFDataUtils {
 
 
-    public static void parseData(ISheetData sheetData, HSSFSheet sheet,
+    public static void parseData(ISheetDataEx sheetData, HSSFSheet sheet,
                                  Class<? extends ICellData> cdClazz,
                                  Class<? extends ICellValue> cvClass) {
         SheetToDataUtils.parseToData(sheetData, sheet, cdClazz, cvClass, new SheetToDataUtils.CellDataRun() {
             @Override
-            public void start(ISheetData sheetData, Sheet sheet) {
+            public void start(ISheetDataEx sheetData, Sheet sheet) {
 
             }
 
@@ -39,7 +39,7 @@ public class HSSFDataUtils {
             }
 
             @Override
-            public void end(ISheetData isheetData, Sheet xsheet) {
+            public void end(ISheetDataEx isheetData, Sheet xsheet) {
                 isheetData.gridInfo().setDataValidations(new ArrayList<>());
                 ValidationDataUtils.setData((HSSFSheet) xsheet, isheetData.gridInfo().getDataValidations());
             }

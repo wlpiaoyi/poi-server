@@ -30,16 +30,16 @@ public class DataHSSFUtils {
      * </p>
      *
      * <p><b>@param</b> <b>sheetData</b>
-     * {@link ISheetData}
+     * {@link ISheetDataEx}
      * </p>
      *
      * <p><b>{@code @date:}</b>2023/12/25 11:46</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static void parseSheet(HSSFWorkbook workbook, ISheetData sheetData){
+    public static void parseSheet(HSSFWorkbook workbook, ISheetDataEx sheetData){
         DataToSheetUtils.parseSheet(workbook, sheetData, new DataToSheetUtils.CellDataRun() {
             @Override
-            public void start(Sheet sheet, ISheetData sheetData) {
+            public void start(Sheet sheet, ISheetDataEx sheetData) {
 
             }
 
@@ -70,7 +70,7 @@ public class DataHSSFUtils {
             }
 
             @Override
-            public void end(Sheet xsheet, ISheetData iSheetData) {
+            public void end(Sheet xsheet, ISheetDataEx iSheetData) {
                 if(xsheet == null){
                     return;
                 }

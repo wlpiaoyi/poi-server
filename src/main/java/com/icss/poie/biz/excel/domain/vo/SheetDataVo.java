@@ -9,6 +9,7 @@ import com.icss.poie.tools.excel.model.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Transient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +21,15 @@ import java.util.List;
  * {@code @version:}:       1.0
  */
 @Data
-public class SheetDataVo extends SheetData implements ISheetData {
+public class SheetDataVo<CD extends CellData> extends SheetData implements ISheetDataEx<CD> {
 
     /** 单元格数据 **/
+    @Transient
     @Schema(description =  "单元格数据")
-    private List<CellDataVo> cellDatas;
+    private List<CD> cellDatas;
 
     /** 网格信息 **/
+    @Transient
     @Schema(description =  "网格信息")
     private GridInfo gridInfo;
 
@@ -36,7 +39,7 @@ public class SheetDataVo extends SheetData implements ISheetData {
             this.setId(ObjectId.get());
         }
         if(ValueUtils.isNotBlank(this.getCellDatas())){
-            for (CellData cellData : this.getCellDatas()){
+            for (CD cellData : this.getCellDatas()){
                 if(cellData.getId() == null){
                     cellData.setId(ObjectId.get());
                 }
@@ -67,7 +70,7 @@ public class SheetDataVo extends SheetData implements ISheetData {
     public void synCellMc() {
         if(this.getGridInfo() != null && ValueUtils.isNotBlank(this.getGridInfo().getCellMerges())
                 && ValueUtils.isNotBlank(this.getCellDatas())){
-            for (CellDataVo cellData : this.getCellDatas()){
+            for (CD cellData : this.getCellDatas()){
                 for (Scope cellMerge : this.getGridInfo().getCellMerges()){
                     if(cellMerge.inScope(cellData)){
                         if(cellData.getV() == null){
@@ -91,28 +94,6 @@ public class SheetDataVo extends SheetData implements ISheetData {
             }
         }
         this.synProperties();
-    }
-
-    @Override
-    public String sheetName() {
-        return this.getSheetName();
-    }
-
-    @Override
-    public void putSheetName(String name) {
-        this.setSheetName(name);
-    }
-
-    @Override
-    public List<ICellData> cellDatas() {
-        List datas = this.cellDatas;
-        return datas;
-    }
-
-    @Override
-    public void putCellDatas(List<ICellData> cellDatas) {
-        List datas = cellDatas;
-        this.cellDatas = datas;
     }
 
 
